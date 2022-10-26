@@ -336,7 +336,7 @@ def prefer_int(input_data: str) -> Union[str, int]:
     except:
         return input_data
 
-
+#This defines what goals are in link to the past
 goals = {
     'ganon': 'ganon',
     'crystals': 'crystals',
