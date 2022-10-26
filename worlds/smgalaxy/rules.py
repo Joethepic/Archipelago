@@ -3,8 +3,9 @@ from sqlite3 import connect
 from worlds.AutoWorld import LogicMixin
 from ..generic.Rules import add_rule
 from .regions import connect_regions
+
 class GalaxyLogic(LogicMixin):
-    
+# these are varible states that the game uses for logic in different points.    
     def smg_gate_open(self, player: int):
         return self.has('Grand Star Engine Room', player) 
     
