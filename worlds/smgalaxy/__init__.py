@@ -38,10 +38,10 @@ class SuperMarioGalaxy(World):
     options = smg_options
 
     def create_regions(self):
-        create_regions(self.world,self.player, location_table)
+        create_regions(self.multiworld,self.player, location_table)
     
     def set_star_rules(self):
-        set_star_rules(self.world,self.player)
+        set_star_rules(self.multiworld,self.player)
     
     def create_item(self, name: str) -> Item:
         item_id = item_table[name]
@@ -56,21 +56,21 @@ class SuperMarioGalaxy(World):
     
     def generate_basic(self, player): 
         gstaritem = self.create_item("Green Star")
-        self.world.itempool += [gstaritem for i in range(0,3)]
+        self.multiworld.itempool += [gstaritem for i in range(0,3)]
         
         staritem = self.create_item("Power Star")
-        if self.world.enable_purple_coin_stars[self.player].value == 1:
-           self.world.itempool += [staritem for i in range(0,117)]
+        if self.multiworld.enable_purple_coin_stars[self.player].value == 1:
+           self.multiworld.itempool += [staritem for i in range(0,117)]
         
-        elif self.world.enable_purple_coin_stars[self.player].value == 1:
-            self.world.itempool += [staritem for i in range(0,118)]
+        elif self.multiworld.enable_purple_coin_stars[self.player].value == 1:
+            self.multiworld.itempool += [staritem for i in range(0,118)]
         
         else:
-            self.world.itempool += [staritem for i in range(0,101)]
+            self.multiworld.itempool += [staritem for i in range(0,101)]
         
         grandstar1 = self.create_item("Grand Star Terrace")   
         grandstar2 = self.create_item("Grand Star Fountain")  
         grandstar3 = self.create_item("Grand Star Kitchen")
         grandstar4 = self.create_item("Grand Star Bedroom")
         grandstar5 = self.create_item("Grand Star Engine Room")          
-        self.world.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]    
+        self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]    
