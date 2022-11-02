@@ -141,7 +141,7 @@ def create_regions(player: int, self: int):
     regGarden = Region("Garden", RegionType.Generic, "Garden", player, multiworld)
     multiworld.regions.append(regGarden)      
 
-def connect_regions(player: int, source: str, target: str, rule):
+def connect_regions(multiworld: MultiWorld, player: int, source: str, target: str, rule):
     sourceRegion = multiworld.get_region(source, player)
     targetRegion = multiworld.get_region(target, player)
 
