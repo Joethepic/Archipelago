@@ -54,7 +54,7 @@ class SuperMarioGalaxy(World):
         return item
    
     
-    def generate_basic(self, player): 
+    def generate_basic(multiworld, self, player): 
         gstaritem = self.create_item("Green Star")
         self.multiworld.itempool += [gstaritem for i in range(0,3)]
         
