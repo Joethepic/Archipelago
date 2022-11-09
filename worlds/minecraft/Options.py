@@ -45,6 +45,9 @@ class StructureCompasses(DefaultOnToggle):
     """Adds structure compasses to the item pool, which point to the nearest indicated structure."""
     display_name = "Structure Compasses"
 
+class Structureresourcesinlogic(Toggle):
+    """Makes the logic require getting resources from structures."""
+    display_name = "Structure Resource in logic"
 
 class BeeTraps(Range): 
     """Replaces a percentage of junk items with bee traps, which spawn multiple angered bees around every player when
@@ -96,6 +99,7 @@ minecraft_options: typing.Dict[str, type(Option)] = {
     "required_bosses":                      BossGoal,
     "shuffle_structures":                   ShuffleStructures,
     "structure_compasses":                  StructureCompasses,
+    "Structure_resources_in_logic":         Structureresourcesinlogic,
     "bee_traps":                            BeeTraps,
     "combat_difficulty":                    CombatDifficulty,
     "include_hard_advancements":            HardAdvancements,

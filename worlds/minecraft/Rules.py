@@ -8,7 +8,12 @@ class MinecraftLogic(LogicMixin):
 
     def _mc_has_iron_ingots(self, player: int):
         return self.has('Progressive Tools', player) and self.has('Progressive Resource Crafting', player)
+    def _mc_has_ore_hard(self, player: int):
+        return self._mc_can_adventure
 
+    def _mc_nether_hard(self, player: int):
+        return self._mc_can_adventure 
+    
     def _mc_has_copper_ingots(self, player: int):
         return self.has('Progressive Tools', player) and self.has('Progressive Resource Crafting', player)
 
@@ -117,7 +122,7 @@ class MinecraftLogic(LogicMixin):
         return self.has(f"Structure Compass ({self.multiworld.get_entrance(entrance_name, player).connected_region.name})", player)
 
 # Sets rules on entrances and advancements that are always applied
-def set_advancement_rules(world: MultiWorld, player: int):
+def set_advancement_rules(world: MultiWorld, player: int, self):
 
     # Retrieves the appropriate structure compass for the given entrance
     def get_struct_compass(entrance_name): 
@@ -140,10 +145,16 @@ def set_advancement_rules(world: MultiWorld, player: int):
 
     set_rule(world.get_location("Who is Cutting Onions?", player), lambda state: state._mc_can_piglin_trade(player))
     set_rule(world.get_location("Oh Shiny", player), lambda state: state._mc_can_piglin_trade(player))
-    set_rule(world.get_location("Suit Up", player), lambda state: state.has("Progressive Armor", player) and state._mc_has_iron_ingots(player))
+    if self.multiworld.Structure_resources_in_logic[player]:
+        set_rule(world.get_location("Suit Up", player), lambda state: state.has("Progressive Armor", player) and state._mc_has_iron_ingots(player) or state._mc_ore_hard and state.has("Progressive Armor") or state.can_reach("End City", "Region"))
+    else:
+        set_rule(world.get_location("Suit Up", player), lambda state: state.has("Progressive Armor", player) and state._mc_has_iron_ingots(player))
     set_rule(world.get_location("Very Very Frightening", player), lambda state: state.has("Channeling Book", player) and 
         state._mc_can_use_anvil(player) and state._mc_can_enchant(player) and state._mc_overworld_villager(player))
-    set_rule(world.get_location("Hot Stuff", player), lambda state: state.has("Bucket", player) and state._mc_has_iron_ingots(player))
+    if self.multiworld.Structure_resorces_in_logic[player]:
+        set_rule(world.get_location("Hot Stuff", player), lambda state: state.has("Bucket", player) and state._mc_has_iron_ingots(player) or state.can_reach("Village", "Region") or state._mc_ore_hard and state.has("Bucket"))
+    else:
+        set_rule(world.get_location("Hot Stuff", player), lambda state: state.has("Bucket", player) and state._mc_has_iron_ingots(player))
     set_rule(world.get_location("Free the End", player), lambda state: state._mc_can_respawn_ender_dragon(player) and state._mc_can_kill_ender_dragon(player))
     set_rule(world.get_location("A Furious Cocktail", player), lambda state: state._mc_can_brew_potions(player) and 
                                                                              state.has("Fishing Rod", player) and # Water Breathing
@@ -191,7 +202,10 @@ def set_advancement_rules(world: MultiWorld, player: int):
     set_rule(world.get_location("Arbalistic", player), lambda state: state._mc_craft_crossbow(player) and state.has("Piercing IV Book", player) and 
                                                                      state._mc_can_use_anvil(player) and state._mc_can_enchant(player))
     set_rule(world.get_location("The End... Again...", player), lambda state: state._mc_can_respawn_ender_dragon(player) and state._mc_can_kill_ender_dragon(player))
-    set_rule(world.get_location("Acquire Hardware", player), lambda state: state._mc_has_iron_ingots(player))
+    if self.multiworld.Structure_resources_in_logic[player]:
+        set_rule(world.get_location("Acquire Hardware", player), lambda state: state._mc_ore_hard(player))
+    else: 
+        set_rule(world.get_location("Acquire Hardware", player), lambda state: state._mc_has_iron_ingots(player))
     set_rule(world.get_location("Not Quite \"Nine\" Lives", player), lambda state: state._mc_can_piglin_trade(player) and state.has("Progressive Resource Crafting", player, 2))
     set_rule(world.get_location("Cover Me With Diamonds", player), lambda state: state.has("Progressive Armor", player, 2) and state.can_reach("Diamonds!", "Location", player))
     set_rule(world.get_location("Sky's the Limit", player), lambda state: state._mc_basic_combat(player))
@@ -289,8 +303,6 @@ def set_advancement_rules(world: MultiWorld, player: int):
     set_rule(world.get_location("When the Squad Hops into Town", player), lambda state: state._mc_can_adventure(player) and state.has("Lead", player))
     # lead frogs to the nether and a basalt delta's biomes to find magma cubes.
     set_rule(world.get_location("With Our Powers Combined!", player), lambda state: state._mc_can_adventure(player) and state.has("Lead", player))
-
-
 # Sets rules on completion condition and postgame advancements
 def set_completion_rules(world: MultiWorld, player: int):
     def reachable_locations(state):

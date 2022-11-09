@@ -132,7 +132,7 @@ class MinecraftWorld(World):
         return self.multiworld.random.choices(list(junk_weights.keys()), weights=list(junk_weights.values()))[0]
 
     def set_rules(self):
-        set_advancement_rules(self.multiworld, self.player)
+        set_advancement_rules(self.multiworld, self.player, self)
         set_completion_rules(self.multiworld, self.player)
 
     def create_regions(self):
