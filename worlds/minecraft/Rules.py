@@ -8,9 +8,13 @@ class MinecraftLogic(LogicMixin):
 
     def _mc_has_iron_ingots(self, player: int):
         return self.has('Progressive Tools', player) and self.has('Progressive Resource Crafting', player)
+    
     def _mc_has_ore_hard(self, player: int):
         return self._mc_can_adventure
-
+    
+    def _mc_nether_hard(self, player: int):
+        return self._mc_can_adventure
+    
     def _mc_nether_hard(self, player: int):
         return self._mc_can_adventure 
     
@@ -193,7 +197,10 @@ def set_advancement_rules(world: MultiWorld, player: int, self):
     set_rule(world.get_location("Tactical Fishing", player), lambda state: state.has("Bucket", player) and state._mc_has_iron_ingots(player))
     set_rule(world.get_location("Zombie Doctor", player), lambda state: state._mc_can_brew_potions(player) and state._mc_has_gold_ingots(player))
     # set_rule(world.get_location("The City at the End of the Game", player), lambda state: True)
-    set_rule(world.get_location("Ice Bucket Challenge", player), lambda state: state._mc_has_diamond_pickaxe(player))
+    if self.multiworld.Structure_resorces_in_logic[player]:
+        set_rule(world.get_location("Ice Bucket Challenge", player), lambda state: state._mc_has_diamond_pickaxe(player) or state._mc_ore_hard)
+    else: 
+        set_rule(world.get_location("Ice Bucket Challenge", player), lambda state: state._mc_has_diamond_pickaxe(player)
     # set_rule(world.get_location("Remote Getaway", player), lambda state: True)
     set_rule(world.get_location("Into Fire", player), lambda state: state._mc_basic_combat(player))
     set_rule(world.get_location("War Pigs", player), lambda state: state._mc_basic_combat(player))
