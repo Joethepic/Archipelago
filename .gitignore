@@ -7,6 +7,7 @@
 *.apm3
 *.apmc
 *.apz5
+*.apg
 *.pyc
 *.pyd
 *.sfc
@@ -17,6 +18,7 @@
 *.gb
 *.gbc
 *.gba
+*.iso
 *.wixobj
 *.lck
 *.db3
