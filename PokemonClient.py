@@ -28,6 +28,8 @@ for location in location_data:
             location_map[type(location.ram_address).__name__][location.ram_address.flag] = location.address
             location_bytes_bits[location.address] = {'byte': location.ram_address.byte, 'bit': location.ram_address.bit}
 
+            
+# gameboy connector status messages
 SYSTEM_MESSAGE_ID = 0
 
 CONNECTION_TIMING_OUT_STATUS = "Connection timing out. Please restart your emulator, then restart pkmn_rb.lua"
@@ -39,7 +41,7 @@ CONNECTION_INITIAL_STATUS = "Connection has not been initiated"
 
 DISPLAY_MSGS = True
 
-
+# handels sever spefic commands 
 class GBCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: CommonContext):
         super().__init__(ctx)
