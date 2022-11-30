@@ -22,7 +22,7 @@ class SM64Web(WebWorld):
 
 
 class SM64World(World):
-    """ 
+    """    # what the game's desciprtion will be on the supported games page
     The first Super Mario game to feature 3D gameplay, it features freedom of movement within a large open world based on polygons,
     combined with traditional Mario gameplay, visual style, and characters.
     """
@@ -36,7 +36,7 @@ class SM64World(World):
     location_name_to_id = location_table
 
     data_version = 8
-    required_client_version = (0, 3, 5)
+    required_client_version = (0, 3, 5) # what version the client must be in order to join the server
 
     area_connections: typing.Dict[int, int]
 
@@ -59,7 +59,7 @@ class SM64World(World):
                     sm64_internalloc_to_string[destination],
                     'entrance', self.player)
 
-    def create_item(self, name: str) -> Item:
+    def create_item(self, name: str) -> Item: # Puts every item into one of the classification systems. 
         item_id = item_table[name]
         if name == "1Up Mushroom":
             classification = ItemClassification.filler
