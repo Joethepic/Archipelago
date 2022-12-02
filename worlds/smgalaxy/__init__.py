@@ -59,10 +59,11 @@ class SuperMarioGalaxy(World):
         self.multiworld.itempool += [gstaritem for i in range(0,3)]
         
         staritem = self.create_item("Power Star")
-        if self.multiworld.enable_purple_coin_stars[self.player].value == 1:
-           self.multiworld.itempool += [staritem for i in range(0,117)]
+        # check to see what setting enable purple coin stars is on to see how many stars to create 
+        if self.multiworld.enable_purple_coin_stars[player] == EnablePurpleCoinStars.option_main_game_only:
+           self.multiworld.itempool += [staritem for i in range(0,102)]
         
-        elif self.multiworld.enable_purple_coin_stars[self.player].value == 1:
+        elif self.multiworld.enable_purple_coin_stars[player] == EnablePurpleCoinStars.option_all:
             self.multiworld.itempool += [staritem for i in range(0,118)]
         
         else:
