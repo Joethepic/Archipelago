@@ -8,7 +8,6 @@ class EnablePurpleCoinStars(Choice):
     option_main_game_only = 0
     option_all = 1
     option_none = 2
-    default = 0
 
 # this allows players to pick their own star count to finish the game. 
 class StarstoFinish(Range):

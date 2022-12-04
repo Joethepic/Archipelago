@@ -1,7 +1,7 @@
 import string
 from .items import item_table, SMGItem
 from .locations import location_table, SMGLocation
-from .Options import smg_options
+from .Options import smg_options, EnablePurpleCoinStars
 from .rules import set_star_rules
 from .regions import create_regions
 from BaseClasses import Item, Tutorial, ItemClassification, Region, Location, RegionType, Entrance, MultiWorld  
@@ -38,10 +38,10 @@ class SuperMarioGalaxy(World):
     options = smg_options
 
     def create_regions(self):
-        create_regions(self.multiworld,self.player, location_table)
+        create_regions(self.multiworld, location_table, regions.dict)
     
     def set_star_rules(self):
-        set_star_rules(self.multiworld,self.player)
+        set_star_rules(self.multiworld, self.player)
     
     def create_item(self, name: str) -> Item:
         item_id = item_table[name]
