@@ -17,7 +17,6 @@ Currently, the following games are supported:
 * Rogue Legacy
 * VVVVVV
 * Raft
-* Super Mario Galaxy
 * Super Mario 64
 * Meritous
 * Super Metroid/Link to the Past combo randomizer (SMZ3)
