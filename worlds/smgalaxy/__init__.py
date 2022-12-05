@@ -1,8 +1,8 @@
 import string
 from .items import item_table, SMGItem
 from .locations import location_table, SMGLocation
-from .Options import smg_options, EnablePurpleCoinStars
-from .rules import set_star_rules
+from .Options import EnablePurpleCoinStars, galaxy_options
+from .Rules import set_star_rules
 from .regions import create_regions
 from BaseClasses import Item, Tutorial, ItemClassification, Region, Location, RegionType, Entrance, MultiWorld  
 from ..AutoWorld import World, WebWorld
@@ -10,15 +10,16 @@ from ..AutoWorld import World, WebWorld
 client_version = 1
 
 
-class SM64Web(WebWorld):
+class SMGWeb(WebWorld):
     tutorials = [Tutorial(
         "Multiworld Setup Guide",
-        "A guide to setting up SMG for MultiWorld.",
+        "A guide to setting up Super Mario Galaxy for MultiWorld.",
         "English",
         "setup_en.md",
         "setup/en",
         ["squidy"]
     )]
+
 class SuperMarioGalaxy(World):
     """
     Super Mario Galaxy allows you to explore the cosomos with rosalinna in the comet obserbatory. 
@@ -35,10 +36,10 @@ class SuperMarioGalaxy(World):
     data_version = 1
     forced_auto_forfeit = False
 
-    options = smg_options
+    option_definitions  = galaxy_options
 
     def create_regions(self):
-        create_regions(self.multiworld, location_table, regions.dict)
+        create_regions(self.multiworld, location_table, self)
     
     def set_star_rules(self):
         set_star_rules(self.multiworld, self.player)

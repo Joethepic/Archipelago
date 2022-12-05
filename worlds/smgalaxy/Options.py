@@ -1,10 +1,10 @@
-import typing
-from Options import Option, Choice, Range
+from typing import TypedDict
+from Options import Choice, Range
  
 # this defines the enable_purple_coin_stars setting 
 class EnablePurpleCoinStars(Choice):
     """tuning this off we allow purple coin stars to count as checks do note all purple coin stars are postgame only but one."""
-    display_name = "enable_purple_coin_stars"
+    display_name = "Enable Purple Coin Stars"
     option_main_game_only = 0
     option_all = 1
     option_none = 2
@@ -18,7 +18,7 @@ class StarstoFinish(Range):
     default = 60
  
 # this defines all the options.
-smg_options: typing.Dict[str, type(Option)] = {
+galaxy_options = {
     "enable_purple_coin_stars": EnablePurpleCoinStars,
     "Stars_to_finish": StarstoFinish,
 }

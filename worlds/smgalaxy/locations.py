@@ -3,6 +3,7 @@ from BaseClasses import Location
 class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
 
+# good egg galaxy
 locGE_table = {
     "GE: Dino Piranha": 170000000,
     "GE: A Snack of Cosmic Proportions": 170000001,
@@ -10,6 +11,7 @@ locGE_table = {
     "GE: Luigi on the Roof": 170000003,
     "GE: Dino Piranha Speed Run": 170000004
 }
+#
 locHH_table = {
     "HH: Bee Mario Takes Flight": 170000006,
     "HH: Trouble on the Tower": 170000007,
