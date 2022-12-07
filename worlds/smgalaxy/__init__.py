@@ -33,7 +33,7 @@ class SuperMarioGalaxy(World):
     item_name_to_id = item_table
     location_name_to_id = location_table
     
-    data_version = 1
+    data_version = 0
     forced_auto_forfeit = False
 
     option_definitions  = galaxy_options
