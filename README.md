@@ -33,7 +33,6 @@ Currently, the following games are supported:
 * Hylics 2
 * Overcooked! 2
 * Zillion
-* Super Mario Galaxy
 
 
 For setup and instructions check out our [tutorials page](https://archipelago.gg/tutorial/).
