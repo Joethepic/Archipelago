@@ -19,6 +19,7 @@ class SMGWeb(WebWorld):
         "setup/en",
         ["squidy"]
     )]
+    theme = "ice"
 
 class SuperMarioGalaxy(World):
     """
@@ -34,12 +35,13 @@ class SuperMarioGalaxy(World):
     location_name_to_id = location_table
     
     data_version = 0
+    required_client_version = (0, 3, 8)
     forced_auto_forfeit = False
 
-    option_definitions  = galaxy_options
+    option_definitions = galaxy_options
 
     def create_regions(self):
-        create_regions(self.multiworld, location_table, self)
+        create_regions(self.multiworld, self.player, self)
     
     def set_star_rules(self):
         set_star_rules(self.multiworld, self.player)
