@@ -1,7 +1,12 @@
 from BaseClasses import Location
+from typing import NamedTuple, Optional, Dict
 
 class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
+
+class SMGLocationData(NamedTuple):
+    category: str
+    code: Optional[int] = None
 
 # good egg galaxy
 locGE_table = {
@@ -28,7 +33,8 @@ locspecialstages_table = {
     "BUB: Through the Poison Swamp": 170000016,
     "BB: The Floating Fortress": 170000017,
     "BB: The Secret of Buoy Base": 170000018,
-    "GG: Grand Star Rescue": 170000019,
+  # TO DO ADD BACK WHEN MORE THEN ONE CHECK IN FIRST LEVEL   
+  # "GG: Grand Star Rescue": 170000019,
     "BF: Kingfin's Fearsome Waters": 170000021,
     "MS: Watch Your Step": 170000022,
     "RGT: Gizmos, Gears, and Gadgets": 170000023,
@@ -100,7 +106,8 @@ locGL_table = {
     "GL: When it Rains, it Pours": 170000076,
     "GL: Cosmic Mario Forest Race": 170000077,
     "GL: The Bell on the Big Trees": 170000079
- }
+}
+
 locSS_table = {
     "SS: Going After Guppy": 170000080,
     "SS: Faster Than a Speedrunning Penguin": 170000081,
@@ -108,6 +115,7 @@ locSS_table = {
     "SS: Underwater Cosmic Mario Race": 170000083,
     "SS: Hurry, He's Hungry": 170000085
 }
+
 locTT_table = {
     "TT: Heavy Metal Mecha Boswer": 170000086,
     "TT: Mario (or Luigi) Meets Mario": 170000087,
@@ -115,6 +123,7 @@ locTT_table = {
     "TT: The Flipswitch Chain": 170000089,
     "TT: Fast Foes of Toy Time": 170000090
 }
+
 locDD_table = {
     "DD: The Underground Ghost Ship": 170000092,
     "DD: Bubble Blastoff": 170000093,
@@ -122,6 +131,7 @@ locDD_table = {
     "DD: Ghost Ship Daredevil Run": 170000095,
     "DD: Boo in Box": 170000097
 }
+
 locDN_table = {
     "DN: Inflitrating the Dreadnought": 170000098,
     "DN: Dreanought's Colossal Cannons": 170000099,
@@ -129,6 +139,7 @@ locDN_table = {
     "DN: Topman Tribe Speed Run": 170000101,
     "DN: Dreadnought's Garbage Dump": 170000103
 }
+
 locMM_table = {
     "MM: The Sinking Lava Spire": 170000104,
     "MM: Through the Meteor Storm": 170000105,
@@ -136,6 +147,7 @@ locMM_table = {
     "MM: Lava Spire Daredevil Run": 170000107,
     "MM Burning Tide": 170000109
 }
+
 locHL_table = {
     "SS: Rocky Road": 170000110,
     "SP: A Very Sticky Situation": 170000111,
@@ -163,9 +175,12 @@ locPC_table = {
     "DDune: Purple Coin in the Desert": 170000070,
     "HH: The Honeyhive's Purple Coins": 170000011
 }
-location_table = { **locGE_table,**locHH_table, \
-                   **locSJ_table,**locBR_table,**locBB_table, \
-                   **locGG_table,**locFF_table,**locDDune_table, \
-                   **locGL_table,**locSS_table,**locTT_table, \
-                   **locDD_table,**locDN_table,**locMM_table, \
-                   **locPC_table,**locHL_table,**locspecialstages_table,**locbosses_table}
+
+location_table: Dict[str, SMGLocationData] = {**locGE_table, **locHH_table, 
+                   **locSJ_table, **locBR_table, **locBB_table, 
+                   **locGG_table, **locFF_table, **locDDune_table, 
+                   **locGL_table, **locSS_table, **locTT_table, 
+                   **locDD_table, **locDN_table, **locMM_table, 
+                   **locHL_table, **locspecialstages_table, **locbosses_table, 
+                   **locPC_table,
+}
