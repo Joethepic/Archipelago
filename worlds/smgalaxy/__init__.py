@@ -47,8 +47,9 @@ class SuperMarioGalaxy(World):
     def create_regions(self):
         create_regions(self.multiworld, self.player, self)
 
-    def set_star_rules(self):
-        set_star_rules(self.multiworld, self.player)
+    def set_rules(self):
+        set_star_rules(self.multiworld, self.player, self)
+    
     
     def create_item(self, name: str) -> Item:
         item_id = item_table[name]

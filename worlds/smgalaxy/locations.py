@@ -16,7 +16,7 @@ locGE_table = {
     "GE: Luigi on the Roof": 170000003,
     "GE: Dino Piranha Speed Run": 170000004
 }
-#
+
 locHH_table = {
     "HH: Bee Mario Takes Flight": 170000006,
     "HH: Trouble on the Tower": 170000007,
@@ -32,6 +32,7 @@ locspecialstages_table = {
     "HS: Shrinking Satellite": 170000015,
     "BUB: Through the Poison Swamp": 170000016,
     "BB: The Floating Fortress": 170000017,
+    "DDR: Giant Eel Breakout": 170000117,
     "BB: The Secret of Buoy Base": 170000018,
   # TO DO ADD BACK WHEN MORE THEN ONE CHECK IN FIRST LEVEL   
   # "GG: Grand Star Rescue": 170000019,
@@ -57,6 +58,7 @@ locSJ_table = {
     "SJ: Yoshi's Unexpected Apparence": 170000034,
     "SJ: Pull Star Path Speed Run": 170000035
 }
+
 locBR_table = {
     "BR: Battlerock Barrage": 170000037,
     "BR: Breaking into the Battlerock": 170000038,
@@ -64,6 +66,7 @@ locBR_table = {
     "BR: Topmanic's Dardevil Run": 170000040,
     "BR: Luigi under the Saucer": 170000042
 }
+
 locBB_table = {
     "BB: Sunken Treasure": 170000043,
     "BB: Passing the Swim Test": 170000044,
@@ -71,6 +74,7 @@ locBB_table = {
     "BB: Fast Foes on the Cyclone Stone": 170000046,
     "BB: Wall Jumping Water Falls": 170000048
 }
+
 locG_table = {
     "G: Luigi and the Haunted Mansion": 170000049,
     "G: A Very Spooky Spirit": 170000050,
@@ -78,6 +82,7 @@ locG_table = {
     "G: Bouldergeist's Daredevil Run": 170000052,
     "G: Matter Splatter Mansion": 170000054
 }
+
 locGG_table = {
     "GG: Bunnies in the Wind": 170000055,
     "GG: The Dirty Tricks of Major Burrows": 170000056,
@@ -85,6 +90,7 @@ locGG_table = {
     "GG: Major Burrows's Daredevil Run": 170000058,
     "GG: The Golden Chomp": 170000060
 }
+
 locFF_table = {
     "FF: The Frozen Peak of Baron Brr": 170000061,
     "FF: Freezeflame's Blistering Coore": 170000062,
@@ -92,6 +98,7 @@ locFF_table = {
     "FF: Conquring the Summit": 170000064,
     "FF: Frosty Cosmic Mario race": 170000065
 }
+
 locDDune_table = {
     "DDune: Soaring on the Desert Winds": 170000067,
     "DDune: Blasting through the Sand": 170000068,
@@ -100,6 +107,7 @@ locDDune_table = {
     "DDune: Bullet Bill on Your Back": 170000072,
     "DDune: Treasure of the Pyramid": 170000073
 } 
+
 locGL_table = {
     "GL: Star Bunnies on the Hunt": 170000074,
     "GL: Cataquack to the skies": 170000075,
@@ -157,6 +165,7 @@ locHL_table = {
     "BB: Racing the Spooky Speedster": 170000115,
     "SC: Star Bunnies in the Snow": 170000116
 }
+
 locPC_table = {
     "TT: Luigi's Purple Coins": 170000091, 
     "DN: Battlestation's Purple Coins": 170000102,
@@ -176,9 +185,9 @@ locPC_table = {
     "HH: The Honeyhive's Purple Coins": 170000011
 }
 
-location_table: Dict[str, SMGLocationData] = {**locGE_table, **locHH_table, 
+location_table = { **locGE_table, **locHH_table, 
                    **locSJ_table, **locBR_table, **locBB_table, 
-                   **locGG_table, **locFF_table, **locDDune_table, 
+                   **locGG_table, **locFF_table, **locDDune_table, **locG_table, 
                    **locGL_table, **locSS_table, **locTT_table, 
                    **locDD_table, **locDN_table, **locMM_table, 
                    **locHL_table, **locspecialstages_table, **locbosses_table, 
