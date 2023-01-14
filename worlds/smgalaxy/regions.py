@@ -21,14 +21,15 @@ def create_regions(world: MultiWorld, player: int, self: int):
     regHL = create_region("Hungry Lumas", player, world)
     create_default_locs(regHL, locHL_table, player)    
     world.regions.append(regHL)
+
+    regPC = create_region("Purple Coins", player, world)
+    create_default_locs(regPC, locPC_table, player)
+    world.regions.append(regPC)
+    
     # defines the bosses region
     regbosses = create_region("Bosses", player, world)
     create_default_locs(regbosses, locbosses_table, player)
     world.regions.append(regbosses)  
-    # defines the purple coin stars region
-    regPC = create_region("Purple coins", player, world)
-    create_default_locs(regPC, locPC_table, player)
-    world.regions.append(regPC)
     # defines the good egg galaxy region
     regGE = create_region("Good Egg", player, world)
     create_default_locs(regGE, locGE_table, player)
@@ -81,7 +82,7 @@ def create_regions(world: MultiWorld, player: int, self: int):
     regDDune = create_region("Dusty Dune", player, world)
     create_default_locs(regDDune, locDDune_table, player)
     if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
-        regDDune.locations.append(SMGLocation(player, "DDune: Purple Coins in the Desert", location_table["DDune: Purple Coin in the Desert"], regDDune))  
+        regDDune.locations.append(SMGLocation(player, "DDune: Purple Coin in the Desert", location_table["DDune: Purple Coin in the Desert"], regDDune))  
     world.regions.append(regDDune)  
     # defines golden leaf galaxy
     regGL = create_region("Gold Leaf", player, world)

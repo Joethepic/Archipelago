@@ -4,31 +4,27 @@ from worlds.AutoWorld import LogicMixin
 from ..generic.Rules import add_rule
 from .regions import connect_regions
 from .Options import EnablePurpleCoinStars
-
-class GalaxyLogic(LogicMixin):
-# these are varible states that the game uses for logic in different points.    
+# main stage logic
+class GalaxyLogic(LogicMixin):    
     def smg_gate_open(self, player: int):
-        return self.has('Grand Star Engine Room', player) 
+        return self.has("Grand Star Engine Room", player) 
     
     def smg_can_finish(self, player: int):
-        return self.has('Power Star 60', player) and self.has('Grand Star Bedroom', player)  
+        return self.has("Power Star 60", player) and self.has("Grand Star Bedroom", player)  
     
     def smg_purple_coins(self, player: int):
-        return self.has('Power Star 60', player) and self.has('Grand Star Bedroom', player) and self.has('Grand Star Engine Room', player) 
+        return self.has("Power Star 60", player) and self.has("Grand Star Bedroom", player) and self.has("Grand Star Engine Room", player) 
     
     def smg_can_get_comet(self, player: int):
-        return self.has('Power Star 13', player)
+        return self.has("Power Star 13", player)
     
     def smg_trail(self, player: int):
-        return self.has('Green Star 3', player)
+        return self.has("Green Star 3", player)
 
-    # main stage logic
-def set_star_rules(world, player: int, self):
-    
-    connect_regions(world, player, "Menu", 'Good Egg', lambda state: True)
+def set_rules(world, player: int, self):
+    connect_regions(world, player, "Menu", "Good Egg", lambda state: True)
     connect_regions(world, player, "Menu", "Bosses", lambda state: True)
     connect_regions(world, player, "Menu", "Hungry Lumas", lambda state: True)
-    connect_regions(world, player, "Menu", "Purple coins", lambda state: True)
     connect_regions(world, player, "Menu", "Honeyhive", lambda state: state.has("Power Star", player, 3))
     connect_regions(world, player, "Menu", "Fountain", lambda state: state.has("Grand Star Terrace", player))
     connect_regions(world, player, "Fountain", "Battlerock", lambda state: state.has("Power Star", player, 12))
@@ -39,6 +35,7 @@ def set_star_rules(world, player: int, self):
     connect_regions(world, player, "Menu", "Bedroom", lambda state: state.has("Grand Star Kitchen", player))
     connect_regions(world, player, "Bedroom", "Gusty Gardens", lambda state: state.has("Power Star", player, 24))
     connect_regions(world, player, "Bedroom", "Freezeflame", lambda state: state.has("Power Star", player, 26))
+    connect_regions(world, player, "Bedroom", "Dusty Dune", lambda state: state.has("Power Star", player, 29))
     connect_regions(world, player, "Menu", "Engine Room", lambda state: state.has("Grand Star Bedroom", player))
     connect_regions(world, player, "Engine Room", "Gold Leaf", lambda state: state.has("Power Star", player, 34))
     connect_regions(world, player, "Engine Room", "Toy Time", lambda state: state.has("Power Star", player, 40))
@@ -47,6 +44,7 @@ def set_star_rules(world, player: int, self):
     connect_regions(world, player, "Garden", "Deep Dark", lambda state: state.has("Power Star", player, 46))
     connect_regions(world, player, "Garden", "Dreadnaught", lambda state: state.has("Power Star", player, 48))
     connect_regions(world, player, "Garden", "Melty Molten", lambda state: state.has("Power Star", player, 52))
+    connect_regions(world, player, "Menu", "Purple Coins", lambda state: True)
     
     # special stages logic
     add_rule(world.get_location("LDL: Surfing 101", player), lambda state: state.has("Power Star", player, 5))
@@ -59,21 +57,21 @@ def set_star_rules(world, player: int, self):
     add_rule(world.get_location("BF: Kingfin's Fearsome Waters", player), lambda state: state.has("Power Star", player, 55) and state.has("Grand Star Bedroom", player))
     add_rule(world.get_location("MS: Watch Your Step", player), lambda state: state.has("Power Star", player, 50) and state.has("Grand Star Engine Room", player) and state.has("Grand Star Bedroom", player))
     add_rule(world.get_location("DDR: Giant Eel Breakout", player), lambda state: state.has("Grand Star Fountain", player))
-    add_rule(world.get_location("RGT: Gizmos, Gears, and Gadgets", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.smg_trail(player))
-    add_rule(world.get_location("LDT: The Galaxy's Greatest Wave", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.has("Grand Star Kitchen", player) and state.smg_trail(player))
-    add_rule(world.get_location("BBT: The Electric Labyrinth", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.has("Grand Star Kitchen", player) and state.smg_trail(player))
+    add_rule(world.get_location("RGT: Gizmos, Gears, and Gadgets", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.has("Green Star", player, 3))
+    add_rule(world.get_location("LDT: The Galaxy's Greatest Wave", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.has("Grand Star Kitchen", player) and state.has("Green Star", player, 3))
+    add_rule(world.get_location("BBT: The Electric Labyrinth", player), lambda state: state.has("Grand Star Fountain", player) and state.has("Grand Star Terrace", player) and state.has("Grand Star Kitchen", player) and state.has("Green Star", player, 3))
     add_rule(world.get_location("SS: Rocky Road", player), lambda state: state.has("Power Star", player, 7))
     add_rule(world.get_location("SP: A Very Sticky Situation", player), lambda state: state.has("Grand Star Terrace", player) and state.has("Power Star", player, 9))
     add_rule(world.get_location("BM: Bigmouth's Gold Bait", player), lambda state: state.has("Grand Star Kitchen", player) and state.has("Power Star", player, 29))
-    add_rule(world.get_location("SS: Choosing a Favorite Snack", player), lambda state: state.has("Grand Star Bedroom", player) and state.has("Power Star", player, 36) and state.has("Grand Star Fountain", player))
-    add_rule(world.get_location("BB: Racing the Spooky Speedster", player), lambda state: state.has("Grand Star Engine Room", player) and state.has("Grand Star Kitchen", player))
+    add_rule(world.get_location("Sandy Spiral: Choosing a Favorite Snack", player), lambda state: state.has("Grand Star Bedroom", player) and state.has("Power Star", player, 36) and state.has("Grand Star Fountain", player))
+    add_rule(world.get_location("Bone's Boneyard: Racing the Spooky Speedster", player), lambda state: state.has("Grand Star Engine Room", player) and state.has("Grand Star Kitchen", player))
     add_rule(world.get_location("SC: Star Bunnies in the Snow", player), lambda state: state.has("Grand Star Engine Room", player) and state.has("Power Star", player, 52))
     # comet logic
     add_rule(world.get_location("GE: Dino Piranha Speed Run", player), lambda state: state.has("Power Star", player, 13))
     add_rule(world.get_location("HH: Honeyhive Cosmic Mario Race", player), lambda state: state.has("Power Star", player, 13))
     add_rule(world.get_location("SJ: Pull Star Path Speed Run", player), lambda state: state.has("Power Star", player, 13))
-    add_rule(world.get_location("BR: Topmanic's Dardevil Run", player), lambda state: state.smg_can_get_comet(player))
-    add_rule(world.get_location("BB: Fast Foes on the Cyclone Stone", player), lambda state: state.smg_can_get_comet(player))
+    add_rule(world.get_location("BR: Topmanic's Dardevil Run", player), lambda state: state.has("Power Star", player, 13))
+    add_rule(world.get_location("BB: Fast Foes on the Cyclone Stone", player), lambda state: state.has("Power Star", player, 13))
     # boss stage logic 
     add_rule(world.get_location("BJ: Megaleg's Moon", player), lambda state: state.has("Power Star", player, 8))
     add_rule(world.get_location("B: The Firery Stronghold", player), lambda state: state.has("Power Star", player, 15) and state.has("Grand Star Terrace", player))
@@ -84,23 +82,23 @@ def set_star_rules(world, player: int, self):
     
     # purple coin star logic
     if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
-        add_rule(world.get_location("DN: Battlestation's Purple Coins", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("MM: Red-Hot Purple Coins", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("TT: Luigi's Purple Coins", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("DD: Plunder the Purple Coins", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("GL: Purple Coins in the Woods", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("FF: Purple Coins on the Summit", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("SS: Purple Coins by the Seaside", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("GG: Purple Coins on the Puzzle Cube", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("G: Purple Coins in the Bone Pen", player), lambda state: state.smg_purple_coins(player))
-    #    add_rule(world.get_location("DDune: Purple Coin in the Desert", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("BR: Purple Coins on the Battlerock", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("GE: Purple Coin Omelet", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("HH: The Honeyhive's Purple Coins", player), lambda state: state.smg_purple_coins(player))
-        add_rule(world.get_location("SJ: Purple Coin Spacewalk", player), lambda state: state.smg_purple_coins(player))
-    elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
+        add_rule(world.get_location("DN: Battlestation's Purple Coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("MM: Red-Hot Purple Coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("TT: Luigi's Purple Coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("DD: Plunder the Purple Coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("GL: Purple Coins in the Woods", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("FF: Purple Coins on the Summit", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("SS: Purple Coins by the Seaside", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("GG: Purple Coins on the Puzzle Cube", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("G: Purple Coins in the Bone Pen", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("DDune: Purple Coin in the Desert", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("BR: Purple Coins on the Battlerock", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("GE: Purple Coin Omelet", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("HH: The Honeyhive's Purple Coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("SJ: Purple Coin Spacewalk", player), lambda state: state.smg_purple_coins)
+    elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only or self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
         add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins(player))
     else:
         return
-    world.completion_condition[player] = lambda state: state.smg_can_finish(player)
+    world.completion_condition[player] = lambda state: state.smg_can_finish
 

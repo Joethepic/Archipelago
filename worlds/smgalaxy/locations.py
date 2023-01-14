@@ -9,18 +9,19 @@ class SMGLocationData(NamedTuple):
     code: Optional[int] = None
 
 # good egg galaxy
+
 locGE_table = {
-    "GE: Dino Piranha": 170000000,
-    "GE: A Snack of Cosmic Proportions": 170000001,
-    "GE: King Kaliente's Battle Fleet": 170000002,
-    "GE: Luigi on the Roof": 170000003,
-    "GE: Dino Piranha Speed Run": 170000004
+    "GE: Dino Piranha": 17000000,
+    "GE: A Snack of Cosmic Proportions": 17000001,
+    "GE: King Kaliente's Battle Fleet": 17000002,
+    "GE: Luigi on the Roof": 17000003,
+    "GE: Dino Piranha Speed Run": 17000004
 }
 
 locHH_table = {
-    "HH: Bee Mario Takes Flight": 170000006,
-    "HH: Trouble on the Tower": 170000007,
-    "HH: Big Bad Bugabooom": 170000008,
+    "HH: Bee Mario Takes Flight": 17000006,
+    "HH: Trouble on the Tower": 17000007,
+    "HH: Big Bad Bugabooom": 17000008,
     "HH: Luigi in the Honeyhive Kingdom": 17000009,
     "HH: Honeyhive Cosmic Mario Race": 170000010
 }
@@ -29,8 +30,10 @@ locspecialstages_table = {
     "LDL: Surfing 101": 170000012,
     "FS: Painting the Planet Yellow": 170000013,
     "RG: Rolling in the Clouds": 170000014,
+    "Drip Drop: Giant Eel Outbreak": 170000117,
     "HS: Shrinking Satellite": 170000015,
     "BUB: Through the Poison Swamp": 170000016,
+    "HC: Scaling the Sticky Wall": 170000118,
     "BB: The Floating Fortress": 170000017,
     "DDR: Giant Eel Breakout": 170000117,
     "BB: The Secret of Buoy Base": 170000018,
@@ -62,7 +65,8 @@ locSJ_table = {
 locBR_table = {
     "BR: Battlerock Barrage": 170000037,
     "BR: Breaking into the Battlerock": 170000038,
-    "BR: Topmaniac's Garbage dump": 170000039,
+    "BR: Topmaniac and Topman Tribe": 170000119,
+    "BR: Battlerock's Garbage dump": 170000039,
     "BR: Topmanic's Dardevil Run": 170000040,
     "BR: Luigi under the Saucer": 170000042
 }
@@ -72,7 +76,7 @@ locBB_table = {
     "BB: Passing the Swim Test": 170000044,
     "BB: The Secret Undersea Cavern": 170000045,
     "BB: Fast Foes on the Cyclone Stone": 170000046,
-    "BB: Wall Jumping Water Falls": 170000048
+    "BB: Wall Jumping Up Waterfalls": 170000048
 }
 
 locG_table = {
@@ -103,7 +107,7 @@ locDDune_table = {
     "DDune: Soaring on the Desert Winds": 170000067,
     "DDune: Blasting through the Sand": 170000068,
     "DDune: Sunbaked Sand Castle": 170000069,
-    "DDune: Bullet Bill on Your Back": 170000071,
+    "DDune: Sandblast Speed Run": 170000071,
     "DDune: Bullet Bill on Your Back": 170000072,
     "DDune: Treasure of the Pyramid": 170000073
 } 
@@ -142,7 +146,7 @@ locDD_table = {
 
 locDN_table = {
     "DN: Inflitrating the Dreadnought": 170000098,
-    "DN: Dreanought's Colossal Cannons": 170000099,
+    "DN: Dreadnought's Colossal Cannons": 170000099,
     "DN: Revenge of the Topman Tribe": 170000100,
     "DN: Topman Tribe Speed Run": 170000101,
     "DN: Dreadnought's Garbage Dump": 170000103
@@ -161,8 +165,8 @@ locHL_table = {
     "SP: A Very Sticky Situation": 170000111,
     "DDR: Giant Eel Breakout": 170000112,
     "BM: Bigmouth's Gold Bait": 170000113,
-    "SS: Choosing a Favorite Snack": 170000114,
-    "BB: Racing the Spooky Speedster": 170000115,
+    "Sandy Spiral: Choosing a Favorite Snack": 170000114,
+    "Bone's Boneyard: Racing the Spooky Speedster": 170000115,
     "SC: Star Bunnies in the Snow": 170000116
 }
 
