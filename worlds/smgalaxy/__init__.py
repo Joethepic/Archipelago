@@ -38,7 +38,7 @@ class SuperMarioGalaxy(World):
     
     web = SMGWeb()
 
-    data_version = 0
+    data_version = 2
     required_client_version = (0, 3, 8)
 
     option_definitions = galaxy_options
