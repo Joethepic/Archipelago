@@ -10,7 +10,7 @@ The randomizer shuffles emblems and upgrade items into the AP item pool. The sto
 
 ## What is the goal of Sonic Adventure 2: Battle when randomized?
 
-If the Biolizard goal is selected, the objective is to unlock and complete the required number of Cannon's Core Missions, then complete the Biolizard boss fight. If the Emerald Hunt goal is selected, the objective is to find the seven Chaos Emeralds then complete Green Hill Zone and optionally default Final Hazard.
+If the Biolizard goal is selected, the objective is to unlock and complete the required number of Cannon's Core Missions, then complete the Biolizard boss fight. If the Emerald Hunt goal is selected, the objective is to find the seven Chaos Emeralds then complete Green Hill Zone and optionally defeat Final Hazard.
 
 ## What items and locations get shuffled?
 
