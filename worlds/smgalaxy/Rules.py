@@ -96,8 +96,9 @@ def set_rules(world, player: int, self):
         add_rule(world.get_location("GE: Purple Coin Omelet", player), lambda state: state.smg_purple_coins)
         add_rule(world.get_location("HH: The Honeyhive's Purple Coins", player), lambda state: state.smg_purple_coins)
         add_rule(world.get_location("SJ: Purple Coin Spacewalk", player), lambda state: state.smg_purple_coins)
-    elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only or self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
-        add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins(player))
+        add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins)
+    elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
+          add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins)
     else:
         return
     world.completion_condition[player] = lambda state: state.smg_can_finish

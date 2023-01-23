@@ -73,13 +73,13 @@ class SuperMarioGalaxy(World):
         
         # check to see what setting enable purple coin stars is on to see how many stars to create 
         if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
-           self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,102)]
+           self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,99)]
         
         elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
-             self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,120)]
+             self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,127)]
 
         else:
-            self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,101)]
+            self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,107)]
         
          
         # creates the grand stars in each players itempool
@@ -89,4 +89,37 @@ class SuperMarioGalaxy(World):
             grandstar4 = self.create_item("Grand Star Bedroom")
             grandstar5 = self.create_item("Grand Star Engine Room")          
             self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]
+            return
+        if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_none:
+           self.multiworld.get_location("TT: Luigi's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("DN: Battlestation's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("MM: Red-Hot Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("DD: Plunder the Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("SS: Purple Coins by the Seaside", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("GE: Purple Coin Omelet", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("BR: Purple Coins on the Battlerock", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("GG: Purple Coins on the Puzzle Cube", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("SJ: Purple Coin Spacewalk", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("BB: Beachcombing for Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("G: Purple Coins in the Bone Pen", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("GL: Purple Coins in the Woods", self.player).place_locked_item(self.create_item("Nothing")) 
+           self.multiworld.get_location("DDune: Purple Coin in the Desert", self.player).place_locked_item(self.create_item("Nothing"))
+           self.multiworld.get_location("HH: The Honeyhive's Purple Coins", self.player).place_locked_item(self.create_item("Nothing")) 
+           self.multiworld.get_location("GG: Gateway's Purple coins", self.player).place_locked_item(self.create_item("Nothing"))
+        elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
+             self.multiworld.get_location("TT: Luigi's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("DN: Battlestation's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("MM: Red-Hot Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("DD: Plunder the Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("SS: Purple Coins by the Seaside", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("GE: Purple Coin Omelet", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("BR: Purple Coins on the Battlerock", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("GG: Purple Coins on the Puzzle Cube", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("SJ: Purple Coin Spacewalk", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("BB: Beachcombing for Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("G: Purple Coins in the Bone Pen", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("GL: Purple Coins in the Woods", self.player).place_locked_item(self.create_item("Nothing")) 
+             self.multiworld.get_location("DDune: Purple Coin in the Desert", self.player).place_locked_item(self.create_item("Nothing"))
+             self.multiworld.get_location("HH: The Honeyhive's Purple Coins", self.player).place_locked_item(self.create_item("Nothing")) 
+        else: 
             return

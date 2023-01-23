@@ -15,4 +15,5 @@ item_table: Dict[str, SMGLocationData] = {
   "Grand Star Bedroom": 170000004,
   "Grand Star Engine Room": 170000005,
   "Green Star": 170000006,
+  "Nothing": 170000007,
 }
