@@ -62,6 +62,7 @@ def set_rules(world, player: int, self):
     add_rule(world.get_location("BJ: Sinking the Airships", player), lambda state: state.has("Power Star", player, 23) and state.has("Grand Star Fountain", player))
     add_rule(world.get_location("BJ: King Kaliente's Spicy Return", player), lambda state: state.has("Power Star", player, 45) and state.has("Grand Star Engine Room", player))
     add_rule(world.get_location("B:  Darkness on the Horizon", player), lambda state: state.has("Power Star", player, 33) and state.has("Grand Star Kitchen", player))
+    add_rule(world.get_location("B: Bowser's Galaxy Reactor", player), lambda state: state.has("Power Star", player, world.Stars_to_finish[self.player].value and state.has("Grand Star Bedroom", player)))
     
     
     # purple coin star logic
