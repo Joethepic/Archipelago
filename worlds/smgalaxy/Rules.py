@@ -1,26 +1,10 @@
 from sqlite3 import connect
 
-from worlds.AutoWorld import LogicMixin
+from ..AutoWorld import LogicMixin
 from ..generic.Rules import add_rule
 from .regions import connect_regions
 from .Options import EnablePurpleCoinStars
 # main stage logic
-class GalaxyLogic(LogicMixin):    
-    def smg_gate_open(self, player: int):
-        return self.has("Grand Star Engine Room", player) 
-    
-    def smg_can_finish(self, player: int):
-        return self.has("Power Star 60", player) and self.has("Grand Star Bedroom", player)  
-    
-    def smg_purple_coins(self, player: int):
-        return self.has("Power Star 60", player) and self.has("Grand Star Bedroom", player) and self.has("Grand Star Engine Room", player) 
-    
-    def smg_can_get_comet(self, player: int):
-        return self.has("Power Star 13", player)
-    
-    def smg_trail(self, player: int):
-        return self.has("Green Star 3", player)
-
 def set_rules(world, player: int, self):
     connect_regions(world, player, "Menu", "Good Egg", lambda state: True)
     connect_regions(world, player, "Menu", "Bosses", lambda state: True)
@@ -82,24 +66,24 @@ def set_rules(world, player: int, self):
     
     # purple coin star logic
     if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
-        add_rule(world.get_location("DN: Battlestation's Purple Coins", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("MM: Red-Hot Purple Coins", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("TT: Luigi's Purple Coins", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("DD: Plunder the Purple Coins", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("GL: Purple Coins in the Woods", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("FF: Purple Coins on the Summit", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("SS: Purple Coins by the Seaside", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("GG: Purple Coins on the Puzzle Cube", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("G: Purple Coins in the Bone Pen", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("DDune: Purple Coin in the Desert", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("BR: Purple Coins on the Battlerock", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("GE: Purple Coin Omelet", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("HH: The Honeyhive's Purple Coins", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("SJ: Purple Coin Spacewalk", player), lambda state: state.smg_purple_coins)
-        add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins)
+        add_rule(world.get_location("DN: Battlestation's Purple Coins", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("MM: Red-Hot Purple Coins", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("TT: Luigi's Purple Coins", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("DD: Plunder the Purple Coins", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("GL: Purple Coins in the Woods", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("FF: Purple Coins on the Summit", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("SS: Purple Coins by the Seaside", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("GG: Purple Coins on the Puzzle Cube", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("G: Purple Coins in the Bone Pen", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("DDune: Purple Coin in the Desert", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("BR: Purple Coins on the Battlerock", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("GE: Purple Coin Omelet", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("HH: The Honeyhive's Purple Coins", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("SJ: Purple Coin Spacewalk", player), lambda state: state.has("Peach", player))
+        add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.has("Peach", player))
     elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
-          add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.smg_purple_coins)
+          add_rule(world.get_location("GG: Gateway's Purple coins", player), lambda state: state.has("Grand Star Engine", player))
     else:
         return
-    world.completion_condition[player] = lambda state: state.smg_can_finish
+    world.completion_condition[player] = lambda state: state.has("Peach", player)
 
