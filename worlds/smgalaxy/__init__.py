@@ -70,6 +70,7 @@ class SuperMarioGalaxy(World):
         grandstar4 = self.create_item("Grand Star Bedroom")
         grandstar5 = self.create_item("Grand Star Engine Room")          
         self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]    
+        
         self.multiworld.get_location("B: Bowser's Galaxy Reactor", self.player).place_locked_item(self.create_item("Peach"))
         
         # check to see what setting enable purple coin stars is on to see how many stars to create 
@@ -80,17 +81,17 @@ class SuperMarioGalaxy(World):
              self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,127)]
 
         else:
-            self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,107)]
+             self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,92)]
         
          
         # creates the grand stars in each players itempool
-            grandstar1 = self.create_item("Grand Star Terrace")   
-            grandstar2 = self.create_item("Grand Star Fountain")  
-            grandstar3 = self.create_item("Grand Star Kitchen")
-            grandstar4 = self.create_item("Grand Star Bedroom")
-            grandstar5 = self.create_item("Grand Star Engine Room")          
-            self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]
-            return
+             grandstar1 = self.create_item("Grand Star Terrace")   
+             grandstar2 = self.create_item("Grand Star Fountain")  
+             grandstar3 = self.create_item("Grand Star Kitchen")
+             grandstar4 = self.create_item("Grand Star Bedroom")
+             grandstar5 = self.create_item("Grand Star Engine Room")          
+             self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]
+
         if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_none:
            self.multiworld.get_location("TT: Luigi's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
            self.multiworld.get_location("DN: Battlestation's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
@@ -107,7 +108,9 @@ class SuperMarioGalaxy(World):
            self.multiworld.get_location("DDune: Purple Coin in the Desert", self.player).place_locked_item(self.create_item("Nothing"))
            self.multiworld.get_location("HH: The Honeyhive's Purple Coins", self.player).place_locked_item(self.create_item("Nothing")) 
            self.multiworld.get_location("GG: Gateway's Purple coins", self.player).place_locked_item(self.create_item("Nothing"))
-        elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
+        elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
+             return
+        else:
              self.multiworld.get_location("TT: Luigi's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
              self.multiworld.get_location("DN: Battlestation's Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
              self.multiworld.get_location("MM: Red-Hot Purple Coins", self.player).place_locked_item(self.create_item("Nothing"))
@@ -122,5 +125,3 @@ class SuperMarioGalaxy(World):
              self.multiworld.get_location("GL: Purple Coins in the Woods", self.player).place_locked_item(self.create_item("Nothing")) 
              self.multiworld.get_location("DDune: Purple Coin in the Desert", self.player).place_locked_item(self.create_item("Nothing"))
              self.multiworld.get_location("HH: The Honeyhive's Purple Coins", self.player).place_locked_item(self.create_item("Nothing")) 
-        else: 
-            return
