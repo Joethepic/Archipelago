@@ -2,7 +2,7 @@ import string
 from typing import Optional
 from .items import item_table, SMGItem
 from .locations import location_table, SMGLocation
-from .Options import EnablePurpleCoinStars, galaxy_options
+from .Options import EnablePurpleCoinStars, galaxy_options, StarstoFinish, ExtraStars
 from .Rules import set_rules
 from .regions import create_regions
 from BaseClasses import Item, Tutorial, ItemClassification, Region, Location, RegionType, Entrance, MultiWorld  
@@ -60,7 +60,7 @@ class SuperMarioGalaxy(World):
         return item
    
     
-    def generate_basic(self): 
+    def generate_basic(self, world): 
         # creates the green stars in each players itempool
         self.multiworld.itempool += [self.create_item("Green Star") for i in range(0,3)]
         
@@ -72,16 +72,23 @@ class SuperMarioGalaxy(World):
         self.multiworld.itempool += [grandstar1,grandstar2,grandstar3,grandstar4,grandstar5]    
         
         self.multiworld.get_location("B: Bowser's Galaxy Reactor", self.player).place_locked_item(self.create_item("Peach"))
-        
+        starcountm = self.multiworld.Stars_to_finish[self.player]
+        if (self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only):
+            max(80, starcountm = self.multiworld.ExtraStars[self.player] - 28)
+        starcountm= max(self.multiworld.Stars_to_finish[self.player])
+        elif (self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only):
+        starcountn = self.multiworld.Stars_to_finish[self.player] == EnablePurpleCoinStars.option_none
+             max(60, starcountn = self.multiworld.ExtraStars[self.player] - 35)
+        starcountn = max(self.multiworld.Stars_to_finish[self.player])
+        else:
         # check to see what setting enable purple coin stars is on to see how many stars to create 
         if self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_main_game_only:
-           self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,99)]
-        
+            self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,starcountm)]
         elif self.multiworld.enable_purple_coin_stars[self.player] == EnablePurpleCoinStars.option_all:
              self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,127)]
 
         else:
-             self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,92)]
+             self.multiworld.itempool += [self.create_item("Power Star") for i in range(0,starcountn)]
         
          
         # creates the grand stars in each players itempool
