@@ -1,0 +1,160 @@
+[	
+    { "name": "Toad Road - climb to the top of the vine (lucky event)", "requires": ["slow dice block"] },
+    { "name": "Toad Road - miniboss" },
+    { "name": "Toad Road - make it over the bridge gap", "requires": ["1-10 dice block"] },
+    { "name": "Toad Road - reach top of 9 island", "requires": ["1-10 dice block"] },
+    { "name": "Toad Road - almost there", "requires": ["1-10 dice block"]},
+    { "name": "Toad Road - boss", "requires": ["1-10 dice block"] },
+    { "name": "Toad Road - victory", "requires": ["1-10 dice block"] },
+    { "name": "Bomb-omb Factory - miniboss", "requires": ["Bomb-omb Factory"] },
+    { "name": "Bomb-omb Factory - Have bomb  explode while your captain", 
+    "requires": [
+        "Bomb-omb Factory", "4-6 dice block",   
+        {"or": ["Bomb-omb Factory", "1-10 dice block"] }
+        ]
+    },
+    { "name": "Bomb-omb Factory - pipe(lucky space event)", "requires": ["Bomb-omb Factory"] },
+    { "name": "Bomb-omb Factory - almost there", "requires": ["Bomb-omb Factory"] },
+    { "name": "Bomb-omb Factory - boss", "requires": ["Bomb-omb Factory"] },
+    { "name": "Bomb-omb Factory - victory", "requires": ["Bomb-omb Factory"] },
+    { "name": "Bomb-omb Factory - captain event", "requires": ["Bomb-omb Factory"] },
+    { "name": "Boos Horror Castle - get caught by boo as captain",  
+    "requires": [  
+            "1-3 dice block",
+            {"or": ["0-1 dice block"] },
+            {"or": ["slow dice block"] }
+                ]    
+},
+    { "name": "Boos Horror Castle - miniboss", "requires": ["Boos Horror Castle"] },
+    { "name": "Boos Horror Castle - catch rat", "requires": ["Boos Horror Castle"] },
+    { "name": "Boos Horror Castle - almost there", "requires": ["Boos Horror Castle"] },
+    { "name": "Boos Horror Castle - boss", "requires": ["Boos Horror Castle"] },
+    { "name": "Boos Horror Castle - victory", "requires": ["Boos Horror Castle"] },
+    { "name": "Blooper Beach - miniboss", "requires": ["Blooper Beach"] },
+    { "name": "Blooper Beach - get sucked up by Blooper(unlucky space event)", "requires": ["Blooper Beach", "slow dice block"] },
+    { "name": "Blooper Beach - almost there", "requires": ["Blooper Beach"] },
+    {
+        "name": "Blooper Beach - go to star island",
+        "requires": ["Blooper Beach", "slow dice block"]
+    },
+    { "name": "Blooper Beach - boss", "requires": ["Blooper Beach"] },
+    { "name": "Blooper Beach - victory", "requires": ["Blooper Beach"] },
+    { "name": "Blooper Beach - get dolphin mini stars", "requires": ["Blooper Beach"] },
+    { "name": "Blooper Beach - recover 10 mini-stars (captain event)", "requires": ["Blooper Beach"] },
+    { "name": "Blooper Beach - recover 15 mini-stars (captain event)", "requires": ["Blooper Beach"] },
+    { "name": "Magma Mine - miniboss", "requires": ["Magma Mine"] },
+    { "name": "Magma Mine - get burnt by the lava as captian", "requires": ["Magma Mine"] },
+    { "name": "Magma Mine - dont fall (captain event)", "requires": ["Magma Mine"] },
+    { "name": "Magma Mine - almost there", "requires": ["Magma Mine"] },
+    { "name": "Magma Mine - boss", "requires": ["Magma Mine"] },
+    { "name": "Magma Mine - victory", "requires": ["Magma Mine"] },
+    { "name": "Bowser Station - Captain Event 1", "requires": ["Bowser Station"] },
+    { "name": "Bowers Station - Have 20 stars in the jackpot machine", "requires": ["Bowser Station"] },
+    { "name": "Bowser Station - win a jackpot minigame", "requires": ["Bowser Station"] },
+    { "name": "Bowser Station - miniboss", "requires": ["Bowser Station"] },
+    { "name": "Bowser Station - bingo", "requires": ["Bowser Station", "1-10 dice block"]},
+    { "name": "Bowser Station - almost there", "requires": ["Bowser Station", "1-10 dice block"] },
+    { "name": "Bowser Station - Captain Event 3", "requires": ["Bowser Station", "1-10 dice block"] }, 
+    { "name": "Bowser Station - boss", "requires": ["Bowser Station", "1-10 dice block"] }, 
+    { "name": "Bowser Station - victory", "victory": true, "requires": ["Bowser Station", "1-10 dice block"] },
+    { "name": "DK Jungle Ruins - land on a dk space", "requires": ["DK Jungle Ruins", "slow dice block"] },
+    { "name": "DK Jungle Ruins - barrel shuffle diddy only (captian event)", "requires": ["DK Jungle Ruins"] },
+    { "name": "DK Jungle Ruins - DK hands launcher(lucky event)", "requires": ["DK Jungle Ruins", "slow dice block"] },
+    { "name": "DK Jungle Ruins - miniboss", "requires": ["DK Jungle Ruins"] },
+    { "name": "DK Jungle Ruins - barrel shuffle both (captian event)", "requires": ["DK Jungle Ruins"] },
+    { "name": "DK Jungle Ruins - almost there", "requires": ["DK Jungle Ruins"] },
+    { "name": "DK Jungle Ruins - boss", "requires": ["DK Jungle Ruins"] },    
+    { "name": "DK Jungle Ruins - victory", "requires": ["DK Jungle Ruins"] },    
+    { "name": "DK Jungle Ruins - Victory with over 100 bannanas", "requires": ["DK Jungle Ruins"] },
+    { "name": "land on 3 event spaces", "requires": ["slow dice block"] },
+    { "name": "land on a back space", "requires": ["slow dice block"] },
+    { "name": "land on a dash space", 
+        "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins", "slow dice block"] },
+        {"or": ["Magma Mine", "slow dice block"] },
+        {"or": ["Blooper Beach", "slow dice block"] },
+        {"or": ["1-10 dice block", "slow dice block"] },
+        {"or": ["Boos Horror Castle", "slow dice block"] }
+    ]
+    },
+    { "name": "land on play a 1 vs rivals game", "requires": ["slow dice block"] },
+    { "name": "land on a unlucky space", "requires": ["slow dice block"] },
+    { "name": "land on a boswer jr. space", "requires": ["slow dice block"] },
+    { "name": "finish with over 50 mini stars", 
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+    },
+    { "name": "roll a 0 ", "requires": ["0-1 dice block"] },
+    { "name": "roll a 10", "requires": ["1-10 dice block"] },
+    { "name": "land on 3 lucky spaces", "requires": ["slow dice block"] },
+    { "name": "win the mini game bonus star",
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+},
+    { "name": "win the slow bonus star",
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+},
+    { "name": "win the spin bonus star",
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+    },
+    { "name": "win the far bonus star",
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+    },
+    { "name": "win the minus bonus star",
+    "requires": [
+        "Bomb-omb Factory",
+        {"or": ["DK Jungle Ruins"] },
+        {"or": ["Magma Mine"] },
+        {"or": ["Blooper Beach"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["Boos Horror Castle"] }
+    ]
+    },
+    { "name": "win a game with over 100 mini stars", "requires": ["Blooper Beach"] },
+    { "name": "win a reverse mini-game", "requires": ["slow dice block"] },
+    { "name": "Use 5 dice blocks on one game", 
+    "requires": [
+        "slow dice block",
+        {"or": ["0-1 dice block"] },
+        {"or": ["1-3 dice block"] },
+        {"or": ["1-10 dice block"] },
+        {"or": ["4-6 dice block"] }
+
+    ]
+    },
+    {"name": "use every dice block type", "requires": ["slow dice block", "0-1 dice block", "1-10 dice block", "1-3 dice block", "4-6 dice block", "0-1 dice block"] }
+]
