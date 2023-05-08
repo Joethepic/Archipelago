@@ -1,0 +1,87 @@
+{
+    "Toad-Road Start": {
+        "connects_to": [
+        ]
+    },
+    "Toad-Road Main": {
+        "connects_to": [],
+        "requires": ["1-10 dice block"]
+    },
+    "Bomb-omb Factory":{
+        "connects_to": [     
+        ],
+        "requires": ["Bomb-omb Factory"]
+    },
+    "Boos Horror Castle":{
+        "connects_to": [
+        ],
+        "requires": ["Boos Horror Castle"]
+    },
+    "Blooper Beach": {
+        "connects_to": [
+        ],
+        "requires": ["Blooper Beach"]
+    },
+    "Magma Mine": {
+        "connects_to": [
+        ],
+        "requires": ["Magma Mine"]
+    },
+    "Bowser Station": {
+        "connects_to": [
+        ],
+        "requires": ["Bowser Station"]
+    },
+    "DK Jungle Ruins": {
+        "connects_to": [],
+        "requires": ["DK Jungle Ruins"]
+    },
+    "Step it up": {
+        "connects_to": [],
+        "requires": ["Step it up"]
+    },
+    "Garden Battle": {
+        "connects_to": [],
+        "requires": ["Garden Battle"]
+    },
+    "Choice Challenge": {
+        "connects_to": [],
+        "requires": ["Choice Challenge"]
+    },
+    "High Rollers": {
+        "connects_to": [],
+        "requires": ["High Rollers"]
+    },
+    "Time Attack": {
+        "connects_to": [],
+        "requires": ["Time Attack"]
+    },
+    "Castle Clearout": {
+        "connects_to": [],
+        "requires": ["Castle Clearout"]
+    },
+    "Shell Soccer": {
+        "connects_to": [],
+        "requires": ["Shell Soccer"]
+    },
+    "Extra - Goomba Bowling": {
+        "connects_to": [],
+        "requires": ["Extra - Goomba Bowling"]
+    },
+    "Free for all mini games": {
+        "connects_to": [],
+        "requires": ["Free For All Mini Game selector"]
+    },
+    "1 vs rivals mini games": {
+        "connects_to": [],
+        "requires": ["1 vs rivals mini game slector"]
+    },
+    "Bosses": {
+        "connects_to": [],
+        "requires": ["Boss selector"]
+    },
+    "Specific spaces": {
+        "connects_to": [],
+        "requires": ["slow dice block"]
+    }
+}

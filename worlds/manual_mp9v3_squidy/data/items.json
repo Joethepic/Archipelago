@@ -1,0 +1,28 @@
+[
+    { "name": "Bomb-omb Factory", "progression": true },
+    { "name": "Boos Horror Castle", "progression": true },
+	{ "name": "Blooper Beach", "progression": true },
+	{ "name": "Magma Mine", "progression": true },
+	{ "name": "Bowser Station", "progression": true },
+	{ "name": "DK Jungle Ruins", "progression": true },
+	{ "name": "Step it up", "progression": true },
+	{ "name": "Garden Battle", "progression": true },
+	{ "name": "Choice Challenge", "progression": true },
+	{ "name": "High Rollers", "progression": true },
+	{ "name": "Time Attack", "progression": true },
+	{ "name": "Castle Clearout", "progression": true },
+	{ "name": "Shell Soccer", "progression": true },
+	{ "name": "Extra - Goomba Bowling", "progression": true },
+ 	{ "name": "Free For All Mini Game selector", "progression": true },
+	{ "name": "1 vs rivals mini game slector", "progression": true },
+	{ "name": "Boss selector", "progression": true },
+	{ "name": "slow dice block", "progression": true },
+	{ "name": "1-10 dice block", "progression": true },	
+    { "name": "0-1 dice block", "progression": true },
+	{ "name": "1-3 dice block", "progression": false },
+	{ "name": "4-6 dice block", "progression": false },
+	{ "name": "Trap: must use regular dice block next turn", "progression": false, "count": 10 },
+	{ "name": "Trap: HYDRATION", "count": 5 },
+	{ "name": "Trap: Can't use buttons during the next mini-game", "count": 3 }
+]
+
