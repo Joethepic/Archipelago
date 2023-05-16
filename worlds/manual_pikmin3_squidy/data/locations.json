@@ -1,0 +1,629 @@
+[
+    {
+        "name": "Charlie crash site complete",
+        "category": ["Distant Tundra"],
+        "region": "Tropical Wilds Starting Area"
+    },
+    { 
+        "name": "Red pikmin discovered", 
+        "region": "Tropical Wilds Starting Area",
+        "category": ["Topical Wilds"]
+    }, 
+    {
+        "name": "Red Onion Recovered",
+        "region": "Tropical Wilds Starting Area",
+        "category": ["Topical Wilds"]
+    },
+    { 
+        "name": "Drake Found", 
+        "region": "Tropical Wilds Starting Area",
+        "category": ["Tropical Wilds"]
+    },
+    {
+        "name": " Tropical Wilds - Recieve call from brittany",
+        "region": "Tropical Wilds Starting Area",
+        "category": ["Topical Wilds"]
+    },
+    {   "name": "First Sunseed Berry",
+        "region": "Garden of Hope Pre Britiny rescue",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Rock pikmin discovered",
+        "region": "Garden of Hope Pre Britiny rescue",
+        "category": ["Garden of Hope"],
+        "requires": ["Rock Pikmin" ]
+    },
+    {
+        "name": "Rescue Brittany",
+        "region": "Garden of Hope Pre Britiny rescue",
+        "category": ["Garden of Hope"],
+        "requires": ["Rock Pikmin"]
+    },
+    {
+        "name": "Face Wrinkler Captain throwing tutorial",
+        "region": "Garden of Hope Post Britiny rescue",
+        "category": ["Garden of Hope"]
+    },
+    {   "name": "Sunseed Berry side path back to Drake",
+        "region": "Garden of Hope Post Britiny rescue",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Fire-Breathing Feast",
+        "region": "Garden of Hope Post Britiny rescue",
+        "category": ["Garden of Hope"]
+    },
+    { "name": "Data Glutton", "region": "Garden of Hope Post Britiny rescue", "category": ["Garden of Hope"] },
+    {
+        "name": "Discover Yellow Pikmin",
+        "region": "Garden of Hope Post Britiny rescue",
+        "category": ["Distant Tundra"],
+        "requires": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra Reunite Alph and Bittany",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Velvety Dreamdrop Near cave entrance",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Dapper Blob",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Face Wrinkler",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Dusk Pustules",
+        "region":"Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Heroine's Tear",
+        "region":"Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Sunseed Berry",
+        "region":"Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Steller Extrusion",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Zest Bomb",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"],
+        "requires": ["Charlie"]
+    },
+    {
+        "name": "Distant Tundra - Dawn Pustules",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Disguised Delicacy",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Crunchy Deluge",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Citrus Lump",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"],
+        "requires": [
+            ["Charlie"],
+            {"or": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Wing Pikmin", "Twilight River", "Garden Of Hope"] }
+        ]
+    },
+    {
+        "name": "Distant Tundra - Astringent Clump",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Distant Tundra"]                                                                                                     
+    },
+    {
+        "name": "Distant Tundra - Cupids Grenade on top of snow man",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Cupids Grenade by snow man near cave",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Distant Tundra - Portable Sunset",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Distant Tundra"]
+    },
+    { 
+        "name": "Rescue Charlie",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },
+    {
+        "name": "Recover Dodge Whistle",
+        "region": "Distant Tundra",
+        "category": ["Distant Tundra"]
+    },    
+    {
+        "name": "Tropical Wilds - Cupids Grenade",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Citrus Lump",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Pocket Airhead",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Dapper Blob",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Delectable Bouquet",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Crimson Banquet",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Cave Velvety Dreamdrop ",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Velvety Dreamdrop in Armored Cannon Larva",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - -Lesser Mock Bottom",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Dawn Pustules",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Face Wrinkler",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Scaly Custard",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Stellar Extrusion",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"],
+        "requires": ["Charlie"]
+    },
+    {
+        "name": "Tropical Wilds - Mock Bottom",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Zest Bomb",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Disguised Delicacy",
+        "region": "Tropical Wilds Main",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - SlapStick Crescent",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Topical Wilds"]
+    },
+    {
+        "name": "Tropical Wilds - Searing Acidshock",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Topical Wilds"]
+    },
+    { "name": "Folded Data Glutton", 
+      "region": "Tropical Wilds Main",
+      "category": ["Topical Wilds"]   
+    },
+    { "name": "Recover Metal Suit Z",
+      "region": "Tropical Wilds Main",
+      "category": ["Topical Wilds"]
+    },
+    { "name": "Twilight River - Delectable Bouquet",
+      "region": "Twilight River Pre onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Dapper Blob",
+      "region": "Twilight River Pre onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Blonde Imposter",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Citrus Lump", "region": "Garden of Hope Louie Area", "category": ["Twilight River"] },
+    { "name": "Twilight River - Crunchy Deluge",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Dusk Pustules",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },    
+    { "name": "Twilight River - Insect Condo",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Juicy Gaggle 1",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Juicy Gaggle 2",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Juicy Gaggle 3",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Lesser Mock Bottom",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Portable Sunset",
+    "region": "Twilight River Post onion rescue",
+    "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Searing Acidshock",
+    "region": "Twilight River Post onion rescue",
+    "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Seed Hive",
+    "region": "Twilight River Post onion rescue",
+    "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Tremendous Sniffer",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Rescue Wing Onion",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },
+    { "name": "Twilight River - Recover Scorch Guard",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]
+    },   
+    { "name": "Twilight River - Rescue Hocotatian",
+      "region": "Twilight River Post onion rescue",
+      "category": ["Twilight River"]    
+    },
+    {
+     "name": "Garden of Hope - Sunseed berry Louie Area ",
+     "region": "Garden of Hope Louie Area",
+     "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Zest Bomb",
+        "region": "Garden of Hope Post Britiny rescue",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Steller Extrusion",
+        "region": "Distant Tundra",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Dusk Pustules",
+        "region": "Distant Tundra",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Pocket Airhead",
+        "region": "Distant Tundra",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Citrus Lump",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Searing Acidshock 1",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Searing Acidshock 2",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Lesser Mock Bottom",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },    
+    {
+        "name": "Garden of Hope - Velvety Dreamdrop",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Scaly Custard",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Astringent Clump",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Astringent Clump",
+        "region": "Twilight River Post onion rescue",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Wayword Moon",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    {
+        "name": "Garden of Hope - Food Theif",
+        "region": "Garden of Hope Louie Area",
+        "category": ["Garden of Hope"]
+    },
+    { 
+        "name": "Defeat eniemies- Tropical Forest victory",
+        "region": "Mission Mode Defeat eniemies Row 1",
+        "category": ["Battle Enemies" ],
+        "requires": ["Yellow Pikmin", "Brittany" ]
+    },
+    { 
+        "name": "Defeat eniemies- Silver Lake victory",
+        "region": "Mission Mode Defeat eniemies Row 1",
+        "category": ["Battle Enemies"],
+        "requires": ["Yellow Pikmin", "Charlie", "Blue Pikmin", "Wing Pikmin", "Brittany" ]
+    },
+    { 
+        "name": "Defeat eniemies - Thirsty Desert victory",
+        "region": "Mission Mode Defeat eniemies Row 1",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Charlie", "Rock Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies- Twilight Hollow victory",
+        "region": "Mission Mode Defeat eniemies Row 1",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Charlie", "Rock Pikmin", "Wing Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - Shaded Garden victory",
+        "region": "Mission Mode Defeat eniemies Row 1",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Charlie", "Rock Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - Tropical Wilds Remix victory",
+        "region": "Mission Mode Defeat eniemies Row 2",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Wing Pikmin", "Blue Pikmin", "Charlie" ]
+    },
+    { 
+        "name": "Defeat eniemies - Garden of Hope Remix victory",
+        "region": "Mission Mode Defeat eniemies Row 2",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany","Rock Pikmin", "Wing Pikmin", "Charlie" ]
+    },
+    { 
+        "name": "Defeat eniemies - Distant Tundra Remix victory",
+        "region": "Mission Mode Defeat eniemies Row 2",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Rock Pikmin", "Yellow Pikmin", "Charlie" ]
+    },
+    { 
+        "name": "Defeat eniemies - Twilight River Remix victory",
+        "region": "Mission Mode Defeat eniemies Row 2",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Rock Pikmin", "Charlie", "Wing Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - Formidable Oak Remix victory",
+        "region": "Mission Mode Defeat eniemies Row 2",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Rock Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - Forest Of Festivity victory",
+        "region": "Mission Mode Defeat eniemies Row 3",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Yellow Pikmin", "Charlie", "Wing Pikmin", "Blue Pikmin", "Rock Pikmin", "Wing Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - The Rustyard victory",
+        "region": "Mission Mode Defeat eniemies Row 3",
+        "category": ["Battle Enemies"],
+        "requires": ["Brittany", "Blue Pikmin", "Rock Pikmin" ]
+    },
+    { 
+        "name": "Defeat eniemies - Beastly Caverns victory",
+        "region": "Mission Mode Defeat eniemies Row 3",
+        "category": ["Battle Enemies"],
+        "requires": ["Olimar (Mission mode)", "Louie (Mission mode)", "Blue Pikmin", "Wing Pikmin", "Rock Pikmin"  ]
+    },
+    { 
+        "name": "Defeat eniemies - Forgotten Cove victory",
+        "region": "Mission Mode Defeat eniemies Row 3",
+        "category": ["Battle Enemies"],
+        "requires": ["Rock Pikmin", "Blue Pikmin", "Olimar (Mission mode)", "Louie (Mission mode)" ]
+    },
+    { 
+        "name": "Defeat eniemies - Clockwork Chasm victory",
+        "region": "Mission Mode Defeat eniemies Row 3",
+        "category": ["Battle Enemies"],
+        "requires": ["Yellow Pikmin", "Blue Pikmin", "Olimar (Mission mode)", "Louie (Mission mode)", "Brittany", "Wing Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Tropical Forest victory",
+        "region": "Mission Mode Collect Treasure Row 1",
+        "category": ["Collect Treasure"],
+        "requires": ["Rock Pikmin"]
+    },
+    { 
+        "name": "Collect Treasure - Silver Lake victory",
+        "region": "Mission Mode Collect Treasure Row 1",
+        "category": ["Collect Treasure"],
+        "requires": ["Yellow Pikmin", "Charlie", "Blue Pikmin", "White Pikmin", "Purple Pikmin", "Brittany" ]
+    },
+    { 
+        "name": "Collect Treasure - Thirsty Desert victory",
+        "region": "Mission Mode Collect Treasure Row 1",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Charlie", "Wing Pikmin", "White Pikmin", "Purple Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Twilight Hollow victory",
+        "region": "Mission Mode Collect Treasure Row 1",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Charlie", "Yellow Pikmin", "Wing Pikmin", "Purple Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Shaded Garden victory",
+        "region": "Mission Mode Collect Treasure Row 1",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Charlie", "Rock Pikmin", "White Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Tropical forest Remix victory",
+        "region": "Mission Mode Collect Treasure Row 2",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Yellow Pikmin", "White Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Silver Lake Remix victory",
+        "region": "Mission Mode Collect Treasure Row 2",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Yellow Pikmin", "Rock Pikmin", "White Pikmin", "Purple Pikmin", "Charlie" ]
+    },
+    { 
+        "name": "Collect Treasure - Thirsty Desert Remix victory",
+        "region": "Mission Mode Collect Treasure Row 2",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Wing Pikmin", "White Pikmin", "Purple Pikmin", "Charlie" ]
+    },
+    { 
+        "name": "Collect Treasure - Twilight Hollow Remix victory",
+        "region": "Mission Mode Collect Treasure Row 2",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Rock Pikmin", "Charlie", "Wing Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Shaded Garden Remix victory",
+        "region": "Mission Mode Collect Treasure Row 2",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Yellow Pikmin", "Charlie", "Wing Pikmin", "Blue Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Forest Of Festivity victory",
+        "region": "Mission Mode Collect Treasure Row 3",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Yellow Pikmin", "Charlie", "Wing Pikmin", "Blue Pikmin", "Rock Pikmin", "Purple Pikmin", "White Pikmin", "Wing Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - The Rustyard victory",
+        "region": "Mission Mode Collect Treasure Row 3",
+        "category": ["Collect Treasure"],
+        "requires": ["Brittany", "Yellow Pikmin", "Rock Pikmin" ]
+    },
+    { 
+        "name": "Collect Treasure - Beastly Caverns victory",
+        "region": "Mission Mode Collect Treasure Row 3",
+        "category": ["Collect Treasure"],
+        "requires": ["Olimar (Mission mode)", "Louie (Mission mode)", "Blue Pikmin", "White Pikmin", "Purple Pikmin"  ]
+    },
+    { 
+        "name": "Collect Treasure - Forgotten Cove victory",
+        "region": "Mission Mode Collect Treasure Row 3",
+        "category": ["Collect Treasure"],
+        "requires": ["Yellow Pikmin", "Blue Pikmin", "Olimar (Mission mode)", "Louie (Mission mode)" ]
+    },
+    { 
+        "name": "Collect Treasure - Clockwork Chasm victory",
+        "region": "Mission Mode Collect Treasure Row 3",
+        "category": ["Collect Treasure"],
+        "requires": ["Rock Pikmin", "Blue Pikmin", "Olimar (Mission mode)", "Louie (Mission mode)", "Brittany" ]
+    },
+    {
+        "name": "Defeat Bosses - Armored Mawdad",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany" ]
+    },
+    {
+        "name": "Defeat Bosses - Vehemoth Phosbat",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany", "Yellow Pikmin" ]
+    },
+    {
+        "name": "Defeat Bosses - Sandbelching Meerslug",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany", "Yellow Pikmin", "Charlie" ]
+    },
+    {
+        "name": "Defeat Bosses - Scornet Maestro",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany", "Charlie", "Wing Pikmin" ]
+    },
+    {
+        "name": "Defeat Bosses - Quaggled Mireclops",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany", "Charlie", "Blue Pikmin" ]
+    },
+    {
+        "name": "Defeat Bosses - Plasm Wraith",
+        "region": "Mission Mode Defeat Bosses",
+        "category": ["Defeat Bosses"],
+        "requires": ["Rock Pikmin", "Brittany", "Charlie", "Blue Pikmin", "Wing Pikmin", "Yellow Pikmin" ]
+    },
+    { "name": "Formidable Oak - rescue olimar", 
+      "category": ["Formidable Oak"], 
+      "region": "Formidable Oak",
+      "victory": true 
+    }
+
+]

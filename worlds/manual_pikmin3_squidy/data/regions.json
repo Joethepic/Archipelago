@@ -1,0 +1,86 @@
+{
+    "Tropical Wilds Starting Area": {
+        "connects_to": [
+            "Garden of Hope Pre Britiny rescue"
+        ],
+        "starting": true,
+        "requires": []
+    },
+
+    "Garden of Hope Pre Britiny rescue": {
+        "requires": ["Garden Of Hope"],
+        "connects_to": [
+            "Garden of Hope Post Britiny rescue"
+        ]
+    },
+
+    "Garden of Hope Post Britiny rescue": {
+        "requires": ["Rock Pikmin", "Brittany", "Garden Of Hope" ],
+        "connects_to": [
+            "Distant Tundra"
+        ]
+    },
+    "Distant Tundra": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Garden Of Hope" ],
+        "connects_to": [
+            "Tropical Wilds Main"
+        ]
+    },
+    "Tropical Wilds Main": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Twilight River", "Garden Of Hope" ],
+        "connects_to": [
+            "Twilight River Pre onion rescue"
+        ]
+    },
+    "Twilight River Pre onion rescue": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Wing Pikmin", "Twilight River", "Garden Of Hope", "Charlie" ],
+        "connects_to": [
+            "Twilight River Post onion rescue"
+        ]
+    },
+    "Twilight River Post onion rescue": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Wing Pikmin", "Twilight River", "Garden Of Hope" ],
+        "connects_to": [
+            "Garden of Hope Louie Area"
+        ]
+    },
+    "Garden of Hope Louie Area": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Wing Pikmin", "Blue Pikmin", "Twilight River", "Garden Of Hope" ],
+        "connects_to": [
+            "Formidable Oak"
+        ]
+    },
+    "Formidable Oak": {
+        "requires": ["Rock Pikmin", "Yellow Pikmin", "Distant Tundra", "Brittany", "Wing Pikmin", "Blue Pikmin", "Charlie", "Twilight River", "Garden Of Hope" ],
+        "connects_to": [
+        ]
+    }, 
+    "Mission Mode Collect Treasure Row 1": {
+        "requires": ["Collect Treasure row 1 key"],
+        "starting": true
+    },
+    "Mission Mode Collect Treasure Row 2": {
+        "requires": ["Collect Treasure row 2 key"],
+        "starting": true
+    },
+    "Mission Mode Collect Treasure Row 3": {
+        "requires": ["Collect Treasure row 3 key"],
+        "starting": true
+    }, 
+    "Mission Mode Defeat eniemies Row 1": {
+        "requires": ["Battle enemies row 1 key"],
+        "starting": true
+    },
+    "Mission Mode Defeat eniemies Row 2": {
+        "requires": ["Battle enemies row 2 key"],
+        "starting": true
+    },
+    "Mission Mode Defeat eniemies Row 3": {
+        "requires": ["Battle enemies row 3 key"],
+        "starting": true
+    },
+    "Mission Mode Defeat Bosses": {
+        "requires": ["Defeat bosses key"],
+        "starting": true
+    }
+}

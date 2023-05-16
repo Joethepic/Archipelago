@@ -1,0 +1,52 @@
+[ 
+    {
+        "name": "Garden Of Hope",
+        "category": [
+            "Areas"
+        ],
+        "progression": true
+    },
+    { 
+        "name": "Distant Tundra", 
+        "category": [
+            "Areas"
+        ], 
+        "progression": true 
+    },
+    { 
+        "name": "Twilight River", 
+        "category": [
+            "Areas"
+        ], 
+        "progression": true 
+    },
+    { 
+        "name": "Formidable Oak", 
+        "category": [
+            "Areas"
+        ], 
+        "progression": true 
+    },
+    { "name": "Blue Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "Yellow Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "Rock Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "Wing Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "White Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "Purple Pikmin", "progression": true, "category": ["Pikmin"] },
+    { "name": "Brittany", "progression": true, "category": ["Captains"] },
+    { "name": "Charlie", "progression": true, "category": ["Captains"] },
+    { "name": "Louie (Mission mode)", "progression": true, "category": ["Captains"] },
+    { "name": "Olimar (Mission mode)", "progression": true, "category": ["Captains"] },
+    { "name": "Collect Treasure row 1 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Collect Treasure row 2 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Collect Treasure row 3 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Battle enemies row 1 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Battle enemies row 2 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Battle enemies row 3 key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Defeat bosses key", "progression": true, "category": ["Mission mode keys"] },
+    { "name": "Dodge Whistle", "useful": true },
+    { "name": "Must take picture", "trap": true, "count": 10, "category": ["Traps"] },
+    { "name": "End Day", "trap": true, "count": 20, "category": ["Traps"] },
+    { "name": "HYRDRATION", "trap": true, "count": 15, "category": ["Traps"] },
+    { "name": "Exict a pikmin type", "trap": true, "category": ["Traps"] }
+]
