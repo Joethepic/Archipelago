@@ -474,8 +474,7 @@ def get_woth_hint(world, checked):
     locations = world.required_locations
     locations = list(filter(lambda location:
         location.name not in checked[location.player]
-        and not (world.woth_dungeon >= world.hint_dist_user['dungeons_woth_limit']
-                 and getattr(location.parent_region, "dungeon", None))
+        and not (world.woth_dungeon >= world.hint_dist_user['dungeons_woth_limit'] and location.parent_region.dungeon)
         and location.name not in world.hint_exclusions
         and location.name not in world.hint_type_overrides['woth']
         and location.item.name not in world.item_hint_type_overrides['woth'],
@@ -487,7 +486,7 @@ def get_woth_hint(world, checked):
     location = world.hint_rng.choice(locations)
     checked[location.player].add(location.name)
 
-    if getattr(location.parent_region, "dungeon", None):
+    if location.parent_region.dungeon:
         world.woth_dungeon += 1
         location_text = getHint(location.parent_region.dungeon.name, world.clearer_hints).text
     else:
@@ -571,7 +570,7 @@ def get_good_item_hint(world, checked):
     checked[location.player].add(location.name)
 
     item_text = getHint(getItemGenericName(location.item), world.clearer_hints).text
-    if getattr(location.parent_region, "dungeon", None):
+    if location.parent_region.dungeon:
         location_text = getHint(location.parent_region.dungeon.name, world.clearer_hints).text
         return (GossipText('#%s# hoards #%s#.' % (attach_name(location_text, location, world), attach_name(item_text, location.item, world)), 
             ['Green', 'Red']), location)
@@ -614,8 +613,8 @@ def get_specific_item_hint(world, checked):
     location = world.hint_rng.choice(locations)
     checked[location.player].add(location.name)
     item_text = getHint(getItemGenericName(location.item), world.clearer_hints).text
-
-    if getattr(location.parent_region, "dungeon", None):
+    
+    if location.parent_region.dungeon:
         location_text = getHint(location.parent_region.dungeon.name, world.clearer_hints).text
         if world.hint_dist_user.get('vague_named_items', False):
             return (GossipText('#%s# may be on the hero\'s path.' % (location_text), ['Green']), location)
