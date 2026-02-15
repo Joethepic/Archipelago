@@ -28,6 +28,7 @@ item_table: dict[str, SMGItemData] = {
   "Nothing": SMGItemData(["Nothing Item"], 170000007, IC.filler),
   "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
   "Peach": SMGItemData(["Victory"], None, IC.progression)
+
 }
 
 ITEM_NAME_TO_ID: dict[str, int] =  {

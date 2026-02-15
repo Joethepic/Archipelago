@@ -33,15 +33,12 @@ class ShuffleDomes(Toggle):
     internal_name = "dome_shuffle"
 
 # this defines the enable_purple_coin_stars setting 
-class EnablePurpleCoinStars(Choice):
+class EnablePurpleCoinStars(Toggle):
     """
     Add Purple Coin star location. Only one of these is normally available outside of post game
     """
     display_name = "Enable Purple Coin Stars"
     internal_name = "enable_purple_coin_stars"
-    option_main_game_only = 0
-    option_all = 1
-    option_none = 2
 
 # this allows players to pick their own star count to finish the game. 
 class StarstoFinish(Range):
@@ -58,8 +55,8 @@ class StarstoFinish(Range):
 class Dome1Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
-    Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
+    will be capped to ensure generation if necessary, and will never be allowed to go above 9 total stars
 
     These are based on each orbit in the dome, in case levels are shuffled. Inner Orbit is excluded, to ensure you have
     at least one world to start.
@@ -67,8 +64,8 @@ class Dome1Offsets(OptionCounter):
     display_name = "Dome 1 Access"
     internal_name = "dome_one_counts"
     min = 0
-    max = 10
-    valid_keys = ["Second Orbit", "Third Orbit", "Fourth Orbit", "Outer Orbit"]
+    max = 8
+    valid_keys = ["Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
     default = {
         "Second Orbit": 0,
         "Third Orbit": 0,
@@ -81,15 +78,15 @@ class Dome2Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and willed be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
     display_name = "Dome 2 Access"
     internal_name = "dome_two_counts"
     min = 0
-    max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Outer Orbit"]
+    max = 10
+    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
     default = {
         "Inner Orbit": 0,
         "Second Orbit": 0,
@@ -102,15 +99,15 @@ class Dome3Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and willed be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
     display_name = "Dome 3 Access"
     internal_name = "dome_three_counts"
     min = 0
-    max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Outer Orbit"]
+    max = 10
+    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
     default = {
         "Inner Orbit": 0,
         "Second Orbit": 0,
@@ -123,15 +120,15 @@ class Dome4Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and willed be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
     display_name = "Dome 4 Access"
     internal_name = "dome_four_counts"
     min = 0
-    max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Outer Orbit"]
+    max = 10
+    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
     default = {
         "Inner Orbit": 0,
         "Second Orbit": 0,
@@ -144,15 +141,15 @@ class Dome5Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and willed be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
     display_name = "Dome 5 Access"
     internal_name = "dome_five_counts"
     min = 0
-    max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Outer Orbit"]
+    max = 10
+    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
     default = {
         "Inner Orbit": 0,
         "Second Orbit": 0,
@@ -173,7 +170,7 @@ class Dome6Offsets(OptionCounter):
     internal_name = "dome_six_counts"
     min = 0
     max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Outer Orbit"]
+    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Final Orbit"]
     default = {
         "Inner Orbit": 0,
         "Second Orbit": 0,
@@ -187,14 +184,14 @@ class SMGOptions(PerGameCommonOptions):
     enable_purple_coin_stars: EnablePurpleCoinStars
     stars_to_finish: StarstoFinish
     character_select: Character
-    # dome_one_counts: Dome1Offsets
-    # dome_two_counts: Dome2Offsets
-    # dome_three_counts: Dome3Offsets
-    # dome_four_counts: Dome4Offsets
-    # dome_five_counts: Dome5Offsets
-    # dome_six_counts: Dome6Offsets
+    dome_one_counts: Dome1Offsets
+    dome_two_counts: Dome2Offsets
+    dome_three_counts: Dome3Offsets
+    dome_four_counts: Dome4Offsets
+    dome_five_counts: Dome5Offsets
+    dome_six_counts: Dome6Offsets
     #dome_shuffle: ShuffleDomes Enable when Ready
-    #galaxy_shuffle: GalaxyShuffle Enable when Ready
+    galaxy_shuffle: GalaxyShuffle
 
 option_groups = [
     Options.OptionGroup("Extra Locations", [
@@ -219,6 +216,6 @@ option_groups = [
 ]
 
 
-option_presets = Dict[str, Dict[str, Any]] = {
+option_presets: dict[str, dict[str, Any]] = {
 
 }

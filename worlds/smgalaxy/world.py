@@ -1,12 +1,15 @@
 from typing import ClassVar
 from BaseClasses import Item
 from Utils import visualize_regions
+from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
 
 from . import items, regions, Rules, web_world, Options
 from .Constants.Names import region_names as regname
+from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
+from .regions import disconnect_from_option
 
 
 class SMGWorld(World):
@@ -37,9 +40,42 @@ class SMGWorld(World):
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
         self.origin_region_name: str = regname.SHIP
+        self.shuffled_levels: list[tuple[str, str]] = []
+        self.starting_galaxy: str = "Good Egg Galaxy"
+        self.galaxy_counts: dict[str, int] = {}
+
+    def generate_early(self) -> None:
+        self.galaxy_counts = self.get_galaxy_counts()
 
     def create_regions(self):
         regions.create_regions(self)
+
+    def get_galaxy_counts(self) -> dict[str, int]:
+        """Gets all the required galaxy required counts for each dome number and galaxies within that dome."""
+        stupid_word_dict: dict[str, int] = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
+        galaxy_counts: dict[str, int] = {}
+
+        for dome_name, dome_num in stupid_word_dict.items():
+            # Get each set of dome offsets for each dome
+            dome_dict: dict = getattr(self.options, f"dome_{dome_name}_counts").value
+            # Each dome offset needs to account for the previous dome's max count. In the case of Dome 1, return 0
+            previous_dome_value: int = galaxy_counts.get(f"D{dome_num - 1}G5", 0)
+            # Gets the list of all the option counter names from the current option's value
+            dome_orbits: list[str] = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+
+            for i, dome_orb_name in enumerate(dome_orbits):
+                if not dome_orb_name in dome_dict.keys():
+                    print(f"Dome {dome_name} did not have orb name: {dome_orb_name}")
+                    continue
+
+                # Special case for Dome 6, as D6 will only ever have 4 galaxies total
+                if dome_name == "six" and dome_orb_name == "Final Orbit":
+                    galaxy_counts[f"D6G4"] = previous_dome_value + int(dome_dict[dome_orb_name])
+                    continue
+
+                galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_value + int(dome_dict[dome_orb_name])
+
+        return galaxy_counts
 
     def set_rules(self):
         Rules.set_rules(self, self.player)
@@ -55,17 +91,13 @@ class SMGWorld(World):
     def create_items(self):
         # creates the green stars in each player's itempool
         local_pool: list[SMGItem] = []
-        local_pool += [self.create_item("Green Star") for i in range(0,3)]
-        local_pool += [self.create_item("Grand Star") for i in range(0,7)]
+        local_pool += [self.create_item("Green Star") for i in range(0,2)]
+        local_pool += [self.create_item("Grand Star") for i in range(0,6)]
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
         # check to see what setting enable purple coin stars is on to see how many stars to create 
-        if self.options.enable_purple_coin_stars == self.options.enable_purple_coin_stars.option_main_game_only:
-           local_pool += [self.create_item("Power Star") for i in range(0,95)]
-        
-        elif self.options.enable_purple_coin_stars == self.options.enable_purple_coin_stars.option_all:
-             local_pool += [self.create_item("Power Star") for i in range(0,110)]
-
+        if self.options.enable_purple_coin_stars.value == 1:
+             local_pool += [self.create_item("Power Star") for i in range(0,109)]
         else:
              local_pool += [self.create_item("Power Star") for i in range(0,94)]
 
@@ -79,6 +111,15 @@ class SMGWorld(World):
             local_pool.append(self.create_item(self.get_filler_item_name()))
 
         self.multiworld.itempool += local_pool
+
+    def connect_entrances(self) -> None:
+        if self.options.galaxy_shuffle:
+            # Disconnect entrances based on options choice. Also ensures first available slot is a major galaxy
+            self.starting_galaxy = disconnect_from_option(self)
+            # Run randomize entrances, and return the entrance-exit pairings
+            self.shuffled_levels: list[tuple[str, str]] = randomize_entrances(self, True, {0: [0]}).pairings
+            # Apply rules to newly formed entrances based on within-world access
+            rules_from_er_placements(self, self.shuffled_levels)
 
     def pre_fill(self) -> None:
         visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph",show_entrance_names=True)

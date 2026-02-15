@@ -1,5 +1,6 @@
 from typing import NamedTuple, Optional, Callable, TYPE_CHECKING
 from BaseClasses import Region, Entrance, MultiWorld
+from entrance_rando import disconnect_entrance_for_randomization
 
 from .Constants.Names import region_names as regname
 from .Options import SMGOptions
@@ -65,9 +66,9 @@ region_list: dict[str, SMGRegionData] = {
     regname.SANDSPIRAL: SMGRegionData("Special", [regname.SHIP], [], [], {}),
     regname.SNOWCAP: SMGRegionData("Special", [regname.SHIP], [], [], {}),
     regname.BOOBONE: SMGRegionData("Special", [regname.SHIP], [], [], {}),
-    regname.ROLLINGGIZ: SMGRegionData("Special", [regname.SHIP], [], [], {"Green Star": 1}),
-    regname.LOOPDEESWOOP: SMGRegionData("Special", [regname.SHIP], [], [], {"Green Star": 1}),
-    regname.BUBBLEBLAST: SMGRegionData("Special", [regname.SHIP], [], [], {"Green Star": 1}),
+    regname.ROLLINGGIZ: SMGRegionData("Special", [regname.TRIALS], [], [], {}),
+    regname.LOOPDEESWOOP: SMGRegionData("Special", [regname.TRIALS], [], [], {}),
+    regname.BUBBLEBLAST: SMGRegionData("Special", [regname.TRIALS], [], [], {}),
     #regname.FINALE: SMGRegionData("Special", [regname.SHIP], [], [], {}),
     regname.BOWJR1: SMGRegionData("Boss", [regname.TERRACE], [], [], {}),
     regname.BOWJR2: SMGRegionData("Boss", [regname.KITCHEN], [], [], {}),
@@ -99,8 +100,10 @@ region_list: dict[str, SMGRegionData] = {
     regname.HONEYCLIMB: SMGRegionData("Minor", [regname.BEDROOM], [], [], {}),
     regname.BONEFIN: SMGRegionData("Minor", [regname.ENGINE], [], [], {}),
     regname.MATTER: SMGRegionData("Minor", [regname.GARDEN], [], [], {}),
+    regname.TRIALS: SMGRegionData("Hub", [], [regname.SHIP], [regname.LOOPDEESWOOP, regname.BUBBLEBLAST, regname.ROLLINGGIZ], {"Green Star": 1}),
 }
 
+major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]
 
 def create_regions(world: "SMGWorld"):
     for region_name in region_list.keys():
@@ -108,10 +111,7 @@ def create_regions(world: "SMGWorld"):
 
     create_locations(base_stars_locations, world)
 
-    if world.options.enable_purple_coin_stars.value == 0:
-        gateway_purple: dict[str, SMGLocationData] = {"GG: Gateway's Purple coins": locPC_table["GG: Gateway's Purple coins"]}
-        create_locations(gateway_purple, world)
-    elif world.options.enable_purple_coin_stars.value == 1:
+    if world.options.enable_purple_coin_stars.value == 1:
         create_locations(locPC_table, world)
 
     if world.options.stars_to_finish.value > 104 >= len(list(world.get_locations())):
@@ -142,3 +142,60 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
 
         reg.locations += [location]
 
+def disconnect_from_option(world: "SMGWorld") -> str:
+    Dome1Slot1 = "Good Egg Galaxy"
+    if "Bosses" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Final Orbit Galaxy"), 0, "BOWJR1")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Final Orbit Galaxy"), 0, "BOWSER1")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Final Orbit Galaxy"), 0, "BOWJR2")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Final Orbit Galaxy"), 0, "BOWSER2")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Final Orbit Galaxy"), 0, "BOWJR3")
+    if "Dome Majors" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Inner Orbit Galaxy"), 0, regname.GOODEGG)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Inner Orbit Galaxy"), 0, regname.SPACEJUNK)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Inner Orbit Galaxy"), 0, regname.BEACHBOWL)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Inner Orbit Galaxy"), 0, regname.GUSTY)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Inner Orbit Galaxy"), 0, regname.GOLDLEAF)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Inner Orbit Galaxy"), 0, regname.DEEPDARK)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Second Orbit Galaxy"), 0, regname.HONEYHIVE)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Third Orbit Galaxy"), 0, regname.BATTLEROCK)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Third Orbit Galaxy"), 0, regname.GHOSTLY)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Second Orbit Galaxy"), 0, regname.FREEZEFLAME)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Second Orbit Galaxy"), 0, regname.SEASLIDE)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Second Orbit Galaxy"), 0, regname.DREADNOUGHT)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Third Orbit Galaxy"), 0, regname.DUSTY)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Third Orbit Galaxy"), 0, regname.TOYTIME)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Fourth Orbit Galaxy"), 0, regname.MELTY)
+
+        # Ensure the first galaxy is a major one
+        Dome1Galaxy1Slot = world.get_entrance("Dome 1 Inner Orbit Galaxy")
+        starting_galaxy = world.get_region(world.random.choice(sorted(major_galaxy_list)))
+        er_target: Entrance = {e.name: e for e in starting_galaxy.entrances}[starting_galaxy.name]
+        starting_galaxy.entrances.remove(er_target)
+        Dome1Galaxy1Slot.connect(starting_galaxy)
+        Dome1Slot1 = starting_galaxy.name
+
+    if "Dome Minors" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Third Orbit Galaxy"), 0, "LOOPDEELOOP")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Second Orbit Galaxy"), 0, "ROLLINGGREEN")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Second Orbit Galaxy"), 0, "BEACHBOWL")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Fourth Orbit Galaxy"), 0, "GUSTY")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Fourth Orbit Galaxy"), 0, "BONEFIN")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Third Orbit Galaxy"), 0, "MATTER")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Fourth Orbit Galaxy"), 0, "FLIPSWITCH")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Fourth Orbit Galaxy"), 0, "HURRYSCUR")
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Fourth Orbit Galaxy"), 0, "BUOY")
+    if "Observatory Specials" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
+        disconnect_entrance_for_randomization(world.get_entrance("Sweet Sweet Hungry Luma"), 0, "SWEETSWEET")
+        disconnect_entrance_for_randomization(world.get_entrance("Sling Pod Hungry Luma"), 0, "SLINGPOD")
+        disconnect_entrance_for_randomization(world.get_entrance("Drip Drop Hungry Luma"), 0, "DRIPDROP")
+        disconnect_entrance_for_randomization(world.get_entrance("Bigmouth Hungry Luma"), 0, "BIGMOUTH")
+        disconnect_entrance_for_randomization(world.get_entrance("Sand Spiral Hungry Luma"), 0, "SANDSPIRAL")
+        disconnect_entrance_for_randomization(world.get_entrance("Snow Cap Hungry Luma"), 0, "SNOWCAP")
+        disconnect_entrance_for_randomization(world.get_entrance("Gateway Dome"), 0, "GATEWAY")
+        disconnect_entrance_for_randomization(world.get_entrance("Boo's Boneyard Hungry Luma"), 0, "BOOBONE")
+        disconnect_entrance_for_randomization(world.get_entrance("Rolling Gizmo Launch Star"), 0, "ROLLINGGIZ")
+        disconnect_entrance_for_randomization(world.get_entrance("Loopdeeswoop Launch Star"), 0, "LOOPDEESWOOP")
+        disconnect_entrance_for_randomization(world.get_entrance("Bubble Blast Launch Star"), 0, "BUBBLEBLAST")
+
+    return Dome1Slot1
