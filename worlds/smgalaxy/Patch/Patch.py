@@ -1,10 +1,12 @@
 import hashlib
 from pathlib import Path
-import os, time
+import os, time, random
 
 from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
-from ooga_booga import create_new_files
+from ooga_booga import create_new_files, galaxy_names
 from gclib.rarc import RARC
+
+from BCSVEditor import BCSVFile
 
 class InvalidCleanISOError(Exception): pass
 
@@ -155,7 +157,24 @@ if __name__ == '__main__':
     
     astrodome = RARC(astrodome_file)
     
-    files = create_new_files()
+    old_names = galaxy_names
+    
+    random.shuffle(old_names)
+    random.shuffle(old_names)
+    random.shuffle(old_names)
+    random.shuffle(old_names)
+    
+    files = ['a','b','c','d','e','f']
+    
+    count = 0
+    for file in files:
+        bcsv = BCSVFile(f"layer{file}/objinfo")
+        for entry in bcsv.entries:
+            for i, field in enumerate(entry.fields):
+                if field.name == 'name' and 'Mini' in entry.values[i]:
+                    entry.values[i] = old_names[count].decode('utf-8')
+                    count += 1
+        bcsv.write_to_file(file, overwrite=True)
     
     for i, file in enumerate(files):
         objinfo_entry = astrodome.get_node_by_path('').files[1].node.files[6].node.files[i+1].node.files[3]
