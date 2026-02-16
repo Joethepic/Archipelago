@@ -6,7 +6,7 @@ from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
 from ooga_booga import create_new_files, galaxy_names
 from gclib.rarc import RARC
 
-from BCSVEditor import BCSVFile
+from BCSVEditor import BCSVEditor
 
 class InvalidCleanISOError(Exception): pass
 
@@ -150,32 +150,36 @@ class WiiISO:
 if __name__ == '__main__':
     iso = WiiISO(iso_path)
     
-    iso.verify_base_rom()
-    iso.extract_iso()
+    #iso.verify_base_rom()
+    #iso.extract_iso()
     
     astrodome_file = iso.temp_dir + r"/DATA/files/StageData/AstroDome.arc"
     
     astrodome = RARC(astrodome_file)
     
-    old_names = galaxy_names
+    new_names = galaxy_names
     
-    random.shuffle(old_names)
-    random.shuffle(old_names)
-    random.shuffle(old_names)
-    random.shuffle(old_names)
+    random.shuffle(new_names)
+    random.shuffle(new_names)
+    random.shuffle(new_names)
+    random.shuffle(new_names)
     
     files = ['a','b','c','d','e','f']
     
     count = 0
     for file in files:
-        bcsv = BCSVFile(f"layer{file}/objinfo")
-        for entry in bcsv.entries:
-            for i, field in enumerate(entry.fields):
-                if field.name == 'name' and 'Mini' in entry.values[i]:
-                    entry.values[i] = old_names[count].decode('utf-8')
-                    count += 1
-        bcsv.write_to_file(file, overwrite=True)
-    
+        bcsv = BCSVEditor(f"layer{file}/objinfo")
+        mini_indexes = []
+        for i, entry in enumerate(bcsv.entries):
+            for field in bcsv.fields:
+                if field.name == 'name':
+                    if 'Mini' in bcsv.get_string(entry, field):
+                        mini_indexes.append(i)
+        
+        for i in mini_indexes:
+            bcsv.replace_entry_name_by_index(i, new_names[count])
+            count += 1
+
     for i, file in enumerate(files):
         objinfo_entry = astrodome.get_node_by_path('').files[1].node.files[6].node.files[i+1].node.files[3]
         new_data = open(file,'rb').read()
@@ -184,8 +188,8 @@ if __name__ == '__main__':
         
     astrodome.save_changes()
     
-    with open(astrodome_file, 'wb') as f:
+    with open(astrodome_file+'temp', 'wb') as f:
         astrodome.data.seek(0)
         f.write(astrodome.data.read())
     
-    iso.repack_iso()
+    #iso.repack_iso()
