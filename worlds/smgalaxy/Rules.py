@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
+
+from BaseClasses import Entrance
 from .regions import connect_regions, region_list
 from.Constants.Names import region_names as regname
+from ..generic.Rules import add_rule
 
 if TYPE_CHECKING:
     from . import SMGWorld
@@ -115,8 +118,29 @@ def set_rules(world: "SMGWorld", player: int):
     #                 lambda state: state.has("Green Star", player) and state.has("Power Star", player, 120))
     world.multiworld.completion_condition[player] = lambda state: state.has("Peach", player)
 
-def rules_from_er_placements(world: "SMGWorld", er_pairings: list[tuple[str,str]]):
+def rules_from_er_placements(world: "SMGWorld"):
     available_locations = 4
+    dome_orbits: list[str] = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    for dome_num in [1, 2, 3, 4, 5, 6]:
+        dome_galaxy_dict: dict = dict(sorted(dict([(d_key, d_val) for d_key, d_val in world.galaxy_counts.items()
+                                                   if f"D{dome_num}" in d_key]).items(), key=lambda item: item[1]))
+        for galaxy, star_count in dome_galaxy_dict.items():
+            gal_num: int = int(galaxy[3:])
+            if dome_num == 6 and gal_num == 4:
+                orbit_name: str = dome_orbits[4]
+            else:
+                orbit_name:str = dome_orbits[gal_num]
+
+            galaxy_entr: Entrance = world.get_entrance(f"Dome {dome_num} {orbit_name} Galaxy")
+            galaxy_type: str = region_list[galaxy_entr.connected_region.name].type
+
+            if star_count <= available_locations:
+                add_rule(galaxy_entr, lambda state, count=star_count: state.has("Power Star", world.player, count))
+            else:
+                add_rule(galaxy_entr, lambda state, count=available_locations: state.has("Power Star", world.player, count))
+                world.galaxy_counts[galaxy] = available_locations
+
+            available_locations += 4 if galaxy_type == "Major" else 1
 
 
     # # special stages logic Left here for reference later on default values

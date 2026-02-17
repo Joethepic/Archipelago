@@ -121,8 +121,8 @@ class SMGWorld(World):
             self.starting_galaxy = disconnect_from_option(self)
             # Run randomize entrances, and return the entrance-exit pairings
             self.shuffled_levels: list[tuple[str, str]] = randomize_entrances(self, True, {0: [0]}).pairings
-            # Apply rules to newly formed entrances based on within-world access
-            rules_from_er_placements(self, self.shuffled_levels)
+        # Apply rules to newly formed entrances based on within-world access, regardless of randomization
+        rules_from_er_placements(self)
 
     def pre_fill(self) -> None:
         visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph",show_entrance_names=True)

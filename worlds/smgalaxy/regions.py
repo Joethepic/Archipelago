@@ -198,4 +198,7 @@ def disconnect_from_option(world: "SMGWorld") -> str:
         disconnect_entrance_for_randomization(world.get_entrance("Loopdeeswoop Launch Star"), 0, "LOOPDEESWOOP")
         disconnect_entrance_for_randomization(world.get_entrance("Bubble Blast Launch Star"), 0, "BUBBLEBLAST")
 
+    #if world.options.shuffle_option.value == 3:
+
+
     return Dome1Slot1
