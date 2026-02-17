@@ -5,8 +5,9 @@ import os, time, random
 from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
 from ooga_booga import create_new_files, galaxy_names
 from gclib.rarc import RARC
+from yaz0 import compress_fast
 
-from BCSVEditor import BCSVEditor
+from __BCSVEditor import BCSVEditor
 
 class InvalidCleanISOError(Exception): pass
 
@@ -167,6 +168,7 @@ if __name__ == '__main__':
     files = ['a','b','c','d','e','f']
     
     count = 0
+    """
     for file in files:
         bcsv = BCSVEditor(f"layer{file}/objinfo")
         
@@ -176,6 +178,27 @@ if __name__ == '__main__':
                 count += 1
         
         bcsv.write_to_file(file)
+    """
+    for file in files:
+        bcsv = BCSVEditor(f"layer{file}/objinfo")
+
+        indexes = []
+
+        for i, entry in enumerate(bcsv.entries):
+            for field in bcsv.fields:
+                if field.name == 'name':
+                    offset = entry.get_value(field)
+                    offset_index = bcsv.string_offsets.index(offset)
+                    string = bcsv.strings[offset_index]
+                    if 'Mini' in string:
+                        indexes.append(i)
+        
+        for index in indexes:
+            bcsv.replace_entry_name_by_index(index, new_names[count].decode('utf-8'))
+            count += 1
+        
+
+        bcsv.write_to_file(file)
 
     for i, file in enumerate(files):
         objinfo_entry = astrodome.get_node_by_path('').files[1].node.files[6].node.files[i+1].node.files[3]
@@ -184,9 +207,16 @@ if __name__ == '__main__':
         astrodome.get_node_by_path('').files[1].node.files[6].node.files[i+1].node.files[3] = objinfo_entry
          
     astrodome.save_changes()
-    
-    with open(astrodome_file+'temp', 'wb') as f:
+
+    astrodome.data.seek(0)
+    data = astrodome.data.read()
+
+    with open(astrodome_file, 'wb') as f:
         astrodome.data.seek(0)
-        f.write(astrodome.data.read())
+        compress_fast(astrodome.data, f)
+
+    with open('astrodomecopy.arc', 'wb') as f:
+        astrodome.data.seek(0)
+        compress_fast(astrodome.data, f)
     
     iso.repack_iso()

@@ -1,5 +1,5 @@
 import struct
-from hashtable import hash_to_arg
+from hashtable import hash_to_name
 
 class BCSVField:
     """Represents a field in a BCSV file, containing information about the field's hash, bitmask, offset, shift, and type.
@@ -12,7 +12,7 @@ class BCSVField:
         self.shift = int.from_bytes(self.data[10:11], byteorder='big')
         self.type = int.from_bytes(self.data[11:12], byteorder='big')
 
-        self.name = hash_to_arg[int.to_bytes(self.hash, 4, 'big')]
+        self.name = hash_to_name[int.to_bytes(self.hash, 4, 'big')]
 
     def get_value_from_bytes(self, byte_value: bytes):
         """Returns the value of the field from the given byte value based on the field type.
@@ -101,6 +101,9 @@ class BCSVEntry:
             if field.name == name:
                 return field
         raise ValueError(f"Field with name '{name}' not found")
+
+    def __str__(self):
+        return str(self.values)
 
 class BCSVEditor:
     """A class for editing BCSV files, allowing for reading, modifying, and writing BCSV files.
@@ -205,9 +208,10 @@ class BCSVEditor:
             
             if new_name not in self.strings:
                 self.strings.append(new_name)
+                self.string_offsets.append(self.string_offsets[-1] + len(new_name) + 1)
             string_index = self.strings.index(new_name)
             entry.change_value(field, self.fields.index(field), self.string_offsets[string_index])
-            
+            """
             if old_name_offset not in [field.get_value(entry.data) for field in self.fields]: # If the old name is not used by any other field, remove it from the strings list 
                 old_string_index = self.string_offsets.index(old_name_offset)
                 del self.strings[old_string_index]
@@ -215,6 +219,7 @@ class BCSVEditor:
                 self.get_new_string_offsets()
                 new_offsets = self.string_offsets
                 self.update_entry_string_offsets(old_offsets, new_offsets)
+            """
         else:
             raise IndexError("Index out of bounds")
 
@@ -222,13 +227,13 @@ class BCSVEditor:
         """Updates the string offsets in the entry data for all entries based on the old and new string offsets.
         """
         for entry in self.entries:
-            for field in self.fields:
+            for i, field in enumerate(self.fields):
                 if field.type == 6: # STRING_OFFSET
                     value = entry.get_value(field)
                     if value in old_offsets:
                         old_index = old_offsets.index(value)
                         if old_index < len(new_offsets):
-                            entry.change_value(field, self.fields.index(field), new_offsets[old_index])
+                            entry.change_value(field, i, new_offsets[old_index])
         return
 
     def get_string(self, entry: BCSVEntry, field: BCSVField):
