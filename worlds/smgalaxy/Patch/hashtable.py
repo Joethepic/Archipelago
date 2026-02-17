@@ -1,4 +1,4 @@
-hash_to_arg = {b'\x00\x33\x7a\x8b': 'name',
+hash_to_name = {b'\x00\x33\x7a\x8b': 'name',
                b'\x00\x32\x89\xce': 'l_id',
                b'\x08\xe9\xc3\x02': 'Obj_arg0',
                b'\x08\xe9\xc3\x03': 'Obj_arg1',
@@ -33,7 +33,7 @@ hash_to_arg = {b'\x00\x33\x7a\x8b': 'name',
                b'\x8e\x34\xc8\x77': 'DemoGroupId',
                b'\x81\x49\x7c\x36': 'MapParts_ID'}
 
-arg_to_hash = {'name': b'\x00\x33\x7a\x8b',
+name_to_hash = {'name': b'\x00\x33\x7a\x8b',
                'l_id': b'\x00\x32\x89\xce',
                'Obj_arg0': b'\x08\xe9\xc3\x02',
                'Obj_arg1': b'\x08\xe9\xc3\x03',
@@ -70,9 +70,9 @@ arg_to_hash = {'name': b'\x00\x33\x7a\x8b',
 
 def convert_hash_or_name(HASH: int = 0, name: str = ''):
     if HASH:
-        return hash_to_arg[int.to_bytes(HASH, 4, 'big')]
+        return hash_to_name[int.to_bytes(HASH, 4, 'big')]
     if name:
-        return arg_to_hash[name]
+        return name_to_hash[name]
 
 if __name__ == "__main__":
     print(convert_hash_or_name(HASH=0x00337a8b))

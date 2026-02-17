@@ -1,297 +1,365 @@
 import struct
-from hashtable import hash_to_arg
-
-class BCSVField:
-    """Represents a field in a BCSV file, containing information about the field's hash, bitmask, offset, shift, and type.
-    """
-    def __init__(self, data: bytes):
-        self.data = data
-        self.hash = int.from_bytes(self.data[0:4], byteorder='big')
-        self.bitmask = int.from_bytes(self.data[4:8], byteorder='big')
-        self.offset = int.from_bytes(self.data[8:10], byteorder='big')
-        self.shift = int.from_bytes(self.data[10:11], byteorder='big')
-        self.type = int.from_bytes(self.data[11:12], byteorder='big')
-
-        self.name = hash_to_arg[int.to_bytes(self.hash, 4, 'big')]
-
-    def get_value_from_bytes(self, byte_value: bytes):
-        """Returns the value of the field from the given byte value based on the field type.
-        """
-        return struct.unpack('>' + self.get_value_format(), byte_value)[0]
-
-    def get_value(self, entry_data: bytes):
-        """Returns the value of the field from the given entry data.
-        """
-        field_data = entry_data[self.offset: self.offset + self.get_value_size()]
-        value = (int.from_bytes(field_data, byteorder='big') & self.bitmask) >> self.shift
-        byte_value = int.to_bytes(value, self.get_value_size(), byteorder='big')
-        return self.get_value_from_bytes(byte_value)
-
-    def get_value_size(self):
-        """Returns the size of the value based on the field type.
-        """
-        if self.type == 0: # LONG
-            return 4
-        elif self.type == 1: # STRING
-            return 32
-        elif self.type == 2: # FLOAT
-            return 4
-        elif self.type == 3: # LONG_2
-            return 4
-        elif self.type == 4: # SHORT
-            return 2
-        elif self.type == 5: # CHAR
-            return 1
-        elif self.type == 6: # STRING_OFFSET
-            return 4
-        else:
-            raise ValueError(f"Unknown field type: {self.type}")
-    
-    def get_value_format(self):
-        """Returns the struct format character for the field type.
-        """
-        if self.type == 0: # LONG
-            return 'i'
-        elif self.type == 1: # STRING
-            return 'c'*32
-        elif self.type == 2: # FLOAT
-            return 'f'
-        elif self.type == 3: # LONG_2
-            return 'i'
-        elif self.type == 4: # SHORT
-            return 'h'
-        elif self.type == 5: # CHAR
-            return 'b'
-        elif self.type == 6: # STRING_OFFSET
-            return 'I'
-        else:
-            raise ValueError(f"Unknown field type: {self.type}")
-    
-    def __str__(self):
-        return f"Name = {self.name}\nHash = {self.hash}\nBitmask = {self.bitmask}\nOffset = {self.offset}\nShift = {self.shift}\nType = {self.type}"
-    
-class BCSVEntry:
-    """Represents an entry in a BCSV file, containing the entry data and the values of the fields in the entry.
-    """
-    def __init__(self, data: bytes, fields: BCSVField):
-        self.data = data
-        self.values = []
-        for field in fields:
-            value = (int.from_bytes(self.data[field.offset:field.offset + field.get_value_size()], byteorder='big') & field.bitmask) >> field.shift
-            self.values.append(value)
-    
-    def get_value(self, field: BCSVField):
-        """Returns the value of the specified field in the entry.
-        """
-        return field.get_value(self.data)
-
-    def change_value(self, field: BCSVField, field_index: int, new_value: int):
-        """Changes the value of the specified field in the entry to the new value.
-        """
-        self.values[field_index] = new_value
-        value = (new_value << field.shift) & field.bitmask
-        byte_value = int.to_bytes(value, field.get_value_size(), byteorder='big')
-        self.data = self.data[:field.offset] + byte_value + self.data[field.offset + field.get_value_size():]
-        return
-
-    def get_field_by_name(self, name: str, fields: BCSVField):
-        """Returns the field object with the specified name from the list of fields.
-        """
-        for field in fields:
-            if field.name == name:
-                return field
-        raise ValueError(f"Field with name '{name}' not found")
+from hashtable import hash_to_name, name_to_hash
+import os
 
 class BCSVEditor:
-    """A class for editing BCSV files, allowing for reading, modifying, and writing BCSV files.
-    """
     def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.fields = []
-        self.entries = []
-        self.offset = 0
-
-        self.strings = []
-        self.string_offsets = []
-
-        self.entry_count = 0
-        self.field_count = 0
-        self.entry_offset = 0
-        self.entry_size = 0
-
         try:
             with open(file_path, 'rb') as f:
                 data = f.read()
         except:
             raise FileNotFoundError(f"File not found: {file_path}")
-
-        # Parse the header from the data
-        self.set_header(data[0:16])
-
-        # Parse the fields from the data
-        for i in range(self.field_count):
-            field_data = data[16 + i * 12 : 16 + (i + 1) * 12]
-            self.add_field(field_data)
-
-        # Parse the entries from the data        
-        for i in range(self.entry_count):
-            entry_data = data[self.entry_offset + i * self.entry_size : self.entry_offset + (i + 1) * self.entry_size]
-            self.add_entry(entry_data)
         
-        # Parse the strings from the data
-        strings = data[self.entry_offset + self.entry_count * self.entry_size :]
-        self.strings = [string.decode('utf-8') for string in strings.split(b'\x00')[:-1]]
-        self.get_new_string_offsets()
+        self.data = data
 
-    def set_header(self, header: bytes):
-        """Sets the header information for the BCSV file based on the provided header data.
-        """
-        self.entry_count = int.from_bytes(header[0:4], byteorder='big')
-        self.field_count = int.from_bytes(header[4:8], byteorder='big')
-        self.entry_offset = int.from_bytes(header[8:12], byteorder='big')
-        self.entry_size = int.from_bytes(header[12:16], byteorder='big')
+        # Initialize and set header values
+        self.entry_count = 0
+        self.field_count = 0
+        self.entry_offset = 0
+        self.entry_size = 0
+        self._read_header_from_data()
+
+        # Initialize and set fields
+        self.fields = []
+        self._read_fields_from_data()
+
+        # Initialize and set entries
+        self.entries = []
+        self._read_entries_from_data()
+
+        # Initalize and set strings
+        self.strings = []
+        self.string_offsets = []
+        self._read_strings_from_data()
+        self._read_string_offsets_from_data()
+
+        self._replace_string_offsets_with_strings()
         return
-    
-    def add_field(self, data: bytes, index: int = None):
-        """Adds a field to the BCSV file based on the provided field data and optional index.
-        If index is not provided, the field will be added at the end of the fields list.
+
+    def _read_header_from_data(self):
+        """Reads the header of the data and sets the entry count, field count, entry offset, and entry size.
         """
-        field = BCSVField(data)
-        if index is not None:
-            self.fields.insert(index, field)
-        else:
+        header_data = self.data[:16]
+
+        self.entry_count = int.from_bytes(header_data[0:4], byteorder='big')
+        self.field_count = int.from_bytes(header_data[4:8], byteorder='big')
+        self.entry_offset = int.from_bytes(header_data[8:12], byteorder='big')
+        self.entry_size = int.from_bytes(header_data[12:16], byteorder='big')
+        return
+
+    def _read_field_from_data_by_index(self, index: int):
+        """Reads the field data from the data for the specified index and adds it to the fields list.
+        """
+        # Each field is 12 bytes long and starts at offset 16 in the file
+        field_data_offset = 16 + index*12
+        field_data = self.data[field_data_offset:field_data_offset+12]
+
+        # Convert the field data to a dictionary and return it
+        field = {}
+        field['name'] = hash_to_name[field_data[0:4]]
+        field['bitmask'] = int.from_bytes(field_data[4:8], byteorder='big')
+        field['offset'] = int.from_bytes(field_data[8:10], byteorder='big')
+        field['shift'] = int.from_bytes(field_data[10:11], byteorder='big')
+        field['type'] = int.from_bytes(field_data[11:12], byteorder='big')
+        return field
+
+    def _read_fields_from_data(self):
+        """Reads the field data from the data and sets the fields list.
+        """
+        for i in range(self.field_count):
+            field = self._read_field_from_data_by_index(i)
             self.fields.append(field)
         return
 
-    def add_entry(self, data: bytes, index: int = None):
-        """Adds an entry to the BCSV file based on the provided entry data and optional index.
-        If index is not provided, the entry will be added at the end of the entries list.
+    def _read_entry_from_data_by_index(self, index: int):
+        """Reads the entry data from the data for the specified index and returns it as a dictionary.
         """
-        entry = BCSVEntry(data, self.fields)
-        if index is not None:
-            self.entries.insert(index, entry)
-        else:
+        entry_data_offset = self.entry_offset + index*self.entry_size
+        entry_data = self.data[entry_data_offset:entry_data_offset+self.entry_size]
+
+        # Convert the entry data to a list of values based on the fields and return it
+        entry = []
+        for field in self.fields:
+            data_format = self._get_data_format_from_field(field)
+            data_length = self._get_data_length_from_field(field)
+            offset = field['offset']
+            
+            data = entry_data[offset:offset+data_length]
+            value = struct.unpack('>' + data_format, data)[0]
+            entry.append(value)
+        return entry
+    
+    def _read_entries_from_data(self):
+        """Reads the entry data from the data and returns it as a list of dictionaries.
+        """
+        for i in range(self.entry_count):
+            entry = self._read_entry_from_data_by_index(i)
             self.entries.append(entry)
         return
-
-    def get_new_string_offsets(self):
-        """Updates the string offsets based on the current list of strings.
+    
+    def _read_strings_from_data(self):
+        """Reads the string data from the data and sets the strings list.
         """
+        # The string data starts at the end of the entry data and continues until the end of the file
+        string_data_offset = self.entry_offset + self.entry_count*self.entry_size
+        string_data = self.data[string_data_offset:]
+
+        # Each string is null-terminated, so we can split the string data by null bytes to get the individual strings
+        strings = string_data.split(b'\x00')
+        self.strings = [string.decode('utf-8') for string in strings if b'@' not in string]
+        return
+
+    def _read_string_offsets_from_data(self):
+        """Reads the string offsets from the data and sets the string_offsets list.
+        """
+        # The string data starts at the end of the entry data and continues until the end of the file
+        string_data_offset = self.entry_offset + self.entry_count*self.entry_size
+        string_data = self.data[string_data_offset:]
+
+        # Each string is null-terminated, so we can split the string data by null bytes to get the individual strings and their offsets
         self.string_offsets = [0]
+        for i, char in enumerate(string_data):
+            char = bytes([char])
+            if char == b'\x00' and i < len(string_data):
+                if char != b'@':
+                    self.string_offsets.append(i+1)
+        return
+
+    def _replace_string_offsets_with_strings(self):
+        """Replaces the string offsets in the entries with the actual strings from the strings list.
+        """
+        for entry in self.entries:
+            for i, field in enumerate(self.fields):
+                if field['type'] == 6: # STRING_OFFSET
+                    string_offset = entry[i]
+                    string_index = self.string_offsets.index(string_offset)
+                    string = self.strings[string_index]
+                    entry[i] = string
+        return
+
+    def _replace_strings_with_string_offsets(self):
+        for entry in self.entries:
+            for i, field in enumerate(self.fields):
+                if field['type'] == 6: # STRING_OFFSET
+                    string = entry[i]
+                    string_offset_index = self.strings.index(string)
+                    string_offset = self.string_offsets[string_offset_index]
+                    entry[i] = string_offset
+        return
+
+    def _get_column_from_index(self, index: int):
+        """Returns a list of values for the specified column index from the entries.
+        """
+        column = []
+
+        # Loop through each entry and get the value at the specified index and add it to the column list
+        for entry in self.entries:
+            column.append(entry[index])
+        return column
+
+    def _get_data_format_from_field(self, field: dict):
+        """Returns the data format string for the specified field based on its type.
+        """
+        data_type = field['type']
+        if data_type == 0: # LONG
+            return 'i'
+        elif data_type == 1: # STRING
+            return 'c'*32
+        elif data_type == 2: # FLOAT
+            return 'f'
+        elif data_type == 3: # LONG_2
+            return 'i'
+        elif data_type == 4: # SHORT
+            return 'h'
+        elif data_type == 5: # CHAR
+            return 'b'
+        elif data_type == 6: # STRING_OFFSET
+            return 'I'
+        else:
+            raise ValueError(f"Unknown data type: {data_type}")
+
+    def _get_data_length_from_field(self, field: dict):
+        """Returns the data length in bytes for the specified field based on its type.
+        """
+        data_type = field['type']
+        if data_type == 0: # LONG
+            return 4
+        elif data_type == 1: # STRING
+            return 32
+        elif data_type == 2: # FLOAT
+            return 4
+        elif data_type == 3: # LONG_2
+            return 4
+        elif data_type == 4: # SHORT
+            return 2
+        elif data_type == 5: # CHAR
+            return 1
+        elif data_type == 6: # STRING_OFFSET
+            return 4
+        else:
+            raise ValueError(f"Unknown data type: {data_type}")
+
+    def get_entry_name_by_index(self, index: int):
+        entry = self.entries[index]
+        return entry[0]
+
+    def rename_entry_by_index(self, index: int, new_name: str):
+        entry = self.entries[index]
+        entry[0] = new_name
+        if new_name not in self.strings:
+            self.strings.append(new_name)
+            self.string_offsets.append(self.string_offsets[-1] + len(new_name) + 1)
+        return
+
+    def write_to_file(self, file_path: str, overwrite = True):
+        if os.path.isfile(file_path) and not overwrite:
+            raise FileExistsError(f"File already exists: {file_path}")
+        
+        self._write_header_to_data()
+        self._write_fields_to_data()
+        self._write_entries_to_data()
+        self._write_strings_to_data()
+        self._write_string_offsets_to_data()
+
+        # Pad file to 32 bytes
+        if len(self.data) % 32 != 0:
+            padding = 32 - len(self.data) % 32
+            self.data += b'@' * padding
+
+        try:
+            with open(file_path, 'wb') as f:
+                f.write(self.data)
+        except:
+            raise FileExistsError(f"File not found: {file_path}")
+
+    def _write_header_to_data(self):
+        """Writes the header values to the data.
+        """
+        header_data = b''
+        header_data += self.entry_count.to_bytes(4, byteorder='big')
+        header_data += self.field_count.to_bytes(4, byteorder='big')
+        header_data += self.entry_offset.to_bytes(4, byteorder='big')
+        header_data += self.entry_size.to_bytes(4, byteorder='big')
+        self.data = header_data + self.data[16:]
+        return
+
+    def _write_field_to_data_by_index(self, index: int):
+        """Writes the field data to the data for the specified index.
+        """
+        # Each field is 12 bytes long and starts at offset 16 in the file
+        field_data_offset = 16 + index*12
+        field = self.fields[index]
+        field_data = b''
+
+        # Convert the field dictionary to bytes
+        field_data += name_to_hash[self.fields[index]['name']]
+        field_data += field['bitmask'].to_bytes(4, byteorder='big')
+        field_data += field['offset'].to_bytes(2, byteorder='big')
+        field_data += field['shift'].to_bytes(1, byteorder='big')
+        field_data += field['type'].to_bytes(1, byteorder='big')
+        self.data = self.data[:field_data_offset] + field_data + self.data[field_data_offset+12:]
+        return
+
+    def _write_fields_to_data(self):
+        """Writes the field data to the data.
+        """
+        for i in range(self.field_count):
+            self._write_field_to_data_by_index(i)
+        return
+
+    def _write_entry_to_data_by_index(self, index: int):
+        """Write the entry data from the data for the specified index and returns it as a dictionary.
+        """
+        # Each entry is entry_size bytes long and starts at entry_offset in the file
+        entry_data_offset = self.entry_offset + index*self.entry_size
+        entry_data = b'\x00' * self.entry_size
+
+        entry = self.entries[index]
+
+        # Convert the entry list of values to bytes based on the fields and write it to the data
+        for field in self.fields:
+            data_length = self._get_data_length_from_field(field)
+            data_format = self._get_data_format_from_field(field)
+            offset = field['offset']
+            index = self.fields.index(field)
+            
+            if field['type'] == 6: # STRING_OFFSET
+                string = entry[index]
+                string_offset_index = self.strings.index(string)
+                string_offset = self.string_offsets[string_offset_index]
+                entry[index] = string_offset
+                
+            value_bytes = struct.pack('>' + data_format, entry[index])
+            entry_data = entry_data[:offset] + value_bytes + entry_data[offset+data_length:]
+        self.data = self.data[:entry_data_offset] + entry_data + self.data[entry_data_offset+self.entry_size:]
+        return
+
+    def _write_entries_to_data(self):
+        """Writes the entry data to the data from the entries list.
+        """
+        for i in range(self.entry_count):
+            self._write_entry_to_data_by_index(i)
+        return
+    
+    def _write_strings_to_data(self):
+        """Writes the strings list to the data.
+        """
+        # The string data starts at the end of the entry data and continues until the end of the file
+        string_offset = self.entry_offset + self.entry_count*self.entry_size
+        string_data = b''
         for string in self.strings:
-            self.string_offsets.append(self.string_offsets[-1] + len(string) + 1)
+            string_data += string.encode('utf-8') + b'\x00'
+
+        self.data = self.data[:string_offset] + string_data
+
+        self._read_string_offsets_from_data()
         return
 
-    def update_entry_string_offsets(self):
-        """Updates the string offsets in the entry data for all entries based on the current list of strings and string offsets.
+    def _write_string_offsets_to_data(self):
+        """Writes the string offsets to the data.
         """
-        for entry in self.entries:
-            for field in self.fields:
-                if field.type == 6: # STRING_OFFSET
-                    value = entry.get_value(field)
-                    if value in self.string_offsets:
-                        string_index = self.string_offsets.index(value)
-                        new_offset = self.string_offsets[string_index]
-                        entry.change_value(field, self.fields.index(field), new_offset)
-        return
+        for i, entry in enumerate(self.entries):
+            for j, field in enumerate(self.fields):
+                if field['type'] == 6: # STRING_OFFSET
+                    string_offset = entry[j]
+                    if string_offset not in self.string_offsets:
+                        raise ValueError(f"String offset not found in string offset list: {string_offset}")
+                    
+                    string_offset_data = string_offset.to_bytes(4, byteorder='big')
 
-    def replace_entry_name_by_index(self, index: int, new_name: str):
-        """Replaces the name of an entry at the specified index with a new name.
-        """
-        if 0 <= index < len(self.entries):
-            entry = self.entries[index]
-            field = entry.get_field_by_name('name', self.fields)
-            old_name_offset = field.get_value(entry.data)
-            
-            if new_name not in self.strings:
-                self.strings.append(new_name)
-            string_index = self.strings.index(new_name)
-            entry.change_value(field, self.fields.index(field), self.string_offsets[string_index])
-            
-            if old_name_offset not in [field.get_value(entry.data) for field in self.fields]: # If the old name is not used by any other field, remove it from the strings list 
-                old_string_index = self.string_offsets.index(old_name_offset)
-                del self.strings[old_string_index]
-                old_offsets = self.string_offsets.copy()
-                self.get_new_string_offsets()
-                new_offsets = self.string_offsets
-                self.update_entry_string_offsets(old_offsets, new_offsets)
-        else:
-            raise IndexError("Index out of bounds")
+                    string_offset_data_offset = self.entry_offset + i*self.entry_size + field['offset']
 
-    def update_entry_string_offsets(self, old_offsets: list, new_offsets: list):
-        """Updates the string offsets in the entry data for all entries based on the old and new string offsets.
-        """
-        for entry in self.entries:
-            for field in self.fields:
-                if field.type == 6: # STRING_OFFSET
-                    value = entry.get_value(field)
-                    if value in old_offsets:
-                        old_index = old_offsets.index(value)
-                        if old_index < len(new_offsets):
-                            entry.change_value(field, self.fields.index(field), new_offsets[old_index])
-        return
-
-    def get_string(self, entry: BCSVEntry, field: BCSVField):
-        """Returns the string value of the specified field in the entry.
-        """
-        offset = entry.get_value(field)
-        if offset in self.string_offsets:
-            string_index = self.string_offsets.index(offset)
-            return self.strings[string_index]
-        else:
-            return None
-
-    def write_to_file(self, file_path: str):
-        """Writes the BCSV file to the specified file path.
-        """
-        with open(file_path, 'wb') as f:
-            # Write header
-            f.write(int.to_bytes(self.entry_count, 4, byteorder='big'))
-            f.write(int.to_bytes(self.field_count, 4, byteorder='big'))
-            f.write(int.to_bytes(self.entry_offset, 4, byteorder='big'))
-            f.write(int.to_bytes(self.entry_size, 4, byteorder='big'))
-
-            # Write fields
-            for field in self.fields:
-                f.write(int.to_bytes(field.hash, 4, byteorder='big'))
-                f.write(int.to_bytes(field.bitmask, 4, byteorder='big'))
-                f.write(int.to_bytes(field.offset, 2, byteorder='big'))
-                f.write(int.to_bytes(field.shift, 1, byteorder='big'))
-                f.write(int.to_bytes(field.type, 1, byteorder='big'))
-
-            # Write entries
-            for entry in self.entries:
-                f.write(entry.data)
-
-            # Write strings
-            for string in self.strings:
-                f.write(string.encode('utf-8') + b'\x00')
-            
-            padding = 32 - f.tell() % 32
-            f.write(b'@' * padding)
+                    # Replace the string offset in the data with the actual string offset value
+                    self.data = self.data[:string_offset_data_offset] + string_offset_data + self.data[string_offset_data_offset+4:]
         return
 
     def __str__(self):
-        values = [[field.name for field in self.fields]]
-        for entry in self.entries:
-            values.append([])
-            for field in self.fields:
-                if field.type == 6: # STRING_OFFSET
-                    index = self.string_offsets.index(entry.get_value(field))
-                    values[-1].append(self.strings[index])
-                else:
-                    values[-1].append(entry.get_value(field))
-        
-        max_lengths = [max(len(str(value)) for value in column) for column in zip(*values)]
+        """Create a nice table representation of the BCSV data and return it as a string.
+        """
         out = ''
-        for row in values:
-            out += '-+-'.join('-' * max_lengths[i] for i in range(len(row))) + '\n'
-            out += ' | '.join(str(value).ljust(max_lengths[i]) for i, value in enumerate(row)) + '\n'
+        # Get max lengths for spacing
+        max_lengths = [max(len(field['name']), max(len(str(val)) for val in self._get_column_from_index(i))) for i, field in enumerate(self.fields)]
+        
+        # Add the field names to the output string with proper spacing
+        out  += ' | '.join(field['name'].ljust(max_lengths[i]) for i, field in enumerate(self.fields)) + '\n'
+        out  += '-+-'.join('-' * max_lengths[i] for i in range(len(self.fields))) + '\n'
+        
+        # Loop through each entry and add it to the output string with proper spacing
+        for entry in self.entries:
+            out += ' | '.join(str(val).ljust(max_lengths[i]) for i, val in enumerate(entry)) + '\n'
         return out
 
-if __name__ == "__main__":
+
+def main():
     bcsv = BCSVEditor('layera/objinfo')
-    
-    bcsv.replace_entry_name_by_index(3, 'MiniSkullSharkGalaxy')
+
+    for i in range(len(bcsv.entries)):
+        if 'MiniEgg' in bcsv.get_entry_name_by_index(i):
+            bcsv.rename_entry_by_index(i, 'test')
+
+    print(bcsv)
 
     bcsv.write_to_file('test')
+
+if __name__ == "__main__":
+    main()
