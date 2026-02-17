@@ -54,26 +54,29 @@ class SMGWorld(World):
         """Gets all the required galaxy required counts for each dome number and galaxies within that dome."""
         stupid_word_dict: dict[str, int] = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
         galaxy_counts: dict[str, int] = {}
+        previous_dome_count: int = 0
 
         for dome_name, dome_num in stupid_word_dict.items():
             # Get each set of dome offsets for each dome
-            dome_dict: dict = getattr(self.options, f"dome_{dome_name}_counts").value
+            dome_dict: dict = dict(sorted(dict(getattr(self.options, f"dome_{dome_name}_counts").value).items(),
+                                          key=lambda item: item[1]))
             # Each dome offset needs to account for the previous dome's max count. In the case of Dome 1, return 0
-            previous_dome_value: int = galaxy_counts.get(f"D{dome_num - 1}G5", 0)
+            if dome_num != 1:
+                previous_dome_count = max([d_val for d_key, d_val in galaxy_counts.items() if f"D{dome_num-1}" in d_key])
             # Gets the list of all the option counter names from the current option's value
             dome_orbits: list[str] = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
 
             for i, dome_orb_name in enumerate(dome_orbits):
                 if not dome_orb_name in dome_dict.keys():
-                    print(f"Dome {dome_name} did not have orb name: {dome_orb_name}")
+                    print(f"Dome {dome_name} did not have orbit name: {dome_orb_name}")
                     continue
 
                 # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Final Orbit":
-                    galaxy_counts[f"D6G4"] = previous_dome_value + int(dome_dict[dome_orb_name])
+                    galaxy_counts[f"D6G4"] = previous_dome_count + int(dome_dict[dome_orb_name])
                     continue
 
-                galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_value + int(dome_dict[dome_orb_name])
+                galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
 
         return galaxy_counts
 
