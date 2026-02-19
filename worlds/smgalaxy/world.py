@@ -107,11 +107,9 @@ class SMGWorld(World):
         local_pool += [self.create_item("Grand Star") for i in range(7)]
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
-        # check to see what setting enable purple coin stars is on to see how many stars to create 
-        if self.options.enable_purple_coin_stars.value == 1:
-             local_pool += [self.create_item("Power Star") for i in range(109)]
-        else:
-             local_pool += [self.create_item("Power Star") for i in range(94)]
+        # make sure we don't create more stars than locations, somehow
+        star_count = min([109, (len(list(self.get_locations()))-10)])
+        local_pool += [self.create_item("Power Star") for i in range(star_count)]
 
         # Calculate the number of additional filler items to create to fill all locations
         n_locations = len(self.multiworld.get_unfilled_locations(self.player))
