@@ -62,20 +62,29 @@ class SMGWorld(World):
                                           key=lambda item: item[1]))
             # Each dome offset needs to account for the previous dome's max count. In the case of Dome 1, return 0
             if dome_num != 1:
-                previous_dome_count = max([d_val for d_key, d_val in galaxy_counts.items() if f"D{dome_num-1}" in d_key])
+                previous_dome_count = max([d_val for d_key, d_val in galaxy_counts.items() if f"D{dome_num - 1}" in d_key])
             # Gets the list of all the option counter names from the current option's value
             dome_orbits: list[str] = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
 
             for i, dome_orb_name in enumerate(dome_orbits):
                 if not dome_orb_name in dome_dict.keys():
                     print(f"Dome {dome_name} did not have orbit name: {dome_orb_name}")
+
+                    # If the first dome, Inner Orbit would never exist
+                    # IF the last dome, Fourth Orbit will never exist
+                    if (dome_num == 1 and dome_orb_name == "Inner Orbit") or (
+                            dome_num == 6 and dome_orb_name == "Fourth Orbit"):
+                        continue
+
+                    # Because OptionCounters can somehow be blank entirely, just force these to have values to 0, which
+                    # wouldn't need to be added to dome count.
+                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
                     continue
 
-                # Special case for Dome 6, as D6 will only ever have 4 galaxies total
+                    # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Final Orbit":
                     galaxy_counts[f"D6G4"] = previous_dome_count + int(dome_dict[dome_orb_name])
                     continue
-
                 galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
 
         return galaxy_counts
