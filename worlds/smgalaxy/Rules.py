@@ -129,7 +129,7 @@ def rules_from_er_placements(world: "SMGWorld"):
             if dome_num == 6 and gal_num == 4:
                 orbit_name: str = dome_orbits[4]
             else:
-                orbit_name:str = dome_orbits[gal_num]
+                orbit_name:str = dome_orbits[(gal_num-1)]
 
             galaxy_entr: Entrance = world.get_entrance(f"Dome {dome_num} {orbit_name} Galaxy")
             galaxy_type: str = region_list[galaxy_entr.connected_region.name].type
