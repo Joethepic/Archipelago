@@ -13,7 +13,7 @@ class Character(Choice):
 
 class GalaxyShuffle(OptionSet):
     """
-    Determine what kinds of galaxies should be shuffled between each other
+    Determine what kinds of galaxies should be added to the shuffle pool. Leave empty to disable shuffling
 
     Full: Any galaxy in any galaxy position
     Dome Majors: Add Major galaxies to shuffle pool
@@ -24,6 +24,23 @@ class GalaxyShuffle(OptionSet):
     display_name = "Galaxy Shuffle"
     internal_name = "galaxy_shuffle"
     valid_keys = {"Full", "Dome Majors", "Dome Minors", "Observatory Specials", "Bosses"}
+
+class GalaxyShuffleType(Choice):
+    """
+    Choose how galaxies are shuffled between slots
+
+    By Type - Galaxies will only be shuffled between slots of the same kind. Major galaxies on major galaxies,
+    Boss galaxies on Boss galaxies, Observatory Galaxies on observatory galaxies
+
+    Major Separately - Major galaxies will only be shuffled among themselves, but all other galaxies can go anywhere
+
+    Full - Any galaxy can go on any Galaxy slot
+    """
+    display_name = "Galaxy Shuffle Type"
+    internal_name = "galaxy_shuffle_type"
+    option_By_Type = 0
+    option_Major_Separate = 1
+    option_Full = 2
 
 class ShuffleDomes(Toggle):
     """
@@ -190,8 +207,9 @@ class SMGOptions(PerGameCommonOptions):
     dome_four_counts: Dome4Offsets
     dome_five_counts: Dome5Offsets
     dome_six_counts: Dome6Offsets
-    #dome_shuffle: ShuffleDomes Enable when Ready
+    dome_shuffle: ShuffleDomes
     galaxy_shuffle: GalaxyShuffle
+    galaxy_shuffle_type: GalaxyShuffleType
 
 option_groups = [
     Options.OptionGroup("Extra Locations", [
@@ -199,17 +217,18 @@ option_groups = [
     ]),
     Options.OptionGroup("Access Options", [
         StarstoFinish,
-        #ShuffleDomes,
-        #GalaxyShuffle
+        ShuffleDomes,
+        GalaxyShuffle,
+        GalaxyShuffleType
     ]),
-    #Options.OptionGroup("Dome Offsets", [
-    #    Dome1Offsets,
-    #    Dome2Offsets,
-    #    Dome3Offsets,
-    #    Dome4Offsets,
-    #    Dome5Offsets,
-    #    Dome6Offsets
-    #]),
+    Options.OptionGroup("Dome Offsets", [
+       Dome1Offsets,
+       Dome2Offsets,
+       Dome3Offsets,
+       Dome4Offsets,
+       Dome5Offsets,
+       Dome6Offsets
+    ]),
     Options.OptionGroup("Cosmetics", [
         Character,
     ]),
