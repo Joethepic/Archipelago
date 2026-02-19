@@ -47,6 +47,8 @@ obs_entr_list: list[str] = ["Sweet Sweet Hungry Luma", "Sling Pod Hungry Luma", 
                             "Boo's Boneyard Hungry Luma", "Rolling Gizmo Launch Star", "Loopdeeswoop Launch Star",
                             "Bubble Blast Launch Star"]
 
+all_galaxy_slots: list[str] = major_entr_list + gal_minor_entr_list + obs_entr_list + boss_entr_list
+
 region_list: dict[str, SMGRegionData] = {
     regname.SHIP: SMGRegionData("Main", [],
                                 [],
@@ -208,15 +210,15 @@ def disconnect_from_option(world: "SMGWorld") -> str:
 
         # Ensure the first galaxy is a major one
         Dome1Galaxy1Slot = world.get_entrance("Dome 1 Inner Orbit Galaxy")
-        major_gal_list_copy = copy.deepcopy(major_galaxy_list)
-        starting_galaxy = world.get_region(world.random.choice(sorted(major_gal_list_copy)))
-        major_gal_list_copy.remove(starting_galaxy.name)
+        major_list_copy = copy.deepcopy(major_galaxy_list)
+        starting_galaxy = world.get_region(world.random.choice(sorted(major_list_copy)))
+        major_list_copy.remove(starting_galaxy.name)
         er_target: Entrance = {e.name: e for e in starting_galaxy.entrances}[starting_galaxy.name]
         starting_galaxy.entrances.remove(er_target)
         Dome1Galaxy1Slot.connect(starting_galaxy)
         Dome1Slot1 = starting_galaxy.name
         if world.options.galaxy_shuffle_type.value != 2:
-            by_type_shuffle(world, major_entr_list, major_gal_list_copy)
+            by_type_shuffle(world, major_entr_list, major_list_copy)
 
     if "Dome Minors" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
         disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Third Orbit Galaxy"), 0, "LOOPDEELOOP")

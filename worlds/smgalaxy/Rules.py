@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from BaseClasses import Entrance
-from .regions import connect_regions, region_list
+from .regions import connect_regions, region_list, all_galaxy_slots
 from.Constants.Names import region_names as regname
 from ..generic.Rules import add_rule
 
@@ -141,6 +141,9 @@ def rules_from_er_placements(world: "SMGWorld"):
                 world.galaxy_counts[galaxy] = available_locations
 
             available_locations += 4 if galaxy_type == "Major" else 1
+
+    for galaxy_slot in all_galaxy_slots:
+        world.shuffled_levels[world.get_entrance(galaxy_slot).name] = world.get_entrance(galaxy_slot).connected_region.name
 
 
     # # special stages logic Left here for reference later on default values

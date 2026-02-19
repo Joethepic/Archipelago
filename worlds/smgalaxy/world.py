@@ -40,7 +40,7 @@ class SMGWorld(World):
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
         self.origin_region_name: str = regname.SHIP
-        self.shuffled_levels: list[tuple[str, str]] = []
+        self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
         self.starting_galaxy: str = "Good Egg Galaxy"
         self.galaxy_counts: dict[str, int] = {}
 
@@ -119,8 +119,8 @@ class SMGWorld(World):
         if self.options.galaxy_shuffle:
             # Disconnect entrances based on options choice. Also ensures first available slot is a major galaxy
             self.starting_galaxy = disconnect_from_option(self)
-            # Run randomize entrances, and return the entrance-exit pairings
-            self.shuffled_levels: list[tuple[str, str]] = randomize_entrances(self, True, {0: [0]}).pairings
+            # Run randomize entrances, but do not get pairings - we craete our own method for them
+            randomize_entrances(self, True, {0: [0]})
         # Apply rules to newly formed entrances based on within-world access, regardless of randomization
         rules_from_er_placements(self)
 
