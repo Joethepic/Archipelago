@@ -1,3 +1,5 @@
+import os
+from dataclasses import fields
 from typing import ClassVar
 from BaseClasses import Item
 from Utils import visualize_regions
@@ -6,10 +8,11 @@ from worlds.AutoWorld import World
 
 from . import items, regions, Rules, web_world, Options
 from .Constants.Names import region_names as regname
+from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION
 from .Rules import rules_from_er_placements
-from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category
+from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
-from .regions import disconnect_from_option
+from .regions import disconnect_from_option, region_list, SMGRegionData
 
 
 class SMGWorld(World):
@@ -132,4 +135,61 @@ class SMGWorld(World):
         rules_from_er_placements(self)
 
     def pre_fill(self) -> None:
-        visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph",show_entrance_names=True)
+        visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml",show_entrance_names=True)
+
+    # Output options, locations and doors for patcher
+    def generate_output(self, output_directory: str):
+        # Output seed name and slot number to seed RNG in randomizer client
+        output_data = {
+            "Seed": self.multiworld.seed,
+            "Slot": self.player,
+            "Name": self.player_name,
+            "Options": {},
+            "Locations": {},
+            "Galaxies": {},
+            "Room Enemies": {},
+            "Hints": {},
+            AP_WORLD_VERSION_NAME: CLIENT_VERSION
+        }
+        # Output relevant options to file
+        for field in fields(self.options):
+            if field.name == "plando_items":
+                continue
+            output_data["Options"][field.name] = getattr(self.options, field.name).value
+        # Ourput Randomized Galaxy slot info
+        output_data["Entrances"] = self.shuffled_levels
+        # Output which item has been placed at each location
+        for location in list(smgloc for smgloc in self.get_locations() if isinstance(smgloc, SMGLocation)):
+            if location.address is None:
+                continue
+            if location.item.code is None:
+                item_info = {
+                    "player": location.item.player,
+                    "name": location.item.name,
+                    "game": self.game,
+                    "classification": location.item.classification,
+                    # "type": location.type,
+                }
+            elif location.item:
+                loc_region: SMGRegionData = region_list[location.parent_region.name]
+                item_info = {
+                    "player": location.item.player,
+                    "name": location.item.name,
+                    "game": location.item.game,
+                    "classification": location.item.classification.name,
+                    #"type": location.type,
+                }
+            else:
+                item_info = {"name": "Nothing", "game": self.game, "classification": "filler"}
+            if not location.type in output_data["Locations"].keys():
+                output_data["Locations"][location.type] = {}
+            output_data["Locations"][location.type][location.name] = item_info
+        # Outputs the plando details to our expected output file
+        # Create the output path based on the current player + expected patch file ending.
+        patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
+                                                    f"{SMGPlayerContainer.patch_file_ending}")
+        # Create a zip (container) that will contain all the necessary output files for us to use during patching.
+        lm_container = SMGPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player],
+                                         self.player)
+        # Write the expected output zip container to the Generated Seed folder.
+        lm_container.write()
