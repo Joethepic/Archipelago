@@ -108,7 +108,7 @@ class SMGWorld(World):
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
         # make sure we don't create more stars than locations, somehow
-        star_count = min([109, (len(list(self.get_locations()))-10)])
+        star_count = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
         local_pool += [self.create_item("Power Star") for i in range(star_count)]
 
         # Calculate the number of additional filler items to create to fill all locations
