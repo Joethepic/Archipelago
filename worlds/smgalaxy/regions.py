@@ -152,8 +152,8 @@ def create_regions(world: "SMGWorld"):
     if world.options.enable_purple_coin_stars.value == 1:
         create_locations(locPC_table, world)
 
-    if world.options.stars_to_finish.value > 104 >= len(list(world.get_locations())):
-        world.options.stars_to_finish.value = len(list(world.get_locations()))
+    if world.options.stars_to_finish.value > 103 >= len(list(world.get_locations()))-1:
+        world.options.stars_to_finish.value = len(list(world.get_locations()))-1
 
 def connect_regions(world: "SMGWorld", player: int, source: str, target: str, name: str, rule=None):
     sourceRegion = world.get_region(source)
