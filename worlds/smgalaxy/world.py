@@ -189,7 +189,7 @@ class SMGWorld(World):
         patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
                                                     f"{SMGPlayerContainer.patch_file_ending}")
         # Create a zip (container) that will contain all the necessary output files for us to use during patching.
-        lm_container = SMGPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player],
+        smg_container = SMGPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player],
                                          self.player)
         # Write the expected output zip container to the Generated Seed folder.
-        lm_container.write()
+        smg_container.write()
