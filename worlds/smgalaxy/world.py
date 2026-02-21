@@ -142,6 +142,7 @@ class SMGWorld(World):
     def generate_output(self, output_directory: str):
         # Output seed name and slot number to seed RNG in randomizer client
         output_data: dict = {
+            AP_WORLD_VERSION_NAME: CLIENT_VERSION,
             "Seed": self.multiworld.seed,
             "Slot": self.player,
             "Name": self.player_name,
@@ -150,7 +151,6 @@ class SMGWorld(World):
             "Galaxies": {},
             "Galaxy Counts": {},
             "Hints": {},
-            AP_WORLD_VERSION_NAME: CLIENT_VERSION
         }
 
         # Output relevant options to file
