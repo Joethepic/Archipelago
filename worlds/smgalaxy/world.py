@@ -146,10 +146,12 @@ class SMGWorld(World):
             "Seed": self.multiworld.seed,
             "Slot": self.player,
             "Name": self.player_name,
-            "Options": {},
+            "Options": {
+                "character_select": getattr(self.options, "character_select").value
+            },
             "Locations": {},
-            "Galaxies": {},
-            "Galaxy Counts": {},
+            "Galaxies": self.shuffled_levels,
+            "Galaxy Counts": self.galaxy_counts,
             "Hints": {},
         }
 
@@ -159,11 +161,8 @@ class SMGWorld(World):
         #         continue
         #     output_data["Options"][field.name] = getattr(self.options, field.name).value
         output_data["Options"]["character_select"] = getattr(self.options, "character_select").value
+        output_data["Options"]["mario_colors"] = getattr(self.options, "mario_colors").value
 
-        # Output Galaxy Star Counts
-        output_data["Galaxy Counts"] = self.galaxy_counts
-        # Output Randomized Galaxy slot info
-        output_data["Galaxies"] = self.shuffled_levels
         # Output which item has been placed at each location
         for location in list(smgloc for smgloc in self.get_locations() if isinstance(smgloc, SMGLocation)):
             if location.address is None:
