@@ -195,34 +195,18 @@ class Dome6Offsets(OptionCounter):
         "Final Orbit": 0
     }
 
-class HatShirtFlavorPreset(Choice):
-    """
-    The color of Gooey, from a list of presets.
-    """
-    display_name = "Gooey Flavor"
-    internal_name =  "stuff"
-    option_default = 0
-    option_bubblegum = 1
-    option_cherry = 2
-    option_blueberry = 3
-    option_lemon = 4
-    option_kiwi = 5
-    option_grape = 6
-    option_chocolate = 7
-    option_marshmallow = 8
-    option_licorice = 9
-    option_watermelon = 10
-    option_orange = 11
-    option_lime = 12
-    option_lavender = 13
 
 class  MarioColors(OptionDict):
     """
-    testing
+    Choose new colors for part of Mario's Outfit! (These will also be applied to Luigi)
+    4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
+
+    The following predetermined colors are available:
+    "Red", "Orange", "Yellow", "Green" "Blue", "Purple", "Black" "Brown", "White", "Pink", "Gray"
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
-    valid_keys = ["Hat & Shirt", "Overalls", "Shoes"]
+    valid_keys = ["Hat & Shirt", "Overalls", "Shoes", "Gloves"]
     valid_values = ["Red", "Orange", "Yellow", "Green" "Blue", "Purple", "Black" "Brown", "White", "Pink", "Gray"]
     default = {
         "Hat & Shirt": "Red",
