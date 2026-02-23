@@ -75,19 +75,19 @@ class Dome1Offsets(OptionCounter):
     Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
     will be capped to ensure generation if necessary, and will never be allowed to go above 9 total stars
 
-    These are based on each orbit in the dome, in case levels are shuffled. Inner Orbit is excluded, to ensure you have
+    These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
     at least one world to start.
     """
     display_name = "Dome 1 Access"
     internal_name = "dome_one_counts"
     min = 0
     max = 8
-    valid_keys = ["Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    valid_keys = ["Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     default = {
         "Second Orbit": 0,
         "Third Orbit": 0,
         "Fourth Orbit": 0,
-        "Final Orbit": 0
+        "Fifth Orbit": 0
     }
 
 
@@ -103,13 +103,13 @@ class Dome2Offsets(OptionCounter):
     internal_name = "dome_two_counts"
     min = 0
     max = 10
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    valid_keys = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     default = {
-        "Inner Orbit": 0,
+        "First Orbit": 0,
         "Second Orbit": 0,
         "Third Orbit": 0,
         "Fourth Orbit": 0,
-        "Final Orbit": 0
+        "Fifth Orbit": 0
     }
 
 class Dome3Offsets(OptionCounter):
@@ -124,13 +124,13 @@ class Dome3Offsets(OptionCounter):
     internal_name = "dome_three_counts"
     min = 0
     max = 10
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    valid_keys = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     default = {
-        "Inner Orbit": 0,
+        "First Orbit": 0,
         "Second Orbit": 0,
         "Third Orbit": 0,
         "Fourth Orbit": 0,
-        "Final Orbit": 0
+        "Fifth Orbit": 0
     }
 
 class Dome4Offsets(OptionCounter):
@@ -145,13 +145,13 @@ class Dome4Offsets(OptionCounter):
     internal_name = "dome_four_counts"
     min = 0
     max = 10
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    valid_keys = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     default = {
-        "Inner Orbit": 0,
+        "First Orbit": 0,
         "Second Orbit": 0,
         "Third Orbit": 0,
         "Fourth Orbit": 0,
-        "Final Orbit": 0
+        "Fifth Orbit": 0
     }
 
 class Dome5Offsets(OptionCounter):
@@ -166,13 +166,13 @@ class Dome5Offsets(OptionCounter):
     internal_name = "dome_five_counts"
     min = 0
     max = 10
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Final Orbit"]
+    valid_keys = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     default = {
-        "Inner Orbit": 0,
+        "First Orbit": 0,
         "Second Orbit": 0,
         "Third Orbit": 0,
         "Fourth Orbit": 0,
-        "Final Orbit": 0
+        "Fifth Orbit": 0
     }
 
 class Dome6Offsets(OptionCounter):
@@ -187,12 +187,12 @@ class Dome6Offsets(OptionCounter):
     internal_name = "dome_six_counts"
     min = 0
     max = 20
-    valid_keys = ["Inner Orbit", "Second Orbit", "Third Orbit", "Final Orbit"]
+    valid_keys = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit"]
     default = {
-        "Inner Orbit": 0,
+        "First Orbit": 0,
         "Second Orbit": 0,
         "Third Orbit": 0,
-        "Final Orbit": 0
+        "Fourth Orbit": 0
     }
 
 

@@ -26,14 +26,14 @@ class SMGRegion(Region):
         super().__init__(region_name, player, multiworld)
         self.region_data = region_data
 
-major_entr_list: list[str] = ["Dome 1 Inner Orbit Galaxy", "Dome 2 Inner Orbit Galaxy", "Dome 3 Inner Orbit Galaxy",
-                              "Dome 4 Inner Orbit Galaxy", "Dome 5 Inner Orbit Galaxy", "Dome 6 Inner Orbit Galaxy",
+major_entr_list: list[str] = ["Dome 1 First Orbit Galaxy", "Dome 2 First Orbit Galaxy", "Dome 3 First Orbit Galaxy",
+                              "Dome 4 First Orbit Galaxy", "Dome 5 First Orbit Galaxy", "Dome 6 First Orbit Galaxy",
                               "Dome 1 Second Orbit Galaxy", "Dome 2 Third Orbit Galaxy", "Dome 3 Third Orbit Galaxy",
                               "Dome 4 Second Orbit Galaxy", "Dome 5 Second Orbit Galaxy", "Dome 6 Second Orbit Galaxy",
-                              "Dome 4 Third Orbit Galaxy", "Dome 5 Third Orbit Galaxy", "Dome 6 Final Orbit Galaxy"]
+                              "Dome 4 Third Orbit Galaxy", "Dome 5 Third Orbit Galaxy", "Dome 6 Fourth Orbit Galaxy"]
 
-boss_entr_list: list[str] = ["Dome 1 Final Orbit Galaxy", "Dome 2 Final Orbit Galaxy", "Dome 3 Final Orbit Galaxy",
-                             "Dome 4 Final Orbit Galaxy", "Dome 5 Final Orbit Galaxy"]
+boss_entr_list: list[str] = ["Dome 1 Fifth Orbit Galaxy", "Dome 2 Fifth Orbit Galaxy", "Dome 3 Fifth Orbit Galaxy",
+                             "Dome 4 Fifth Orbit Galaxy", "Dome 5 Fifth Orbit Galaxy"]
 
 gal_minor_entr_list: list[str] = ["Dome 1 Third Orbit Galaxy", "Dome 2 Second Orbit Galaxy",
                                   "Dome 3 Second Orbit Galaxy", "Dome 4 Fourth Orbit Galaxy",
@@ -183,20 +183,20 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
 def disconnect_from_option(world: "SMGWorld") -> str:
     Dome1Slot1 = "Good Egg Galaxy"
     if "Bosses" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Final Orbit Galaxy"), 0, regname.BOWJR1)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Final Orbit Galaxy"), 0, regname.BOWSER1)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Final Orbit Galaxy"), 0, regname.BOWJR2)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Final Orbit Galaxy"), 0, regname.BOWSER2)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Final Orbit Galaxy"), 0, regname.BOWJR3)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Fifth Orbit Galaxy"), 0, regname.BOWJR1)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Fifth Orbit Galaxy"), 0, regname.BOWSER1)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Fifth Orbit Galaxy"), 0, regname.BOWJR2)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Fifth Orbit Galaxy"), 0, regname.BOWSER2)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Fifth Orbit Galaxy"), 0, regname.BOWJR3)
         if world.options.galaxy_shuffle_type.value == 0:
             by_type_shuffle(world, boss_entr_list, copy.deepcopy(boss_galaxy_list))
     if "Dome Majors" in world.options.galaxy_shuffle.value or "Full" in world.options.galaxy_shuffle.value:
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Inner Orbit Galaxy"), 0, regname.GOODEGG)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Inner Orbit Galaxy"), 0, regname.SPACEJUNK)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Inner Orbit Galaxy"), 0, regname.BEACHBOWL)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Inner Orbit Galaxy"), 0, regname.GUSTY)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Inner Orbit Galaxy"), 0, regname.GOLDLEAF)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Inner Orbit Galaxy"), 0, regname.DEEPDARK)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 1 First Orbit Galaxy"), 0, regname.GOODEGG)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 2 First Orbit Galaxy"), 0, regname.SPACEJUNK)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 3 First Orbit Galaxy"), 0, regname.BEACHBOWL)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 4 First Orbit Galaxy"), 0, regname.GUSTY)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 5 First Orbit Galaxy"), 0, regname.GOLDLEAF)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 First Orbit Galaxy"), 0, regname.DEEPDARK)
         disconnect_entrance_for_randomization(world.get_entrance("Dome 1 Second Orbit Galaxy"), 0, regname.HONEYHIVE)
         disconnect_entrance_for_randomization(world.get_entrance("Dome 2 Third Orbit Galaxy"), 0, regname.BATTLEROCK)
         disconnect_entrance_for_randomization(world.get_entrance("Dome 3 Third Orbit Galaxy"), 0, regname.GHOSTLY)
@@ -205,10 +205,10 @@ def disconnect_from_option(world: "SMGWorld") -> str:
         disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Second Orbit Galaxy"), 0, regname.DREADNOUGHT)
         disconnect_entrance_for_randomization(world.get_entrance("Dome 4 Third Orbit Galaxy"), 0, regname.DUSTY)
         disconnect_entrance_for_randomization(world.get_entrance("Dome 5 Third Orbit Galaxy"), 0, regname.TOYTIME)
-        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Final Orbit Galaxy"), 0, regname.MELTY)
+        disconnect_entrance_for_randomization(world.get_entrance("Dome 6 Fourth Orbit Galaxy"), 0, regname.MELTY)
 
         # Ensure the first galaxy is a major one
-        Dome1Galaxy1Slot = world.get_entrance("Dome 1 Inner Orbit Galaxy")
+        Dome1Galaxy1Slot = world.get_entrance("Dome 1 First Orbit Galaxy")
         major_list_copy = copy.deepcopy(major_galaxy_list)
         starting_galaxy = world.get_region(world.random.choice(sorted(major_list_copy)))
         major_list_copy.remove(starting_galaxy.name)
@@ -217,7 +217,7 @@ def disconnect_from_option(world: "SMGWorld") -> str:
         Dome1Galaxy1Slot.connect(starting_galaxy)
         Dome1Slot1 = starting_galaxy.name
         major_entr_list_copy = copy.deepcopy(major_entr_list)
-        major_entr_list_copy.remove("Dome 1 Inner Orbit Galaxy")
+        major_entr_list_copy.remove("Dome 1 First Orbit Galaxy")
         if world.options.galaxy_shuffle_type.value != 2:
             by_type_shuffle(world, major_entr_list_copy, major_list_copy)
 
