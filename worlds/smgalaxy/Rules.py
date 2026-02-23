@@ -126,10 +126,7 @@ def rules_from_er_placements(world: "SMGWorld"):
                                                    if f"D{dome_num}" in d_key]).items(), key=lambda item: item[1]))
         for galaxy, star_count in dome_galaxy_dict.items():
             gal_num: int = int(galaxy[3:])
-            if dome_num == 6 and gal_num == 4:
-                orbit_name: str = dome_orbits[4]
-            else:
-                orbit_name:str = dome_orbits[(gal_num-1)]
+            orbit_name:str = dome_orbits[(gal_num-1)]
 
             galaxy_entr: Entrance = world.get_entrance(f"Dome {dome_num} {orbit_name} Galaxy")
             galaxy_type: str = region_list[galaxy_entr.connected_region.name].type

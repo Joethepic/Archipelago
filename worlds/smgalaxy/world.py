@@ -81,12 +81,12 @@ class SMGWorld(World):
 
                     # Because OptionCounters can somehow be blank entirely, just force these to have values to 0, which
                     # wouldn't need to be added to dome count.
-                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
-                    continue
+                    if dome_name == "six" and dome_orb_name != "Fifth Orbit":
+                        galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
+                        continue
 
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
-                if dome_name == "six" and dome_orb_name == "Final Orbit":
-                    galaxy_counts[f"D6G4"] = previous_dome_count + int(dome_dict[dome_orb_name])
+                if dome_name == "six" and dome_orb_name == "Fifth Orbit":
                     continue
                 galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
 
@@ -155,10 +155,12 @@ class SMGWorld(World):
         }
 
         # Output relevant options to file
-        # for field in fields(self.options):
-        #     if field.name == "plando_items":
-        #         continue
-        #     output_data["Options"][field.name] = getattr(self.options, field.name).value
+        for field in fields(self.options):
+            if field.name == "plando_items":
+                continue
+            output_data["Options"][field.name] = getattr(self.options, field.name).value
+            if isinstance(output_data["Options"][field.name], set):
+                output_data["Options"][field.name] = list(output_data["Options"][field.name])
         output_data["Options"]["character_select"] = getattr(self.options, "character_select").value
         output_data["Options"]["mario_colors"] = getattr(self.options, "mario_colors").value
 
