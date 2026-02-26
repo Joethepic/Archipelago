@@ -1,4 +1,4 @@
-from typing import Callable, Dict, NamedTuple, Optional, Set
+from typing import Dict, NamedTuple, Optional, Set
 from BaseClasses import Location, Region
 
 from.Constants.Names import region_names as regname
@@ -13,8 +13,8 @@ class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
 
     def __init__(self, player: int, name: str, parent: Region):
-        super(SMGLocation, self).__init__(player, name, address=location_table[name], parent=parent)
-        self.code = location_table[name]
+        super(SMGLocation, self).__init__(player, name, address=location_table[name].code, parent=parent)
+        self.code = location_table[name].code
 
 class SMGLocationData(NamedTuple):
     location_groups: list[str] # type of randomization option table and group []
@@ -65,7 +65,7 @@ locbosses_table: dict[str, SMGLocationData]  = {
     "BJ: Sinking the Airships": SMGLocationData([regname.BOWJR2, "Power Star", "Boss Star"], regname.BOWJR2, 170000028),
     "BJ: King Kaliente's Spicy Return": SMGLocationData([regname.BOWJR3, "Power Star", "Boss Star"], regname.BOWJR3, 170000029),
     "B: Darkness on the Horizon": SMGLocationData([regname.BOWSER2, "Power Star", "Boss Star"], regname.BOWSER2, 170000030),
-    "B: The Fate of the Universe": SMGLocationData([regname.BOWSER3, "Power Star", "Boss Star"], regname.BOWSER3, 170000120)
+    "B: The Fate of the Universe": SMGLocationData([regname.BOWSER3, "Power Star", "Boss Star"], regname.BOWSER3, None)
 }
 
 locSJ_table: dict[str, SMGLocationData]  = {
@@ -192,7 +192,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     "SS: Purple Coins by the Seaside": SMGLocationData(["Sea Slide Galaxy", "Power Star", "Purple Coins"], regname.SEASLIDE, 170000084),
     "GE: Purple Coin Omelet": SMGLocationData(["Good Egg Galaxy", "Power Star", "Purple Coins"], regname.GOODEGG, 170000005),
     "GG: Gateway's Purple coins": SMGLocationData([regname.GATEWAY, "Power Star", "Purple Coins"], regname.GATEWAY, 170000020),
-    "BR: Purple Coins on the Battlerock": SMGLocationData(["Battlerock Galaxy", "Power Star", "Purple Coins"], regname.BATTLEROCK, 17000004),
+    "BR: Purple Coins on the Battlerock": SMGLocationData(["Battlerock Galaxy", "Power Star", "Purple Coins"], regname.BATTLEROCK, 17000121),
     "SJ: Purple Coin Spacewalk": SMGLocationData(["Space Junk Galaxy", "Power Star", "Purple Coins"], regname.SPACEJUNK, 170000036),
     "GG: Purple Coins on the Puzzle Cube": SMGLocationData(["Gusty Garden Galaxy", "Power Star", "Purple Coins"], regname.GUSTY, 170000059),
     "BB: Beachcombing for Purple Coins": SMGLocationData(["Bubble Breeze Galaxy", "Power Star", "Purple Coins"], regname.BUBBLEBREEZE, 170000047),
