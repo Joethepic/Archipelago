@@ -15,12 +15,11 @@ class SMGItem(Item):
 
     def __init__(self, name: str, player: int, data: SMGItemData):
         super(SMGItem, self).__init__(name, data.classification, data.code, player)
-
         self.type = data.type
-        self.item_id = data.code
+        self.code = data.code
+
+
 # This is all the items that are used by the game we define them here so they can be used.
-
-
 item_table: dict[str, SMGItemData] = {
   "Power Star": SMGItemData(["Power Star"], 170000004, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
   "Grand Star": SMGItemData(["Grand Star", "Power Star"], 170000005, IC.progression),
