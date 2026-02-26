@@ -1,2 +1,0 @@
-AP_WORLD_VERSION_NAME: str = "APWorldVersion"
-CLIENT_VERSION: str = "V0.0.1"
