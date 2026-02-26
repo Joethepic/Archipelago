@@ -27,7 +27,7 @@ class GalaxyShuffle(OptionSet):
 
 class GalaxyShuffleType(Choice):
     """
-    Choose how galaxies are shuffled between slots
+    Choose how galaxies are shuffled between slots. Does nothing if no galaxies are randomized
 
     By Type - Galaxies will only be shuffled between slots of the same kind. Major galaxies on major galaxies,
     Boss galaxies on Boss galaxies, Observatory Galaxies on observatory galaxies
