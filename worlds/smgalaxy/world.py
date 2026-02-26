@@ -6,6 +6,7 @@ from BaseClasses import Item
 from Utils import visualize_regions
 from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
+from worlds.LauncherComponents import Component, SuffixIdentifier, Type, components, launch_subprocess
 
 from . import items, regions, Rules, web_world, Options
 from .Constants.Names import region_names as regname
@@ -15,6 +16,11 @@ from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMG
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
 from .regions import disconnect_from_option, region_list, SMGRegionData
 
+def runClient(*args):
+    from .SMGClient import launch
+    launch_subprocess(launch, name = "SMG Client", args = args)
+
+components.append(Component("SMG Client", func=runClient, component_type=Type.CLIENT, file_identifier=SuffixIdentifier(".apsmg")))
 
 class SMGWorld(World):
     """

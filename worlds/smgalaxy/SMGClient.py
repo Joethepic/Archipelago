@@ -1,0 +1,182 @@
+from __future__ import annotations
+import asyncio
+import urllib.parse
+import sys
+import typing
+import time
+import functools
+
+import ModuleUpdate
+ModuleUpdate.update()
+
+import websockets
+
+import Utils
+
+from typing import Optional
+from MultiServer import CommandProcessor
+from NetUtils import Endpoint, decode, NetworkItem, encode, JSONtoTextParser, \
+    ClientStatus, Permission, NetworkSlot, RawJSONtoTextParser
+from Utils import Version, stream_input, async_start
+from worlds import network_data_package, AutoWorldRegister
+from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+import os
+import dolphin_memory_engine as dme
+clientname: str = "SMG Client"
+# All the dolphin connection messages used in the client
+CONNECTION_REFUSED_STATUS: str = "Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in 5 seconds..."
+CONNECTION_LOST_STATUS: str = "Dolphin connection was lost. Please restart your emulator and make sure SMG is running."
+NO_SLOT_NAME_STATUS: str = "No slot name was detected. Ensure a randomized ROM is loaded. Retrying in 5 seconds..."
+CONNECTION_VERIFY_SERVER: str = "Dolphin was confirmed to be opened and ready, Connect to the server when ready..."
+CONNECTION_INITIAL_STATUS: str = "Dolphin emulator was not detected to be running. Retrying in 5 seconds..."
+DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY: str = "Dolphin did not load the ROM correctly. Close only the game / dolphin launcher and try again..."
+CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready to play SMG!"
+AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
+EXPECTED_GAME_ID: str = "RMGE01"
+WAIT_TIMER_LONG_TIMOUT: int = 5
+WAIT_TIMER_SHORT_TIMOUT: float = 0.125
+class GalaxyCommand(ClientCommandProcessor):
+    # command to print dolphin status
+    def _cmd_dolphin(self):
+        """Prints the current Dolphin status to the client."""
+        if isinstance(self.ctx, GalaxyContext):
+            logger.info(f"Dolphin Status: {self.ctx.dolphin_status}")
+    # command to print deathlink status
+    # commented out till we implement deathlink
+#    def _cmd_deathlink(self):
+#        """Toggle deathlink from client. Overrides default setting."""
+#        if isinstance(self.ctx, GalaxyContext):
+#            Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
+class GalaxyContext(CommonContext):
+    password_required: bool = False
+    rom_loaded: bool = False
+    command_processor = GalaxyCommand
+    game: str = "Super Mario Galaxy"
+    items_handling = 0b111
+    runloop: Optional[asyncio.Task[None]] = None
+    def make_gui(self) -> type["kvui.GameManager"]:
+        """
+        Initialize the GUI for SMG Client.
+
+        :return: The client's GUI.
+        """
+        ui = super().make_gui()
+        ui.base_title = f"Archipelago | {clientname}"
+        return ui
+    def __init__(self, server_address, password):
+        """
+        Initialize the SMG context.
+
+        :param server_address: Address of the Archipelago server.
+        :param password: Password for server authentication.
+        """
+        super().__init__(server_address, password)
+    async def wait_for_next_loop(self, time_to_wait: float):
+        await asyncio.sleep(time_to_wait)
+    async def dolphinloop(self):
+        logger.info("Starting Dolphin connector. Use /dolphin for status information.")
+        try:
+            while(not self.exit_event.is_set()):
+                try:
+                    # If DME is not already hooked or connected in any way
+                    if not dme.is_hooked():
+                        dme.hook()
+                        if dme.get_status() == dme.get_status().noEmu or dme.get_status() == dme.get_status().notRunning:
+                            dme.un_hook()
+                            self.dolphin_status = CONNECTION_INITIAL_STATUS
+                            logger.info(self.dolphin_status)
+                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+                            continue
+                    if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
+                        #checks the id of the game as a string
+                        romgameid: str = dme.read_bytes(0x80000000,6).decode()
+                        if romgameid != EXPECTED_GAME_ID:
+                            logger.info(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
+                            self.dolphin_status = DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY
+                            dme.un_hook()
+                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+                            continue
+                        if not self.auth:
+                            await self.get_username()
+                        # Inform the player we are ready and waiting for them to connect.
+                        if not self.rom_loaded:
+                            self.dolphin_status = CONNECTION_VERIFY_SERVER
+                            logger.info(self.dolphin_status)
+                            self.rom_loaded = True
+                            await self.server_auth(self.password_required)
+                        if not self.slot:
+                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+                            continue
+                    # Currently verified connected to AP and dolphin is properly loaded
+                    await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+                except Exception as dmeEx:
+                    logger.error("Something went wrong when connection to dolphin details:" + str(dmeEx))
+                    dme.un_hook()
+                    self.dolphin_status = CONNECTION_LOST_STATUS
+                    logger.info(self.dolphin_status)
+                    await self.disconnect()
+                    self.rom_loaded = False
+                    await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+                    continue
+        except Exception as dolphinEx:
+            logger.error("Something went wrong when connection to dolphin details:" + str(dolphinEx))
+    def on_package(self, cmd, args):
+        super().on_package(cmd, args)
+        match cmd:
+            case "RoomInfo":
+                self.password_required = bool(args["password"])
+            
+            case "Connected":
+                pass
+            case "Connection Refused":
+                pass
+    async def server_auth(self, password_requested: bool = False):
+        """
+        Authenticate with the Archipelago server. This function will be called as part of the init RoomInfo call
+        in CommonClient, however we will exit if the rom is not loaded yet.
+
+        :param password_requested: Whether the server requires a password. Defaults to `False`.
+        """
+        if not self.rom_loaded:
+            logger.info("ROM is not loaded yet, waiting for dolphin to be connected before trying again.")
+            return
+
+        if password_requested and not self.password:
+            logger.info('Enter the password required to join this game:')
+            self.password = await self.console_input()
+        await self.send_connect()
+# launches/starts everything we need
+def launch(*launch_args: str):
+    import colorama
+    Utils.init_logging(clientname)
+    logger.info("Starting SMG Client")
+    parser = get_base_parser()
+    args = parser.parse_args(launch_args)
+    async def _main(connect, password):
+        try:
+            ctx = GalaxyContext(connect, password)
+            ctx.server_task = asyncio.create_task(server_loop(ctx), name="SMG - ServerLoop")
+
+            if gui_enabled:
+                ctx.run_gui()
+            ctx.run_cli()
+            await ctx.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
+
+            ctx.runloop = asyncio.create_task(ctx.dolphinloop(), name="SMG - DolphinSync")
+
+            await ctx.exit_event.wait()
+            await ctx.shutdown()
+
+            if ctx.dolphin_sync_task:
+                await ctx.dolphin_sync_task
+        except Exception as clientEx:
+            client_msg: str = (f"An unknown error occurred while running {clientname}.\n" +
+                f"Additional details:\n{str(clientEx)}")
+            logger.error(client_msg)
+            Utils.messagebox(f"Main Client Issue {clientname}", client_msg, True)
+            raise clientEx
+    colorama.just_fix_windows_console()
+    asyncio.run(_main(args.connect, args.password))
+    colorama.deinit()
+if __name__ == "__main__":
+    launch(*sys.argv[1:])
