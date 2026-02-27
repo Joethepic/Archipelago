@@ -3,12 +3,6 @@ from BaseClasses import Location, Region
 
 from.Constants.Names import region_names as regname
 
-def purplecoinstar(multiworld, player):
-    return multiworld.enable_purple_coin_stars[player].value < 2
-
-def maingameonly(multiworld, player):
-    return multiworld.enable_purple_coin_stars[player].value == 1
-
 class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
 
