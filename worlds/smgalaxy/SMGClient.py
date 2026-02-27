@@ -1,27 +1,13 @@
 from __future__ import annotations
+from typing import Optional
+
 import asyncio
-import urllib.parse
 import sys
-import typing
-import time
-import functools
-
-import ModuleUpdate
-ModuleUpdate.update()
-
-import websockets
 
 import Utils
-
-from typing import Optional
-from MultiServer import CommandProcessor
-from NetUtils import Endpoint, decode, NetworkItem, encode, JSONtoTextParser, \
-    ClientStatus, Permission, NetworkSlot, RawJSONtoTextParser
-from Utils import Version, stream_input, async_start
-from worlds import network_data_package, AutoWorldRegister
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-import os
 import dolphin_memory_engine as dme
+
 clientname: str = "SMG Client"
 # All the dolphin connection messages used in the client
 CONNECTION_REFUSED_STATUS: str = "Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in 5 seconds..."
