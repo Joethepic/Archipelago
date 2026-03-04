@@ -1,13 +1,18 @@
 from __future__ import annotations
-from typing import Optional
-
 import asyncio
 import sys
 
 import Utils
-from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-import dolphin_memory_engine as dme
 
+from typing import Optional
+from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+
+from .locations import SMGLocationData, location_table
+from .regions import SMGRegionData, region_list
+
+import os
+import copy
+import dolphin_memory_engine as dme
 clientname: str = "SMG Client"
 # All the dolphin connection messages used in the client
 CONNECTION_REFUSED_STATUS: str = "Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in 5 seconds..."
@@ -40,6 +45,8 @@ class GalaxyContext(CommonContext):
     game: str = "Super Mario Galaxy"
     items_handling = 0b111
     runloop: Optional[asyncio.Task[None]] = None
+    dolphin_status: str = CONNECTION_INITIAL_STATUS
+    last_galaxy: str = ""
     def make_gui(self) -> type["kvui.GameManager"]:
         """
         Initialize the GUI for SMG Client.
@@ -59,6 +66,46 @@ class GalaxyContext(CommonContext):
         super().__init__(server_address, password)
     async def wait_for_next_loop(self, time_to_wait: float):
         await asyncio.sleep(time_to_wait)
+    async def check_ingame(self) -> bool:
+        """Checks to see if Mario/Luigi is in game and not at file select."""
+        game_status: str = dme.read_bytes(0x809A90DC,16).split(b"\0")[0].decode()
+        curr_galaxy: str = await self.current_galaxy()
+        return game_status == "Game" and curr_galaxy != "FileSelect"
+
+    async def current_galaxy(self):
+        """Updates what Galaxy the user is currently on, but for some weird reason also tracks if you are in FileSelect.
+        Everything else including Domes, the Observatory Ship and even the intro planet has a galaxy name."""
+        return dme.read_bytes(0x809A90FC,16).split(b"\0")[0].decode()
+    async def last_visited_galaxy(self):
+        """Updates the last Galaxy Mario/Luigi was on."""
+        curr_galaxy: str = await self.current_galaxy()
+        if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
+            return
+        self.last_galaxy = curr_galaxy
+    async def smg_location_checker(self):
+        """Checks the various location within SMG to see if the player has completed any appropriate actions"""
+        if not await self.check_ingame():
+            return
+        
+        local_missing_locs = copy.deepcopy(self.missing_locations)
+
+        for loc_id in local_missing_locs:
+            local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
+            region_data: SMGRegionData = region_list[local_loc.region]
+
+            if region_data.in_game_name != self.last_galaxy:
+                continue
+
+            if local_loc.game_address is None:
+                continue
+
+            star_bit_flag: int = int(dme.read_byte(dme.follow_pointers(dme.follow_pointers(0x80900B18, [
+                0x8, 0xC, 0x0, 0xC, 0x8, 0x0]) + region_data.region_offset, [0x0]) + 0x8))
+
+            if (star_bit_flag & (1 << local_loc.game_address)) > 0:
+                self.locations_checked.add(loc_id)
+
+        await self.check_locations(self.locations_checked)
     async def dolphinloop(self):
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         try:
@@ -94,9 +141,11 @@ class GalaxyContext(CommonContext):
                             await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
                             continue
                     # Currently verified connected to AP and dolphin is properly loaded
+                    await self.last_visited_galaxy()
+                    await self.smg_location_checker()
                     await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
                 except Exception as dmeEx:
-                    logger.error("Something went wrong when connection to dolphin details:" + str(dmeEx))
+                    logger.error("Something went wrong when connection to dolphin Memory Engine details:" + str(dmeEx))
                     dme.un_hook()
                     self.dolphin_status = CONNECTION_LOST_STATUS
                     logger.info(self.dolphin_status)
@@ -153,8 +202,8 @@ def launch(*launch_args: str):
             await ctx.exit_event.wait()
             await ctx.shutdown()
 
-            if ctx.dolphin_sync_task:
-                await ctx.dolphin_sync_task
+            if ctx.runloop:
+                await ctx.runloop
         except Exception as clientEx:
             client_msg: str = (f"An unknown error occurred while running {clientname}.\n" +
                 f"Additional details:\n{str(clientEx)}")
