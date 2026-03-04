@@ -141,9 +141,11 @@ class GalaxyContext(CommonContext):
                             await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
                             continue
                     # Currently verified connected to AP and dolphin is properly loaded
+                    await self.last_visited_galaxy()
+                    await self.smg_location_checker()
                     await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
                 except Exception as dmeEx:
-                    logger.error("Something went wrong when connection to dolphin details:" + str(dmeEx))
+                    logger.error("Something went wrong when connection to dolphin Memory Engine details:" + str(dmeEx))
                     dme.un_hook()
                     self.dolphin_status = CONNECTION_LOST_STATUS
                     logger.info(self.dolphin_status)
