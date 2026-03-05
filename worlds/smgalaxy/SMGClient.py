@@ -104,6 +104,7 @@ class GalaxyContext(CommonContext):
 
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
+                logger.info(loc_id)
 
         await self.check_locations(self.locations_checked)
     async def dolphinloop(self):
