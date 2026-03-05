@@ -9,6 +9,7 @@ from CommonClient import CommonContext, ClientCommandProcessor, logger, server_l
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
+from .items import SMGItemData, item_table
 
 import os
 import copy
@@ -107,6 +108,42 @@ class GalaxyContext(CommonContext):
                 logger.info(loc_id)
 
         await self.check_locations(self.locations_checked)
+    async def writeitems(self):
+        """Modify the items we have received to change things in game"""
+        if not await self.check_ingame():
+            return
+        try:
+            #note will resend items upon reconnection
+            for item_id in self.items_received[self.highest_processed_item_index :]:
+                self.highest_processed_item_index += 1
+                logger.info(item_id.item)
+                match item_id.item:
+                    case 170000007:
+                        logger.info("1up Received")
+                        lives = int.from_bytes(dme.read_bytes(0x80F63CF0, 2))
+                        dme.write_bytes(0x80F63CF0, (lives + 1).to_bytes(2))
+                #note currently adding these in breaks lives adding(might fix once changing that value does something?)
+                #   case 170000004:
+                #     logger.debug("Power Star Received")
+                #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
+                #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                #   case 170000005:
+                #     logger.debug("Grand Star Received")
+                #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
+                #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                #   case 170000006:
+                #     logger.debug("Green Star Received")
+                #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
+                #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                self.items_received.remove(item_id)
+        except Exception as itemEX:
+            logger.error("Something went wrong when in the process of sending items:" + str(itemEX))
+            dme.un_hook()
+            self.dolphin_status = CONNECTION_LOST_STATUS
+            logger.info(self.dolphin_status)
+            await self.disconnect()
+            self.rom_loaded = False
+            await self.dolphinloop()
     async def dolphinloop(self):
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         try:
@@ -144,6 +181,7 @@ class GalaxyContext(CommonContext):
                     # Currently verified connected to AP and dolphin is properly loaded
                     await self.last_visited_galaxy()
                     await self.smg_location_checker()
+                    await self.writeitems()
                     await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMOUT)
                 except Exception as dmeEx:
                     logger.error("Something went wrong when connection to dolphin Memory Engine details:" + str(dmeEx))
@@ -163,6 +201,9 @@ class GalaxyContext(CommonContext):
                 self.password_required = bool(args["password"])
             
             case "Connected":
+                self.highest_processed_item_index = 0
+                #TODO: UNCOMMENT WHEN STAR RECEIVING WORKS PROPERLY
+                # dme.write_bytes(0x80F63CF0, 0.to_bytes(4))
                 pass
             case "Connection Refused":
                 pass
