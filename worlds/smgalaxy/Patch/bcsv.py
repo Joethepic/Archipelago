@@ -137,10 +137,31 @@ class BCSV(GCLibFile):
                     string_index = self.string_offsets.index(self.entries[-1][-1])
                     self.entries[-1][-1] = self.strings[string_index]
     
-    def replace_entry_name(self, old_name: str, new_name: str):
+    def get_value_by_index(self, entry_index: int, field_index: int):
+        if entry_index < 0 or entry_index >= len(self.entries):
+            raise IndexError(f"Entry index out of range. Entries: {len(self.entries)}, index: {entry_index}.")
+        if field_index < 0 or field_index >= len(self.fields):
+            raise IndexError(f"Field index out of range. Fields: {len(self.fields)}, index: {field_index}.")
+        return self.entries[entry_index][field_index]
+        
+
+    def set_value_by_index(self, entry_index: int, field_index: int, new_value):
+        if entry_index < 0 or entry_index >= len(self.entries):
+            raise IndexError(f"Entry index out of range. Entries: {len(self.entries)}, index: {entry_index}.")
+        if field_index < 0 or field_index >= len(self.fields):
+            raise IndexError(f"Field index out of range. Fields: {len(self.fields)}, index: {field_index}.")
+
+        field = self.fields[field_index]
+
+        if field.type != 1:
+            self.entries[entry_index][field_index] = new_value
+
+    def replace_single_entry_name(self, old_name: str, new_name: str):
         for entry_index, entry in enumerate(self.entries):
             if entry[0] == old_name:
                 self.replace_entry_name_by_index(entry_index, new_name)
+                return
+        return
 
     def replace_entry_name_by_index(self, entry_index: int, new_name: str):
         if entry_index < 0 or entry_index >= len(self.entries):
@@ -162,6 +183,16 @@ class BCSV(GCLibFile):
         self.string_offsets = [0]
         for string in self.strings:
             self.string_offsets.append(self.string_offsets[-1] + len(string) + 1)
+
+    def get_field_index(self, field_name: str):
+        for i, field in enumerate(self.fields):
+            if field.name == field_name:
+                return i
+
+    def get_entry_index_by_name(self, entry_name: str):
+        for i, entry in enumerate(self.entries):
+            if entry[0] == entry_name:
+                return i
 
     def save_changes(self):
         # Repacks the bcsv

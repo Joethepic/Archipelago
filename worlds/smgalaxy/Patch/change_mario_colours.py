@@ -23,7 +23,6 @@ def get_img(bdl: BDL, texture_name):
     img = txt_util.decode_image(bti.image_data, bti.palette_data,
                                 bti.image_format, bti.palette_format,
                                 bti.num_colors, bti.width, bti.height)
-    
     return img
 
 def set_img(bdl: BDL, texture_name, img: Image):
@@ -39,7 +38,15 @@ def replace_pixels_in_img(bdl: BDL, texture_name: str, threshold_values: tuple, 
     replace_pixels(img, threshold_values, new_colour)
     set_img(bdl, texture_name, img)
 
-def change_mario_colours(mario_arc: RARC, mario_part: str, new_colour):
+def change_mario_colours(mario_arc: RARC, mario_part: str, new_colour: tuple):
+    """
+    Change the color of a specific Mario part in a RARC archive.
+    Args:
+        mario_arc (RARC): The Mario.arc archive file containing mario.bdl.
+        mario_part (str): The part of Mario to recolor (Accepted parts: 'Hat', 'Overalls').
+        new_colour (tuple): RGB color tuple (r, g, b) with values 0-255.
+    """
+
     if "mario.bdl" not in [file.name for file in mario_arc.file_entries]:
         raise ValueError("Arc file is not expected arc file: Mario.arc")
     
@@ -58,3 +65,13 @@ def change_mario_colours(mario_arc: RARC, mario_part: str, new_colour):
         ch.save()
     
     mario_arc.save_changes()
+
+if __name__ == "__main__":
+    mario_file = r"temp/DATA/files/ObjectData/Mario.arc"
+    mario_arc = RARC(mario_file)
+
+    change_mario_colours(mario_arc, 'Hat', (255,0,255))
+    change_mario_colours(mario_arc, 'Overalls', (169,64,100))
+
+    with open('Mario.arc', 'wb') as f:
+        f.write(mario_arc.data.getvalue())
