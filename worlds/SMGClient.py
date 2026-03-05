@@ -114,12 +114,10 @@ class GalaxyContext(CommonContext):
             return
         try:
             #note will resend items upon reconnection
-            for item_id in self.items_received[self.highest_processed_item_index :]:
-                self.highest_processed_item_index += 1
-                logger.info(item_id.item)
+            for item_id in self.items_received:
                 match item_id.item:
                     case 170000007:
-                        logger.info("1up Received")
+                        logger.debug("1up Received")
                         lives = int.from_bytes(dme.read_bytes(0x80F63CF0, 2))
                         dme.write_bytes(0x80F63CF0, (lives + 1).to_bytes(2))
                 #note currently adding these in breaks lives adding(might fix once changing that value does something?)
@@ -201,9 +199,6 @@ class GalaxyContext(CommonContext):
                 self.password_required = bool(args["password"])
             
             case "Connected":
-                self.highest_processed_item_index = 0
-                #TODO: UNCOMMENT WHEN STAR RECEIVING WORKS PROPERLY
-                # dme.write_bytes(0x80F63CF0, 0.to_bytes(4))
                 pass
             case "Connection Refused":
                 pass

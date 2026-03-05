@@ -146,6 +146,7 @@ class SMGWorld(World):
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         # Output seed name and slot number to seed RNG in randomizer client
+        self.galaxy_counts.update({"D1G1": 0})
         output_data: dict = {
             AP_WORLD_VERSION_NAME: CLIENT_VERSION,
             "Seed": self.multiworld.seed,
