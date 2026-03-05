@@ -66,6 +66,8 @@ Output Logs/
 /datapackage
 /datapackage_export.json
 /custom_worlds
+# stubgen output
+/out/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -197,3 +199,4 @@ _speedups.html
 .LSOverride
 Thumbs.db
 [Dd]esktop.ini
+/SMG_region_graph
