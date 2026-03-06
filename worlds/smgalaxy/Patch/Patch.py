@@ -103,7 +103,7 @@ class WiiISO:
         try:
             # Makes sure the file exists
             if not Path(self.clean_iso_path).exists():
-                raise Exception(f"ISO file not found: {self.iso_path}")
+                raise Exception(f"ISO file not found: {self.clean_iso_path}")
                 
             # Extract the Wii file into memory and load all the disc partitions/disc structure.
             extractor: WiiIsoExtractor = WiiIsoExtractor(self.clean_iso_path)
@@ -298,7 +298,7 @@ example_input = {
         "Dome 4 Fifth Orbit Galaxy" : "Bonefin Galaxy",
         "Dome 5 Fifth Orbit Galaxy" : "Sand Spiral Galaxy"}
 
-Galaxy_Counts = {"D1G1": -1,
+Galaxy_Counts = {"D1G1": 0,
                  "D1G2": 0,
                  "D1G3": 1,
                  "D1G4": 0,
@@ -380,7 +380,7 @@ def change_galaxies(astrodome: RARC, galaxies: dict[str, str]):
     adjust_nameobjfactory_table(old_galaxies, new_galaxies)
     replace_miniatures(mini_to_surp_galaxies)
 
-def update_star_requirements(dol: DOL):
+def update_star_requirements(dol: DOL, example_input, galaxy_counts):
     begin_address = 0x8053c800
     end_address = 0x8053d520
     size = end_address - begin_address
@@ -403,14 +403,13 @@ def update_star_requirements(dol: DOL):
             dome_index = int(location[5])
             orbit_index = converter[location[7:-13]]
 
-            bcsv.set_value_by_index(entry_index, grandgalaxyno_index, 0)
-            bcsv.set_value_by_index(entry_index, opencondition0_index, 'SpecialStarGrand1')
-            bcsv.set_value_by_index(entry_index, opencondition1_index, '')
-
             star_requirement_key = 'D' + str(dome_index) + 'G' + str(orbit_index)
-            star_requirement = Galaxy_Counts[star_requirement_key]
+            star_requirement = galaxy_counts[star_requirement_key]
 
+            bcsv.set_value_by_index(entry_index, opencondition0_index, f"SpecialStarGrand{dome_index}")
+            bcsv.set_value_by_index(entry_index, opencondition1_index, '')
             bcsv.set_value_by_index(entry_index, powerstarnum_index, star_requirement)
+            bcsv.set_value_by_index(entry_index, grandgalaxyno_index, dome_index)
     
     bcsv.save_changes()
     if bcsv.data.seek(0,2) > size:
@@ -419,13 +418,7 @@ def update_star_requirements(dol: DOL):
     for entry in bcsv.entries:
         print(entry)
 
-def update_dol(dol: DOL):
-    # Ignore arg0 for koopa model
-    address = 0x801ffc44
-    old_instruction = b'\x80\x03\x00\x8c'
-    new_instruction = b'\x38\x00\x00\x02'
-    ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
-
+def update_dol(dol: DOL, example_input, galaxy_counts):
     # Overwrite get index
     address = 0x80200758
     old_instruction = b'\x7f\xe4\xfb\x78'
@@ -436,9 +429,9 @@ def update_dol(dol: DOL):
     old_instruction = b'\x4b\xff\xfe\x01'
     new_instruction = b'\x54\x63\x84\x3e'
     ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
-    update_star_requirements(dol)
+    update_star_requirements(dol, example_input, galaxy_counts)
 
-def update_iso(iso: WiiISO):
+def update_iso(iso: WiiISO, example_input, galaxy_counts):
     mario_file = iso.temp_dir + r"/DATA/files/ObjectData/Mario.arc"
     mario = RARC(mario_file)
     
@@ -460,19 +453,19 @@ def update_iso(iso: WiiISO):
     with open('astrodomecopy.arc', 'wb') as f:
         f.write(Yaz0.compress(astrodome.data).getvalue())
     
-    dol_path = r"temp/DATA/sys/main.dol"
+    dol_path = iso.temp_dir + r"/DATA/sys/main.dol"
     dol = ch_dol.get_dol(dol_path)
-    update_dol(dol)
+    update_dol(dol, example_input, galaxy_counts)
 
 
 if __name__ == '__main__':
-    iso_path = r"Super Mario Galaxy (USA) (En,Fr,Es).iso"
-    iso = WiiISO(iso_path)
+    iso_path = r"worlds/smgalaxy/Patch/Super Mario Galaxy (USA) (En,Fr,Es).iso"
+    iso = WiiISO(iso_path, dest_path=r"worlds/smgalaxy/Patch/")
     
     #iso.verify_base_rom()
     iso.extract()
 
-    update_iso(iso)
+    update_iso(iso, example_input, Galaxy_Counts)
 
     iso.repack(delete=True, verbose=False)
     
