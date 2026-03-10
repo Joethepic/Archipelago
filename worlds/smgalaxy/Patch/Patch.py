@@ -30,7 +30,7 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, clean_iso_path: str, iso_name: str = RANDOMIZER_NAME + r" Patched", dest_path: str = r"", temp_dir: str = r"temp"):
+    def __init__(self, clean_iso_path: str, iso_name: str = RANDOMIZER_NAME + " Patched", dest_path: str = r"", temp_dir: str = r"temp"):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
             clean_iso_path (str): Path to the unmodified ISO file to be patched.
@@ -334,7 +334,7 @@ converter = {"First" : 1,
              "Fourth": 4,
              "Fifth" : 5}
 
-def change_galaxies(astrodome: RARC, galaxies: dict[str, str]):
+def change_galaxies(astrodome: RARC, dol: DOL, galaxies: dict[str, str]):
     mini_to_surp_galaxies = {}
     mini_to_mini_galaxies = {}
 
@@ -377,8 +377,12 @@ def change_galaxies(astrodome: RARC, galaxies: dict[str, str]):
     
     old_galaxies = list(mini_to_mini_galaxies.keys())
     new_galaxies = list(mini_to_mini_galaxies.values())
-    adjust_nameobjfactory_table(old_galaxies, new_galaxies)
-    replace_miniatures(mini_to_surp_galaxies)
+    adjust_nameobjfactory_table(dol, old_galaxies, new_galaxies)
+    replace_miniatures(dol, iso.temp_dir + "/DATA/files/ObjectData/", mini_to_surp_galaxies)
+
+def update_gameeventflagtable(dol: DOL):
+    address = 0x8053bbd0
+    ch_dol.write_to_dol(dol, address, b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 def update_star_requirements(dol: DOL, example_input, galaxy_counts):
     begin_address = 0x8053c800
@@ -419,20 +423,29 @@ def update_star_requirements(dol: DOL, example_input, galaxy_counts):
         print(entry)
 
 def update_dol(dol: DOL, example_input, galaxy_counts):
-    # Overwrite get index
+    # Overwrite calculating miniature galaxy index
+    # Ignore arg0 for koopa model
+    address = 0x801ffc44
+    old_instruction = b'\x80\x03\x00\x8c'
+    new_instruction = b'\x38\x00\x00\x02'
+    ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
+
+    # Get obj_arg0 from miniature galaxy
     address = 0x80200758
     old_instruction = b'\x7f\xe4\xfb\x78'
     new_instruction = b'\x80\x7f\x00\x8c'
     ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
 
+    # Shift 16 bits to the right to get the custom index
     address = 0x8020075c
     old_instruction = b'\x4b\xff\xfe\x01'
     new_instruction = b'\x54\x63\x84\x3e'
     ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
     update_star_requirements(dol, example_input, galaxy_counts)
+    update_gameeventflagtable(dol)
 
 def update_iso(iso: WiiISO, example_input, galaxy_counts):
-    mario_file = iso.temp_dir + r"/DATA/files/ObjectData/Mario.arc"
+    mario_file = iso.temp_dir + "/DATA/files/ObjectData/Mario.arc"
     mario = RARC(mario_file)
     
     change_mario_colours(mario, 'Hat', (random.randint(0,255),random.randint(0,255),random.randint(0,255)))
@@ -440,27 +453,28 @@ def update_iso(iso: WiiISO, example_input, galaxy_counts):
 
     with open(mario_file, 'wb') as f:
         f.write(Yaz0.compress(mario.data).getvalue())
-
+    
     # Get the AstroDome file from the ISO
-    astrodome_file = iso.temp_dir + r"/DATA/files/StageData/AstroDome.arc"
+    astrodome_file = iso.temp_dir + "/DATA/files/StageData/AstroDome.arc"
     astrodome = RARC(astrodome_file)
     
-    change_galaxies(astrodome, example_input)
+    dol_path = iso.temp_dir + "/DATA/sys/main.dol"
+    dol = ch_dol.get_dol(dol_path)
+
+    change_galaxies(astrodome, dol, example_input)
+    astrodome.save_changes()
 
     with open(astrodome_file, 'wb') as f:
         f.write(Yaz0.compress(astrodome.data).getvalue())
-
-    with open('astrodomecopy.arc', 'wb') as f:
-        f.write(Yaz0.compress(astrodome.data).getvalue())
     
-    dol_path = iso.temp_dir + r"/DATA/sys/main.dol"
-    dol = ch_dol.get_dol(dol_path)
     update_dol(dol, example_input, galaxy_counts)
-
+    dol.save_changes()
 
 if __name__ == '__main__':
-    iso_path = r"worlds/smgalaxy/Patch/Super Mario Galaxy (USA) (En,Fr,Es).iso"
-    iso = WiiISO(iso_path, dest_path=r"worlds/smgalaxy/Patch/")
+    base_path = r"worlds/smgalaxy/Patch/"
+    iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
+    iso = WiiISO(iso_path, dest_path=base_path, temp_dir=base_path + "temp")
+    
     
     #iso.verify_base_rom()
     iso.extract()

@@ -30,4 +30,4 @@ def change_dome_miniature(astrodome: RARC, old_galaxies: list[list[str]], new_ga
             objinfo.set_value_by_index(entry_index[i], objarg0_index, obj_arg0[dome_index][i])
 
         objinfo.save_changes()
-        astrodome.save_changes()
+    astrodome.save_changes()

@@ -1,22 +1,21 @@
 from gclib.rarc import RARC
+from gclib.dol import DOL
 from gclib.j3d import BDL
 from gclib.yaz0_yay0 import Yaz0
 from gclib.bunfoe_types import Vec3float
 import change_dol as ch_dol
 
-def replace_miniatures(galaxies: dict):
+def replace_miniatures(dol: DOL, objectdata_path: str, galaxies: dict):
     mini_galaxies = list(galaxies.keys())
     surp_galaxies = list(galaxies.values())
 
     #string_address = adjust_nameobjfactory_table(mini_galaxy, surp_galaxy)
     #adjust_archivelist_table(mini_galaxy, string_address)
     
-    adjust_table(mini_galaxies, surp_galaxies)
-
-    base_path = r"temp/DATA/files/ObjectData/"
+    adjust_table(dol, mini_galaxies, surp_galaxies)
 
     for surp_galaxy in surp_galaxies:
-        path = base_path + 'MiniSurprisedGalaxy.arc'
+        path = objectdata_path + 'MiniSurprisedGalaxy.arc'
         base = RARC(path)
         
         surp_galaxy = surp_galaxy.replace('Surp', 'Mini')
@@ -51,14 +50,11 @@ def replace_miniatures(galaxies: dict):
 
         base.save_changes()
 
-        with open(base_path + surp_galaxy + '.arc', 'wb') as f:
+        with open(objectdata_path + surp_galaxy + '.arc', 'wb') as f:
             f.write(Yaz0.compress(base.data).getvalue())
 
-def adjust_table(old_galaxies: list[str], new_galaxies: list[str]):
-    dol_path = r"temp/DATA/sys/main.dol"
-    dol = ch_dol.get_dol(dol_path)
-
-    addresses = adjust_nameobjfactory_table(old_galaxies, new_galaxies)
+def adjust_table(dol: DOL, old_galaxies: list[str], new_galaxies: list[str]):
+    addresses = adjust_nameobjfactory_table(dol, old_galaxies, new_galaxies)
 
     # ArchiveList
     archivelist_address = 0x80537eb4
@@ -79,11 +75,7 @@ def adjust_table(old_galaxies: list[str], new_galaxies: list[str]):
         ch_dol.write_string_to_dol(dol, new, 'Mini')
 
 
-def adjust_nameobjfactory_table(old_galaxies: str, new_galaxies: str):
-    dol_path = r"temp/DATA/sys/main.dol"
-    dol = ch_dol.get_dol(dol_path)
-
-    
+def adjust_nameobjfactory_table(dol: DOL, old_galaxies: str, new_galaxies: str):
     addresses = [[0,0] for i in range(len(old_galaxies))]
     
     # NameObjFactory
