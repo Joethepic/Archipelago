@@ -19,8 +19,8 @@
         "stars_to_finish": 60,
         "mario_colors": {
             "Gloves": "White",
-            "Hat & Shirt": "Red",
-            "Overalls": "Blue",
+            "Hat & Shirt": "Pink",
+            "Overalls": "Pink",
             "Shoes": "Brown"
         },
         "dome_one_counts": {

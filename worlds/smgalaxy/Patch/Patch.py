@@ -503,6 +503,11 @@ class SuperMarioGalaxyRandomiser:
         patch.repack_iso()
 
 
+        
+        import winsound
+        winsound.MessageBeep(winsound.MB_OK)
+
+
 if __name__ == "__main__":
     base_path = r"worlds/smgalaxy/Patch/"
     iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
