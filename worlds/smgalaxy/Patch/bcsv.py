@@ -122,7 +122,7 @@ class BCSV(GCLibFile):
             
             field = BCSVField(field_data)
             self.fields.append(field)
-        
+            
         for entry_index in range(self.entry_count):
             entry_offset = self.entry_offset + entry_index*self.entry_size
             entry_data = BytesIO(fs.read_bytes(self.data, entry_offset, self.entry_size))
@@ -144,7 +144,6 @@ class BCSV(GCLibFile):
             raise IndexError(f"Field index out of range. Fields: {len(self.fields)}, index: {field_index}.")
         return self.entries[entry_index][field_index]
         
-
     def set_value_by_index(self, entry_index: int, field_index: int, new_value):
         if entry_index < 0 or entry_index >= len(self.entries):
             raise IndexError(f"Entry index out of range. Entries: {len(self.entries)}, index: {entry_index}.")
@@ -182,7 +181,9 @@ class BCSV(GCLibFile):
     def calculate_string_offsets(self):
         self.string_offsets = [0]
         for string in self.strings:
-            self.string_offsets.append(self.string_offsets[-1] + len(string) + 1)
+            # Encode to shift-jis before getting the length since japanese characters
+            # have a different length decoded vs encoded
+            self.string_offsets.append(self.string_offsets[-1] + len(string.encode('shift-jis')) + 1)
 
     def get_field_index(self, field_name: str):
         for i, field in enumerate(self.fields):

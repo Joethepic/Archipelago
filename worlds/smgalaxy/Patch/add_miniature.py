@@ -8,13 +8,12 @@ import change_dol as ch_dol
 def replace_miniatures(dol: DOL, objectdata_path: str, galaxies: dict):
     mini_galaxies = list(galaxies.keys())
     surp_galaxies = list(galaxies.values())
-
-    #string_address = adjust_nameobjfactory_table(mini_galaxy, surp_galaxy)
-    #adjust_archivelist_table(mini_galaxy, string_address)
     
     adjust_table(dol, mini_galaxies, surp_galaxies)
 
-    for surp_galaxy in surp_galaxies:
+    for mini_galaxy, surp_galaxy in galaxies.items():
+        if mini_galaxy.startswith("Surp") or surp_galaxy.startwith("Mini"):
+            continue
         path = objectdata_path + 'MiniSurprisedGalaxy.arc'
         base = RARC(path)
         
@@ -88,11 +87,11 @@ def adjust_nameobjfactory_table(dol: DOL, old_galaxies: str, new_galaxies: str):
         string_address = ch_dol.read_pointer_from_dol(dol, address)
         string = ch_dol.read_string_from_dol(dol, string_address)
 
-        if string in old_galaxies:
+        if string in old_galaxies and string.startswith("Mini"):
             index = old_galaxies.index(string)
             addresses[index][0] = address
         
-        if string in new_galaxies:
+        if string in new_galaxies and string.startswith("Surp"):
             index = new_galaxies.index(string)
             addresses[index][1] = string_address
     

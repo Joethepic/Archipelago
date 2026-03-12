@@ -202,12 +202,12 @@ class  MarioColors(OptionDict):
     4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
 
     The following predetermined colors are available:
-    "Red", "Orange", "Yellow", "Green" "Blue", "Purple", "Black" "Brown", "White", "Pink", "Gray"
+    "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
     valid_keys = ["Hat & Shirt", "Overalls", "Shoes", "Gloves"]
-    valid_values = ["Red", "Orange", "Yellow", "Green" "Blue", "Purple", "Black" "Brown", "White", "Pink", "Gray"]
+    valid_values = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"]
     default = {
         "Hat & Shirt": "Red",
         "Overalls": "Blue",

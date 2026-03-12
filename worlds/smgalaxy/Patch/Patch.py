@@ -8,6 +8,7 @@ from gclib.rarc import RARC
 from gclib.dol import DOL
 from gclib.j3d import BDL
 from gclib.yaz0_yay0 import Yaz0
+import gclib.texture_utils as txt_util
 from io import BytesIO
 
 import random
@@ -15,7 +16,30 @@ from bcsv import BCSV
 from change_mario_colours import change_mario_colours
 from change_dome_galaxies import change_dome_miniature
 from add_miniature import replace_miniatures, adjust_nameobjfactory_table
+from change_observatory import update_observatory, update_domes
 import change_dol as ch_dol
+
+from PIL import Image
+
+# TO BE REMOVED
+class  MarioColors():
+    """
+    Choose new colors for part of Mario's Outfit! (These will also be applied to Luigi)
+    4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
+
+    The following predetermined colors are available:
+    "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
+    """
+    display_name = "Mario Colors"
+    internal_name = "mario_colors"
+    valid_keys = ["Hat & Shirt", "Overalls", "Shoes", "Gloves"]
+    valid_values = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"]
+    default = {
+        "Hat & Shirt": "Red",
+        "Overalls": "Blue",
+        "Shoes": "Brown",
+        "Gloves": "White"
+    }
 
 class InvalidCleanISOError(Exception): pass
 
@@ -135,7 +159,7 @@ class WiiISO:
             print("Deleting temporary directory...")
 
             # Delete the extracted ISO after its done repacking
-            time.sleep(3)
+            time.sleep(10)
             self._delete_temp_dir(self.temp_dir, verbose)
             
             print("Done deleting temporary directory!")
@@ -334,6 +358,161 @@ converter = {"First" : 1,
              "Fourth": 4,
              "Fifth" : 5}
 
+shuffle = {1: 3,
+           2: 2,
+           3: 4,
+           4: 1,
+           5: 6,
+           6: 5}
+
+class MarioColours:
+    """
+    A utility class for modifying Mario character colors in Super Mario Galaxy.
+    This class handles the extraction, manipulation, and replacement of color values
+    in Mario's character model textures (hat, overalls, gloves, and shoes) by working
+    with BDL (Binary Display List) files. It uses pixel threshold detection to identify
+    and replace specific colored regions in texture images.
+    """
+    HAT_THRESHOLD: tuple = (255,50,50)
+    OVERALLS_THRESHOLD: tuple = (50,55,255)
+    GLOVES_THRESHOLD: tuple = (0,0,0) # To be determined whenever i give a fuck
+    SHOES_THRESHOLD: tuple = (0,0,0) # fuck you +2
+
+    convert_colour: dict[str, tuple] = {"Red"   : (255,  0,  0),
+                                        "Orange": (255,165,  0),
+                                        "Yellow": (255,255,  0),
+                                        "Green" : (  0,128,  0),
+                                        "Blue"  : (  0,  0,255),
+                                        "Purple": (128,  0,128),
+                                        "Black" : (  0,  0,  0),
+                                        "Brown" : (165, 42, 42),
+                                        "White" : (255,255,255),
+                                        "Pink"  : (255,192,203),
+                                        "Gray"  : (128,128,128)}
+
+    def __init__(self, mario_arc: RARC):
+        self.mario_arc = mario_arc
+
+        if "mario.bdl" not in [file.name for file in self.mario_arc.file_entries]:
+            raise ValueError("Arc file is not expected arc file: Mario.arc")            
+        
+        self.bdl =  self.mario_arc.get_file("mario.bdl", BDL)
+        
+    def get_img(self, texture_name: str) -> Image:    
+        if texture_name not in self.bdl.tex1.textures_by_name:
+            raise ValueError(f"Texture not found in bdl file: {texture_name}")
+
+        bti = self.bdl.tex1.textures_by_name[texture_name][0]
+        img = txt_util.decode_image(bti.image_data, bti.palette_data,
+                                    bti.image_format, bti.palette_format,
+                                    bti.num_colors, bti.width, bti.height)
+        self.img = img
+
+    def set_img(self, texture_name: str) -> None:
+        if texture_name not in self.bdl.tex1.textures_by_name:
+            raise ValueError(f"Texture not found in bdl file: {texture_name}")
+
+        bti = self.bdl.tex1.textures_by_name[texture_name][0]
+        bti.replace_image(self.img)
+        self.bdl.tex1.textures_by_name[texture_name][0] = bti
+
+    def replace_pixels(self, threshold_values: tuple, new_colour: tuple) -> None:
+        img = self.img
+        pixels = img.load()
+        width = img.size[0]
+        height = img.size[1]
+
+        for x in range(width):
+            for y in range(height):
+                if False not in [pixels[x,y][i] <= threshold_values[i] for i in [0,1,2]]:
+                    pixels[x, y] = (*new_colour, 255)
+    
+    def update_part(self, mario_part: str, colour: str) -> None:
+        if mario_part not in MarioColors.valid_keys:
+            raise ValueError(f"Mario part is not an accepted part: {mario_part}")
+
+        print(f"Updating {mario_part.lower()} to {colour.lower()}")
+
+        colour = self.convert_colour[colour]
+
+        if mario_part == "Hat & Shirt":
+            texture_name = "MarioCap.0"
+            threshold = self.HAT_THRESHOLD
+        elif mario_part == "Overalls":
+            texture_name = "MarioBody.0"
+            threshold = self.OVERALLS_THRESHOLD
+        elif mario_part == "Shoes":
+            texture_name = "MarioBody.0"
+            threshold = self.SHOES_THRESHOLD
+        elif mario_part == "Gloves":
+            texture_name = "MarioBody.0"
+            threshold = self.GLOVES_THRESHOLD
+
+        self.get_img(texture_name)
+        self.replace_pixels(threshold, colour)
+        self.set_img(texture_name)
+
+        self.bdl.save()
+        for ch in self.bdl.chunks:
+            ch.save()
+
+class Patch:
+    def __init__(self, base_path: str, iso_path: str, output: dict):
+        self.iso_path = iso_path
+        self.temp_path = base_path + 'temp'
+        self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
+
+        self.galaxies = output['Galaxies']
+        self.counts = output['Galaxy Counts']
+
+        self.mario_colours = output['Options']['mario_colors']
+    
+    def unpack_iso(self):
+        self.iso.extract()
+    
+    def repack_iso(self, delete: bool = True, verbose: bool = False):
+        self.iso.repack(delete, verbose)
+
+    def get_arc(self, path):
+        return RARC(path)
+
+    def write_arc(self, arc: RARC, path: str) -> None:
+        with open(path, 'wb') as f:
+            f.write(Yaz0.compress(arc.data).getvalue())
+
+    def update_mario_colours(self):
+        mario_arc_filepath = self.temp_path + r"/DATA/files/ObjectData/Mario.arc"
+        mario_arc = self.get_arc(mario_arc_filepath)
+
+        for mario_part, colour in self.mario_colours.items():
+            MarioColours(mario_arc).update_part(mario_part, colour)
+        
+        mario_arc.save_changes()
+        self.write_arc(mario_arc, mario_arc_filepath)
+    
+
+class SuperMarioGalaxyRandomiser:
+    @staticmethod
+    def create_randomiser(base_path: str, iso_path: str, output: dict):
+        patch = Patch(base_path, iso_path, output)
+
+        patch.unpack_iso()
+
+        patch.update_mario_colours()
+        
+        patch.repack_iso()
+
+
+if __name__ == "__main__":
+    base_path = r"worlds/smgalaxy/Patch/"
+    iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
+    
+    with open(base_path + 'example_output.txt', 'r') as f:
+        output = eval(f.read())
+    
+    SuperMarioGalaxyRandomiser.create_randomiser(base_path, iso_path, output)
+
+
 def change_galaxies(astrodome: RARC, dol: DOL, galaxies: dict[str, str]):
     mini_to_surp_galaxies = {}
     mini_to_mini_galaxies = {}
@@ -378,11 +557,29 @@ def change_galaxies(astrodome: RARC, dol: DOL, galaxies: dict[str, str]):
     old_galaxies = list(mini_to_mini_galaxies.keys())
     new_galaxies = list(mini_to_mini_galaxies.values())
     adjust_nameobjfactory_table(dol, old_galaxies, new_galaxies)
-    replace_miniatures(dol, iso.temp_dir + "/DATA/files/ObjectData/", mini_to_surp_galaxies)
+    #replace_miniatures(dol, iso.temp_dir + "/DATA/files/ObjectData/", mini_to_surp_galaxies)
 
 def update_gameeventflagtable(dol: DOL):
-    address = 0x8053bbd0
-    ch_dol.write_to_dol(dol, address, b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    # Set all these flags to require having 0 power stars
+    addresses = [0x8053bbd0, # SpecialStarGreen1
+                 0x8053bd60, # AppearBeltConveyerExGalaxy
+                 0x8053bd74, # AppearCocoonExGalaxy
+                 0x8053bd88, # AppearTearDropGalaxy
+                 0x8053bd9c, # AppearFishTunnelGalaxy
+                 0x8053bdb0, # AppearTransformationExGalaxy
+                 0x8053bdc4, # AppearTeresaMario2DGalaxy
+                 0x8053bdd8, # AppearSnowCapsuleGalaxy
+    ]
+
+    for address in addresses:
+        print(ch_dol.read_string_from_pointer(dol, address - 0x4))
+        ch_dol.write_to_dol(dol, address + 0x0, b'\x01') # Type
+        ch_dol.write_to_dol(dol, address + 0x1, b'\x01') # Saveflag
+        ch_dol.write_to_dol(dol, address + 0x2, b'\x00') # Condition 1
+        ch_dol.write_to_dol(dol, address + 0x3, b'\x00') # Condition 2
+        ch_dol.write_to_dol(dol, address + 0x4, b'\x00\x00\x00\x00') # Unknown
+        ch_dol.write_to_dol(dol, address + 0x8, b'\x00\x00\x00\x00') # Condition 3
+        ch_dol.write_to_dol(dol, address + 0xC, b'\x00\x00\x00\x00') # Condition 4
 
 def update_star_requirements(dol: DOL, example_input, galaxy_counts):
     begin_address = 0x8053c800
@@ -429,7 +626,7 @@ def update_dol(dol: DOL, example_input, galaxy_counts):
     old_instruction = b'\x80\x03\x00\x8c'
     new_instruction = b'\x38\x00\x00\x02'
     ch_dol.replace_instruction(dol, address, old_instruction, new_instruction)
-
+    
     # Get obj_arg0 from miniature galaxy
     address = 0x80200758
     old_instruction = b'\x7f\xe4\xfb\x78'
@@ -467,14 +664,30 @@ def update_iso(iso: WiiISO, example_input, galaxy_counts):
     with open(astrodome_file, 'wb') as f:
         f.write(Yaz0.compress(astrodome.data).getvalue())
     
+    astrogalaxy_path = iso.temp_dir + "/DATA/files/StageData/AstroGalaxy.arc"
+    astrogalaxy = RARC(astrogalaxy_path)
+    update_observatory(astrogalaxy, shuffle)
+
+    with open(astrogalaxy_path, 'wb') as f:
+        f.write(Yaz0.compress(astrogalaxy.data).getvalue())
+
+    astrodomescenario_file = iso.temp_dir + "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
+    astrodomescenario = RARC(astrodomescenario_file)
+    update_domes(astrodomescenario, shuffle)
+
+    with open(astrodomescenario_file, 'wb') as f:
+        f.write(Yaz0.compress(astrodomescenario.data).getvalue())
+
+    ch_dol.write_to_dol(dol, 0x80536fb0, b'\x80\x59\x81\xcb')
+    ch_dol.write_to_dol(dol, 0x80536fb8, b'\x80\x5a\x7c\xbf')
+
     update_dol(dol, example_input, galaxy_counts)
     dol.save_changes()
-
+"""
 if __name__ == '__main__':
     base_path = r"worlds/smgalaxy/Patch/"
     iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
     iso = WiiISO(iso_path, dest_path=base_path, temp_dir=base_path + "temp")
-    
     
     #iso.verify_base_rom()
     iso.extract()
@@ -482,4 +695,8 @@ if __name__ == '__main__':
     update_iso(iso, example_input, Galaxy_Counts)
 
     iso.repack(delete=True, verbose=False)
+
+    import winsound
+    winsound.MessageBeep(winsound.MB_OK)
+"""
     
