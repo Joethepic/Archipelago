@@ -17,15 +17,17 @@ def read_from_dol(dol: DOL, address: int, size: int):
 
 def read_pointer_from_dol(dol: DOL, address: int):
     pointer = int.from_bytes(read_from_dol(dol, address, 4))
-    try:
-        dol.convert_address_to_offset(pointer)
-    except:
+    if not is_pointer(dol, pointer):
         raise TypeError(f"Pointer could not be found at address: {int.to_bytes(address).hex()}")
     return pointer
 
 def read_string_from_dol(dol: DOL, address: int):
     offset = dol.convert_address_to_offset(address)
     return fs.read_str_until_null_character(dol.data, offset)
+
+def read_string_from_pointer(dol: DOL, address: int):
+    pointer = read_pointer_from_dol(dol, address)
+    return read_string_from_dol(dol, pointer)
 
 def read_callback(data: BytesIO, offset: int, size: int):
     return fs.read_bytes(data, offset, size)

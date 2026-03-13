@@ -158,6 +158,7 @@ class WiiISO:
         rebuild_from_directory(self.temp_dir, self.dest_path + self.iso_name + '.iso', callback=self.progress_callback)
         
         print("Repacking ISO complete")
+
         if delete:
             print("Deleting temporary directory...")
 
@@ -464,18 +465,18 @@ class Mario(RARCExtended):
     path = "/DATA/files/ObjectData/Mario.arc"
 
     def __init__(self, base_path):
-        self.filepath = base_path + self.path
-        super().__init__(self.filepath)
+        self.file_path = base_path + self.path
+        super().__init__(self.file_path)
 
         self.colours = MarioColours(self)
     
     def update_colours(self, items: dict[str, str]) -> None:
-        for mario_part, colour in items:
+        for mario_part, colour in items.items():
             self.colours.update_part(mario_part, colour)
 
 
 class AstroDome(RARCExtended):
-    path = "DATA/files/StageData/AstroDome.arc"
+    path = "/DATA/files/StageData/AstroDome.arc"
 
     major_galaxies = ["Good Egg Galaxy",    # Terrace
                       "Honeyhive Galaxy",   # Terrace
@@ -524,8 +525,8 @@ class AstroDome(RARCExtended):
     gateway_galaxy = "Gateway Galaxy"
 
     def __init__(self, base_path):
-        self.filepath = base_path + self.path
-        super().__init__(self.filepath)
+        self.file_path = base_path + self.path
+        super().__init__(self.file_path)
 
         self.dol = DOLExtended(base_path)
     
@@ -580,6 +581,9 @@ class Patch:
         dol = DOLExtended(self.temp_path)
 
         # update a few instructions here
+
+        dol.save()
+        
 
 
 
@@ -798,4 +802,3 @@ if __name__ == '__main__':
     import winsound
     winsound.MessageBeep(winsound.MB_OK)
 """
-    

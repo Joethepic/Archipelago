@@ -37,7 +37,16 @@ hash_to_name = {b'\x00\x33\x7a\x8b': 'name',
                 b'\x4F\x75\x30\x80': 'OpenCondition1',
                 b'\x4F\x75\x30\x81': 'OpenCondition2',
                 b'\x38\x39\xD7\x2F': 'PowerStarNum',
-                b'\x78\xEE\xB1\xFD': 'GrandGalaxyNo'}
+                b'\x78\xEE\xB1\xFD': 'GrandGalaxyNo',
+                b'\xED\x08\xB5\x91': 'ScenarioNo',
+                b'\xCD\xB1\x6E\x5B': 'ScenarioName',
+                b'\x7D\xAF\x48\x52': 'PowerStarId',
+                b'\x5A\x59\xAA\xD5': 'AppearPowerStarObj',
+                b'\x03\xE4\x41\xD0': 'Comet',
+                b'\x50\x0B\x84\xC0': 'LuigiModeTimer',
+                b'\x10\x9F\x70\x22': 'AstroDome',
+                b'\xE3\x75\xF3\x94': 'IsHidden',
+                b'\xD6\xC8\x04\x00': 'ErrorCheck'}
 
 name_to_hash = {'name': b'\x00\x33\x7a\x8b',
                'l_id': b'\x00\x32\x89\xce',
@@ -78,7 +87,16 @@ name_to_hash = {'name': b'\x00\x33\x7a\x8b',
                'OpenCondition1': b'\x4F\x75\x30\x80',
                'OpenCondition2': b'\x4F\x75\x30\x81',
                'PowerStarNum': b'\x38\x39\xD7\x2F',
-               'GrandGalaxyNo': b'\x78\xEE\xB1\xFD'}
+               'GrandGalaxyNo': b'\x78\xEE\xB1\xFD',
+               'ScenarioNo': b'\xED\x08\xB5\x91',
+               'ScenarioName': b'\xCD\xB1\x6E\x5B',
+               'PowerStarId': b'\x7D\xAF\x48\x52',
+               'AppearPowerStarObj': b'\x5A\x59\xAA\xD5',
+               'Comet': b'\x03\xE4\x41\xD0',
+               'LuigiModeTimer': b'\x50\x0B\x84\xC0',
+               'AstroDome': b'\x10\x9F\x70\x22',
+               'IsHidden': b'\xE3\x75\xF3\x94',
+               'ErrorCheck': b'\xD6\xC8\x04\x00'}
 
 def convert_hash_or_name(HASH: int = 0, name: str = ''):
     if HASH:
