@@ -38,7 +38,9 @@ miniature_to_galaxy: dict = {"MiniEggStarGalaxy"         : "Good Egg Galaxy",
                              "SurpTamakoroExLv2Galaxy"   : "Rolling Gizmo Galaxy",
                              "SurpTearDropGalaxy"        : "Drip Drop Galaxy",
                              "SurpTeresaMario2DGalaxy"   : "Boo's Boneyard Galaxy",
-                             "SurpTransformationExGalaxy": "Sand Spiral Galaxy"}
+                             "SurpTransformationExGalaxy": "Sand Spiral Galaxy",
+                             
+                             "AstroChildRoom"            : "Gateway Galaxy"}
 
 galaxy_to_miniature: dict = {"Good Egg Galaxy"            : "MiniEggStarGalaxy",
                              "Honeyhive Galaxy"           : "MiniHoneyBeeKingdomGalaxy",
@@ -80,4 +82,6 @@ galaxy_to_miniature: dict = {"Good Egg Galaxy"            : "MiniEggStarGalaxy",
                              "Rolling Gizmo Galaxy"       : "SurpTamakoroExLv2Galaxy",
                              "Drip Drop Galaxy"           : "SurpTearDropGalaxy",
                              "Boo's Boneyard Galaxy"      : "SurpTeresaMario2DGalaxy",
-                             "Sand Spiral Galaxy"         : "SurpTransformationExGalaxy"}
+                             "Sand Spiral Galaxy"         : "SurpTransformationExGalaxy",
+                             
+                             "Gateway Galaxy"             : "AstroChildRoom"}

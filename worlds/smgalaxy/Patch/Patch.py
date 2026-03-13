@@ -19,6 +19,8 @@ from change_dome_galaxies import change_dome_miniature
 from add_miniature import replace_miniatures, adjust_nameobjfactory_table
 from change_observatory import update_observatory, update_domes
 import change_dol as ch_dol
+from extensions import DOLExtended, RARCExtended
+
 
 from PIL import Image
 
@@ -458,29 +460,6 @@ class MarioColours:
             ch.save()
 
 
-class DOLExtended(DOL):
-    path = "DATA/sys/main.dol"
-
-    def __init__(self, base_path):
-        super().__init__(self)
-        self.file_path = base_path + self.path
-        self.file = open(self.file_path, 'rb+')
-        self.read(self.file)
-
-
-class RARCExtended(RARC):
-    def __init__(self, filepath):
-        self.filepath = filepath
-        super().__init__(filepath)
-
-    def save(self) -> None:
-        """Save the changes back to the file"""
-        self.save_changes()
-
-        with open(self.filepath, 'wb') as f:
-            f.write(Yaz0.compress(self.data).getvalue())
-
-
 class Mario(RARCExtended):
     path = "/DATA/files/ObjectData/Mario.arc"
 
@@ -498,12 +477,61 @@ class Mario(RARCExtended):
 class AstroDome(RARCExtended):
     path = "DATA/files/StageData/AstroDome.arc"
 
+    major_galaxies = ["Good Egg Galaxy",    # Terrace
+                      "Honeyhive Galaxy",   # Terrace
+                      "Space Junk Galaxy",  # Fountain
+                      "Battlerock Galaxy",  # Fountain
+                      "Beach Bowl Galaxy",  # Kitchen
+                      "Ghostly Galaxy",     # Kitchen
+                      "Gusty Garden Galaxy",# Bedroom
+                      "Freezeflame Galaxy", # Bedroom
+                      "Dusty Dune Galaxy",  # Bedroom
+                      "Gold Leaf Galaxy",   # Engine
+                      "Sea Slide Galaxy",   # Engine
+                      "Toy Time Galaxy",    # Engine
+                      "Deep Dark Galaxy",   # Garden
+                      "Dreadnought Galaxy", # Garden
+                      "Melty Molten Galaxy"]# Garden
+    
+    hungry_luma_galaxies = ["Sweet Sweet Galaxy",   # Terrace
+                            "Sling Pod Galaxy",     # Fountain
+                            "Drip Drop Galaxy",     # Kitchen
+                            "Bigmouth Galaxy",      # Bedroom
+                            "Sand Spiral Galaxy",   # Engine
+                            "Snow Cap Galaxy",      # Garden
+                            "Boo's Boneyard Galaxy"]# Gateway
+    
+    green_luma_galaxies = ["Rolling Gizmo Galaxy",
+                           "Loopdeeswoop Galaxy",
+                           "Bubble Blast Galaxy"]
+    
+    minor_galaxies = ["Loopdeeloop Galaxy",     # Terrace
+                      "Flipswitch Galaxy",      # Terrace
+                      "Rolling Green Galaxy",   # Fountain
+                      "Hurry-Scurry Galaxy",    # Fountain
+                      "Bubble Breeze Galaxy",   # Kitchen
+                      "Buoy Base Galaxy",       # Kitchen
+                      "Honeyclimb Galaxy",      # Bedroom
+                      "Bonefin Galaxy",         # Engine
+                      "Matter Splatter Galaxy"] # Garden
+
+    bowser_galaxies = ["Bowser Jr.'s Robot Reactor",    # Terrace
+                       "Bowser Jr.'s Airship Armada",   # Fountain
+                       "Bowser Jr.'s Lava Reactor",     # Kitchen
+                       "Bowser's Star Reactor",         # Bedroom
+                       "Bowser's Dark Matter Plant"]    # Engine
+    
+    gateway_galaxy = "Gateway Galaxy"
+
     def __init__(self, base_path):
         self.filepath = base_path + self.path
         super().__init__(self.filepath)
 
         self.dol = DOLExtended(base_path)
     
+    def get_game_galaxy_name(self, galaxy: str) -> str:
+        return galaxy_to_miniature[galaxy]
+
     def add_luma_galaxy_to_dome(self):
         pass
 
@@ -517,8 +545,11 @@ class Patch:
         self.temp_path = base_path + 'temp'
         self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
 
-        self.galaxies = output['Galaxies']
         self.counts = output['Galaxy Counts']
+        self.galaxies = output['Galaxies']
+
+        self.old_galaxies = self.galaxies.keys()
+        self.new_galaxies = self.galaxies.values()
 
         self.mario_colours = output['Options']['mario_colors']
     
