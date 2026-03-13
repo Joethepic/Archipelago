@@ -9,6 +9,7 @@ from gclib.dol import DOL
 from gclib.j3d import BDL
 from gclib.yaz0_yay0 import Yaz0
 import gclib.texture_utils as txt_util
+import gclib.fs_helpers as fs
 from io import BytesIO
 
 import random
@@ -456,6 +457,60 @@ class MarioColours:
         for ch in self.bdl.chunks:
             ch.save()
 
+
+class DOLExtended(DOL):
+    path = "DATA/sys/main.dol"
+
+    def __init__(self, base_path):
+        super().__init__(self)
+        self.file_path = base_path + self.path
+        self.file = open(self.file_path, 'rb+')
+        self.read(self.file)
+
+
+class RARCExtended(RARC):
+    def __init__(self, filepath):
+        self.filepath = filepath
+        super().__init__(filepath)
+
+    def save(self) -> None:
+        """Save the changes back to the file"""
+        self.save_changes()
+
+        with open(self.filepath, 'wb') as f:
+            f.write(Yaz0.compress(self.data).getvalue())
+
+
+class Mario(RARCExtended):
+    path = "/DATA/files/ObjectData/Mario.arc"
+
+    def __init__(self, base_path):
+        self.filepath = base_path + self.path
+        super().__init__(self.filepath)
+
+        self.colours = MarioColours(self)
+    
+    def update_colours(self, items: dict[str, str]) -> None:
+        for mario_part, colour in items:
+            self.colours.update_part(mario_part, colour)
+
+
+class AstroDome(RARCExtended):
+    path = "DATA/files/StageData/AstroDome.arc"
+
+    def __init__(self, base_path):
+        self.filepath = base_path + self.path
+        super().__init__(self.filepath)
+
+        self.dol = DOLExtended(base_path)
+    
+    def add_luma_galaxy_to_dome(self):
+        pass
+
+
+    
+
+
 class Patch:
     def __init__(self, base_path: str, iso_path: str, output: dict):
         self.iso_path = iso_path
@@ -467,29 +522,35 @@ class Patch:
 
         self.mario_colours = output['Options']['mario_colors']
     
-    def unpack_iso(self):
+    def unpack_iso(self) -> None:
+        """Unpack the contents of the ISO file."""
         self.iso.extract()
     
-    def repack_iso(self, delete: bool = True, verbose: bool = False):
+    def repack_iso(self, delete: bool = True, verbose: bool = False) -> None:
+        """Repack the contents of the ISO file."""
         self.iso.repack(delete, verbose)
 
-    def get_arc(self, path):
-        return RARC(path)
+    def update_mario(self):
+        mario = Mario(self.temp_path)
 
-    def write_arc(self, arc: RARC, path: str) -> None:
-        with open(path, 'wb') as f:
-            f.write(Yaz0.compress(arc.data).getvalue())
+        mario.update_colours(self.mario_colours)
+        # In the future possibly more functionality
 
-    def update_mario_colours(self):
-        mario_arc_filepath = self.temp_path + r"/DATA/files/ObjectData/Mario.arc"
-        mario_arc = self.get_arc(mario_arc_filepath)
-
-        for mario_part, colour in self.mario_colours.items():
-            MarioColours(mario_arc).update_part(mario_part, colour)
-        
-        mario_arc.save_changes()
-        self.write_arc(mario_arc, mario_arc_filepath)
+        mario.save()
     
+    def update_astrodome(self):
+        astrodome = AstroDome(self.temp_path)
+
+        # do stuff
+
+        astrodome.save()
+
+    def update_dol(self):
+        dol = DOLExtended(self.temp_path)
+
+        # update a few instructions here
+
+
 
 class SuperMarioGalaxyRandomiser:
     @staticmethod
@@ -498,12 +559,14 @@ class SuperMarioGalaxyRandomiser:
 
         patch.unpack_iso()
 
-        patch.update_mario_colours()
+        patch.update_mario()
+        patch.update_astrodome()
+        patch.update_dol()
         
         patch.repack_iso()
 
 
-        
+
         import winsound
         winsound.MessageBeep(winsound.MB_OK)
 
