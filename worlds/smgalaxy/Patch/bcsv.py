@@ -185,12 +185,12 @@ class BCSV(GCLibFile):
             # have a different length decoded vs encoded
             self.string_offsets.append(self.string_offsets[-1] + len(string.encode('shift-jis')) + 1)
 
-    def get_field_index(self, field_name: str):
+    def get_field_index(self, field_name: str) -> int:
         for i, field in enumerate(self.fields):
             if field.name == field_name:
                 return i
 
-    def get_entry_index_by_name(self, entry_name: str):
+    def get_entry_index_by_name(self, entry_name: str) -> int:
         for i, entry in enumerate(self.entries):
             if entry[0] == entry_name:
                 return i

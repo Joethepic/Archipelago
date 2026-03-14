@@ -19,7 +19,7 @@ from change_dome_galaxies import change_dome_miniature
 from add_miniature import replace_miniatures, adjust_nameobjfactory_table
 from change_observatory import update_observatory, update_domes
 import change_dol as ch_dol
-from extensions import DOLExtended, RARCExtended
+from extensions import SMGDOL, RARCExtended
 
 
 from PIL import Image
@@ -460,6 +460,12 @@ class MarioColours:
         for ch in self.bdl.chunks:
             ch.save()
 
+class SurprisedGalaxy(RARCExtended):
+    objectdata_path = "/DATA/files/ObjectData/"
+    file_name = "MiniSurprisedGalaxy.arc"
+
+    def __init__(self):
+        pass
 
 class Mario(RARCExtended):
     path = "/DATA/files/ObjectData/Mario.arc"
@@ -528,13 +534,110 @@ class AstroDome(RARCExtended):
         self.file_path = base_path + self.path
         super().__init__(self.file_path)
 
-        self.dol = DOLExtended(base_path)
-    
     def get_game_galaxy_name(self, galaxy: str) -> str:
         return galaxy_to_miniature[galaxy]
 
     def add_luma_galaxy_to_dome(self):
         pass
+
+class AstroDomeScenario(RARCExtended):
+    path = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
+
+    def __init__(self, base_path):
+        self.file_path = base_path + self.path
+        super().__init__(self.file_path)
+
+        for file in self.get_node_by_path('').files:
+            if file.name == "scenariodata.bcsv":
+                self.scenariodata = BCSV(file)
+
+    def update(self, dome_shuffle: dict[int, int]) -> None:
+        scenariono_index = self.scenariodata.get_field_index("ScenarioNo")
+        astrodome_index = self.scenariodata.get_field_index("AstroDome")
+
+        print("Updating dome loading zones...")
+
+        for entry_index in range(self.scenariodata.entry_count):
+            scenariono = self.scenariodata.get_value_by_index(entry_index, scenariono_index)
+            new_value = 2**(dome_shuffle[scenariono] - 1)
+
+            print(f"Loading zone dome {scenariono} -> dome {dome_shuffle[scenariono]}")
+
+            self.scenariodata.set_value_by_index(entry_index, astrodome_index, new_value)
+
+        self.scenariodata.save_changes()
+
+class AstroGalaxy(RARCExtended):
+    path = "/DATA/files/StageData/AstroGalaxy.arc"
+
+    def __init__(self, base_path):
+        self.file_path = base_path + self.path
+        super().__init__(self.file_path)
+    
+    def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
+        """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
+        for index in range(1,7):
+            if index not in dome_shuffle.keys() or index not in dome_shuffle.values():
+                return False
+        return True
+    
+    def shuffle_domes(self, shuffle: dict[int, int]) -> None:
+        # Make sure its a valid shuffle
+        if not self.is_valid_shuffle(shuffle):
+            raise ValueError(f"Invalid shuffle: {shuffle}")
+
+        # Get the common objinfo bcsv
+        for file in self.get_node_by_path('jmp/placement/common').files:
+            if file.name == 'objinfo':
+                objinfo = BCSV(file)
+        
+        # Get the indices of the fields
+        name_index = objinfo.get_field_index("name")
+        objarg0_index = objinfo.get_field_index("Obj_arg0")
+        posx_index = objinfo.get_field_index("pos_x")
+        posy_index = objinfo.get_field_index("pos_y")
+        posz_index = objinfo.get_field_index("pos_z")
+        dirx_index = objinfo.get_field_index("dir_x")
+        diry_index = objinfo.get_field_index("dir_y")
+        dirz_index = objinfo.get_field_index("dir_z")
+        
+        domes = {}
+
+        for entry_index in range(objinfo.entry_count):
+            if objinfo.get_value_by_index(entry_index, name_index) == "AstroDomeEntrance":
+                objarg0 = objinfo.get_value_by_index(entry_index, objarg0_index)
+
+                # Create dictionary element of the dome information
+                domes[objarg0] = {'entry_index': entry_index,
+                                  'pos_x': objinfo.get_value_by_index(entry_index, posx_index),
+                                  'pos_y': objinfo.get_value_by_index(entry_index, posy_index),
+                                  'pos_z': objinfo.get_value_by_index(entry_index, posz_index),
+                                  'dir_x': objinfo.get_value_by_index(entry_index, dirx_index),
+                                  'dir_y': objinfo.get_value_by_index(entry_index, diry_index),
+                                  'dir_z': objinfo.get_value_by_index(entry_index, dirz_index)}
+
+        reverse_shuffle = {}
+        for key, value in shuffle.items():
+            reverse_shuffle[value] = key
+
+        print("Shuffling domes...")
+        
+        for objarg0 in domes.keys():
+            entry_index = domes[objarg0]['entry_index']
+            new_dome = reverse_shuffle[objarg0]
+            new_values = domes[new_dome]
+            
+            print(f"Dome {objarg0} -> Dome {new_dome}")
+
+            # Set the new values
+            objinfo.set_value_by_index(entry_index, posx_index, new_values['pos_x'])
+            objinfo.set_value_by_index(entry_index, posy_index, new_values['pos_y'])
+            objinfo.set_value_by_index(entry_index, posz_index, new_values['pos_z'])
+            objinfo.set_value_by_index(entry_index, dirx_index, new_values['dir_x'])
+            objinfo.set_value_by_index(entry_index, diry_index, new_values['dir_y'])
+            objinfo.set_value_by_index(entry_index, dirz_index, new_values['dir_z'])
+
+        objinfo.save_changes()
 
 
     
@@ -562,6 +665,9 @@ class Patch:
         """Repack the contents of the ISO file."""
         self.iso.repack(delete, verbose)
 
+    def dome_to_luma(self):
+        pass
+
     def update_mario(self):
         mario = Mario(self.temp_path)
 
@@ -570,6 +676,18 @@ class Patch:
 
         mario.save()
     
+
+    def update_astrogalaxy(self, shuffle: dict[int, int]):
+        astrogalaxy = AstroGalaxy(self.temp_path)
+        astrodomescenario = AstroDomeScenario(self.temp_path)
+
+        astrogalaxy.shuffle_domes(shuffle)
+        astrodomescenario.update(shuffle)
+
+        astrogalaxy.save()
+        astrodomescenario.save()
+
+
     def update_astrodome(self):
         astrodome = AstroDome(self.temp_path)
 
@@ -577,10 +695,11 @@ class Patch:
 
         astrodome.save()
 
-    def update_dol(self):
-        dol = DOLExtended(self.temp_path)
 
-        # update a few instructions here
+    def update_dol(self):
+        dol = SMGDOL(self.temp_path)
+
+        
 
         dol.save()
         
@@ -595,6 +714,43 @@ class SuperMarioGalaxyRandomiser:
         patch.unpack_iso()
 
         patch.update_mario()
+
+        """What needs to be done:
+        Update GameEventFlagTable
+            ???    
+            
+        Dome -> Luma
+            Change AstroGalaxy objinfo, might have to go through all layers
+                The Surp galaxy needs to be changed to Mini galaxy
+        
+        Luma -> Dome
+            Create new arc file called Mini[galaxyname]
+                Needs to contain 'mini[galaxyname].bdl' for the model and 'mini[galaxyname].btk' for the animation
+            Change corresponding make archivelist element
+                Name must be Mini[galaxyname] and MakeArchiveListMiniatureGalaxy function
+            Change corresponding nameobjfactory element
+        
+        Dome -> Gateway
+            ???
+
+        Gateway -> Dome
+            Create new arc file ???
+            ???
+        
+        Luma -> Gateway
+            ???
+        
+        Gateway -> Luma
+            ???
+        """
+        shuffle = {1: 3,
+           2: 2,
+           3: 4,
+           4: 1,
+           5: 6,
+           6: 5}
+        patch.update_astrogalaxy(shuffle)
+
         patch.update_astrodome()
         patch.update_dol()
         
