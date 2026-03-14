@@ -3,7 +3,7 @@ from gclib.dol import DOL
 from gclib.j3d import BDL
 from gclib.yaz0_yay0 import Yaz0
 from gclib.bunfoe_types import Vec3float
-import change_dol as ch_dol
+from .change_dol import *
 
 def replace_miniatures(dol: DOL, objectdata_path: str, galaxies: dict):
     mini_galaxies = list(galaxies.keys())
@@ -62,16 +62,16 @@ def adjust_table(dol: DOL, old_galaxies: list[str], new_galaxies: list[str]):
 
     for element in range(archivelist_elements):
         address = archivelist_address + archivelist_element_size * element
-        string_address = ch_dol.read_pointer_from_dol(dol, address)
-        string = ch_dol.read_string_from_dol(dol, string_address)
+        string_address = read_pointer_from_dol(dol, address)
+        string = read_string_from_dol(dol, string_address)
 
         if string in old_galaxies:
             index = old_galaxies.index(string)
             addresses[index][0] = address
         
     for old, new in addresses:
-        ch_dol.write_pointer_to_dol(dol, old, new)
-        ch_dol.write_string_to_dol(dol, new, 'Mini')
+        write_pointer_to_dol(dol, old, new)
+        write_string_to_dol(dol, new, 'Mini')
 
 
 def adjust_nameobjfactory_table(dol: DOL, old_galaxies: str, new_galaxies: str):
@@ -84,8 +84,8 @@ def adjust_nameobjfactory_table(dol: DOL, old_galaxies: str, new_galaxies: str):
 
     for element in range(nameobjfactory_elements):
         address = nameobjfactory_address + nameobjfactory_element_size * element
-        string_address = ch_dol.read_pointer_from_dol(dol, address)
-        string = ch_dol.read_string_from_dol(dol, string_address)
+        string_address = read_pointer_from_dol(dol, address)
+        string = read_string_from_dol(dol, string_address)
 
         if string in old_galaxies and string.startswith("Mini"):
             index = old_galaxies.index(string)
@@ -96,7 +96,7 @@ def adjust_nameobjfactory_table(dol: DOL, old_galaxies: str, new_galaxies: str):
             addresses[index][1] = string_address
     
     for old, new in addresses:
-        ch_dol.write_pointer_to_dol(dol, old, new)
+        write_pointer_to_dol(dol, old, new)
     return addresses
 
 if __name__ == "__main__":

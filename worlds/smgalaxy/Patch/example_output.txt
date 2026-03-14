@@ -690,7 +690,7 @@
         }
     },
     "Galaxies": {
-        "Dome 1 First Orbit Galaxy": "Dusty Dunes Galaxy",
+        "Dome 1 First Orbit Galaxy": "Dusty Dune Galaxy",
         "Dome 2 First Orbit Galaxy": "Rolling Green Galaxy",
         "Dome 3 First Orbit Galaxy": "Bowser's Star Reactor",
         "Dome 4 First Orbit Galaxy": "Space Junk Galaxy",

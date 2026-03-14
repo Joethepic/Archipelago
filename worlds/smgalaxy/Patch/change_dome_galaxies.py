@@ -1,5 +1,5 @@
 from gclib.rarc import RARC
-from bcsv import BCSV
+from .bcsv import BCSV
 
 index_to_layer = {0: 'layera',
                   1: 'layerb',

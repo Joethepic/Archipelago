@@ -1,7 +1,7 @@
 from gclib.gclib_file import GCLibFile
 import gclib.fs_helpers as fs
 from io import BytesIO
-from hashtable import hash_to_name
+from .hashtable import hash_to_name
 import struct
 
 class BCSVField:
@@ -154,6 +154,8 @@ class BCSV(GCLibFile):
 
         if field.type != 1:
             self.entries[entry_index][field_index] = new_value
+        
+        self.get_strings()
 
     def replace_single_entry_name(self, old_name: str, new_name: str):
         for entry_index, entry in enumerate(self.entries):

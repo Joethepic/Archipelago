@@ -1,8 +1,8 @@
 from gclib.rarc import RARC
 from gclib.dol import DOL
 from gclib.yaz0_yay0 import Yaz0
-import change_dol as ch_dol
-from bcsv import BCSV
+from .change_dol import *
+from .bcsv import BCSV
 
 shuffle = {1: 3,
            2: 2,
@@ -101,8 +101,8 @@ if __name__ == "__main__":
     with open(path, 'wb') as f:
         f.write(Yaz0.compress(arc.data).getvalue())
     
-    dol = ch_dol.get_dol(r"worlds/smgalaxy/Patch/temp/DATA/sys/main.dol")
-    ch_dol.write_to_dol(dol, 0x80536fa4, b'\x80\x59\x80\xd5')
+    dol = get_dol(r"worlds/smgalaxy/Patch/temp/DATA/sys/main.dol")
+    write_to_dol(dol, 0x80536fa4, b'\x80\x59\x80\xd5')
 
     path = r"worlds/smgalaxy/Patch/temp/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
     arc = RARC(path)
