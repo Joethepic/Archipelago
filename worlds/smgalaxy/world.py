@@ -171,6 +171,13 @@ class SMGWorld(World):
         output_data["Options"]["character_select"] = getattr(self.options, "character_select").value
         output_data["Options"]["mario_colors"] = getattr(self.options, "mario_colors").value
 
+
+        k = ["Dome 1", "Dome 2", "Dome 3", "Dome 4", "Dome 5", "Dome 6"]
+        if self.options.dome_shuffle.value:
+            self.random.shuffle(k)
+        v = [regname.TERRACE, regname.FOUNTAIN, regname.KITCHEN, regname.BEDROOM, regname.ENGINE, regname.GARDEN]
+        output_data["Options"]["dome_shuffle"] = dict(zip(k, v))
+
         # Output which item has been placed at each location
         for location in list(smgloc for smgloc in self.get_locations() if isinstance(smgloc, SMGLocation)):
             if location.address is None:
