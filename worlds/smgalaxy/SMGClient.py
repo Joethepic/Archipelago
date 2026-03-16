@@ -9,6 +9,7 @@ from CommonClient import CommonContext, ClientCommandProcessor, logger, server_l
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
+from .Constants.ram_constants import *
 from .items import SMGItemData, item_table
 
 import os
@@ -69,14 +70,14 @@ class GalaxyContext(CommonContext):
         await asyncio.sleep(time_to_wait)
     async def check_ingame(self) -> bool:
         """Checks to see if Mario/Luigi is in game and not at file select."""
-        game_status: str = dme.read_bytes(0x809A90DC,16).split(b"\0")[0].decode()
+        game_status: str = dme.read_bytes(CURRENT_GAME_STATUS,16).split(b"\0")[0].decode()
         curr_galaxy: str = await self.current_galaxy()
         return game_status == "Game" and curr_galaxy != "FileSelect"
 
     async def current_galaxy(self):
         """Updates what Galaxy the user is currently on, but for some weird reason also tracks if you are in FileSelect.
         Everything else including Domes, the Observatory Ship and even the intro planet has a galaxy name."""
-        return dme.read_bytes(0x809A90FC,16).split(b"\0")[0].decode()
+        return dme.read_bytes(CURRENT_GALAXY_STATUS,16).split(b"\0")[0].decode()
     async def last_visited_galaxy(self):
         """Updates the last Galaxy Mario/Luigi was on."""
         curr_galaxy: str = await self.current_galaxy()
@@ -89,6 +90,7 @@ class GalaxyContext(CommonContext):
             return
         
         local_missing_locs = copy.deepcopy(self.missing_locations)
+        star_bit_flag: int | None = None
 
         for loc_id in local_missing_locs:
             local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
@@ -100,8 +102,9 @@ class GalaxyContext(CommonContext):
             if local_loc.game_address is None:
                 continue
 
-            star_bit_flag: int = int(dme.read_byte(dme.follow_pointers(dme.follow_pointers(0x80900B18, [
-                0x8, 0xC, 0x0, 0xC, 0x8, 0x0]) + region_data.region_offset, [0x0]) + 0x8))
+            if star_bit_flag is None:
+                star_bit_flag: int = int(dme.read_byte(dme.follow_pointers(GALAXY_STRUCT_ADDR,
+                    [0x8, 0xC, 0x0, 0xC, 0x8, region_data.region_offset, 0x8])))
 
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
@@ -120,8 +123,8 @@ class GalaxyContext(CommonContext):
                 match item_id.item:
                     case 170000007:
                         logger.info("1up Received")
-                        lives = int.from_bytes(dme.read_bytes(0x80F63CF0, 2))
-                        dme.write_bytes(0x80F63CF0, (lives + 1).to_bytes(2))
+                        lives = int.from_bytes(dme.read_bytes(ONEUP_RAM_ADDR, 2))
+                        dme.write_bytes(ONEUP_RAM_ADDR, (lives + 1).to_bytes(2))
                 #note currently adding these in breaks lives adding(might fix once changing that value does something?)
                 #   case 170000004:
                 #     logger.debug("Power Star Received")
