@@ -459,13 +459,8 @@ class SurprisedGalaxy(RARCExtended):
 
         self.bdl_entry = self.get_file_entry(self.bdl_base_name)
         self.btk_entry = self.get_file_entry(self.btk_base_name)
-        
-    def create_luma_miniature(self, luma_galaxy_name: str):
-        name = luma_galaxy_name.lower()
-        self.bdl_entry.name = name +'.bdl'
-        
-        bdl = BDL(self.bdl_entry)
-        
+    
+    def scale_joints(self, bdl: BDL):
         if not self.scaled:
             self.scaled = True
             for joint in bdl.jnt1.joints:
@@ -480,6 +475,14 @@ class SurprisedGalaxy(RARCExtended):
                 joint.bounding_box_max.x *= scale
                 joint.bounding_box_max.y *= scale
                 joint.bounding_box_max.z *= scale
+
+    def create_luma_miniature(self, luma_galaxy_name: str):
+        name = luma_galaxy_name.lower()
+        self.bdl_entry.name = name +'.bdl'
+        
+        bdl = BDL(self.bdl_entry)
+        
+        self.scale_joints(bdl)
         
         bdl.jnt1.save()
         for chunk in bdl.chunks:
@@ -495,6 +498,16 @@ class SurprisedGalaxy(RARCExtended):
             f.write(Yaz0.compress(self.data).getvalue())
         
 
+class Gateway(RARCExtended):
+    path = "/DATA/files/ObjectData/AstroChildRoom.arc"
+    bdl_base_name = "astrochildroom.bdl"
+
+    def __init__(self, base_path):
+        self.file_path = base_path + self.path
+        super().__init__(self.file_path)
+
+    def get_bdl_entry(self):
+        return self.get_file_entry(self.bdl_base_name)
 
 class Mario(RARCExtended):
     path = "/DATA/files/ObjectData/Mario.arc"
@@ -532,13 +545,27 @@ class AstroDome(RARCExtended):
         super().__init__(self.file_path)
 
         self.surprised_galaxy = SurprisedGalaxy(base_path)
+        self.gateway_galaxy = Gateway(base_path)
 
     def create_gateway_miniature(self):
-        return
+        empty_miniature = RARC()
+        empty_miniature.add_root_directory()
+        root = empty_miniature.nodes[0]
+        root.name = "miniastrochildroom"
 
-    def create_luma_miniatures(self, names: list[str]):
-        for name in names:
-            self.surprised_galaxy.create_luma_miniature(name)
+        bdl_entry = self.gateway_galaxy.get_bdl_entry()
+        bdl_entry.name = "miniastrochildroom.bdl"
+        bdl = BDL(bdl_entry)
+        
+        empty_miniature.add_new_file("miniheavensdoorgalaxy.bdl", bdl.data, root)
+
+        empty_miniature.save_changes()
+
+        with open(self.surprised_galaxy.objectdata_path + "MiniAstroChildRoom.arc", 'wb') as f:
+            f.write(Yaz0.compress(empty_miniature.data).getvalue())
+
+    def create_luma_miniature(self, name: str):
+        self.surprised_galaxy.create_luma_miniature(name)
 
     def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int):
         layer = self.index_to_layer[dome_index]
@@ -553,7 +580,7 @@ class AstroDome(RARCExtended):
             if name.startswith("Mini"):
                 miniature_indices.append(entry_index)
 
-        luma_miniatues  = []
+        luma_miniatures  = []
         index = 0
         for galaxy in new_galaxies:
             entry_index = miniature_indices[index]
@@ -576,14 +603,12 @@ class AstroDome(RARCExtended):
             objinfo.set_value_by_index(entry_index, objarg0_index, obj_arg0)
 
             if galaxy.name == GATEWAY:
-                self.create_gateway_miniature()
+                #self.create_gateway_miniature()
+                self.create_luma_miniature(name)
             elif galaxy.name in specials_galaxy_list:
-                luma_miniatues.append(name)
+                self.create_luma_miniature(name)
 
         objinfo.save_changes()
-
-        self.create_luma_miniatures(luma_miniatues)
-
 
 
 class AstroDomeScenario(RARCExtended):
@@ -723,11 +748,10 @@ class Patch:
 
         self.counts = output['Galaxy Counts']
         self.galaxies = output['Galaxies']
+        self.mario_colours = output['Options']['mario_colors']
 
         self.old_galaxies = self.galaxies.keys()
         self.new_galaxies = self.galaxies.values()
-
-        self.mario_colours = output['Options']['mario_colors']
     
     def unpack_iso(self) -> None:
         """Unpack the contents of the ISO file."""
@@ -747,7 +771,7 @@ class Patch:
         mario.save()
 
 
-    def update_astrogalaxy(self, shuffle: dict[int, int]):
+    def update_astrogalaxy_domes(self, shuffle: dict[int, int]):
         astrogalaxy = AstroGalaxy(self.temp_path)
         astrodomescenario = AstroDomeScenario(self.temp_path)
 
@@ -770,7 +794,7 @@ class Patch:
 
     def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]):
         dol = SMGDOL(self.temp_path)
-
+        """
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
         address = 0x801ffc44
@@ -791,78 +815,12 @@ class Patch:
         address = 0x801ad614
         new_instruction = b'\x38\x60\x00\x05'
         dol.write_data(fs.write_bytes, address, new_instruction)
-
-        miniature_nameobj_elements: list[NameObjFactoryElement] = []
-        miniature_archivelist_elements: list[ArchiveListElement] = []
-        strings = {}
-
-        gateway_nameobj = dol.get_nameobjfactory_element(958)
-        gateway_archivelist = dol.get_archivelist_element(51)
-
-        for index in range(dol.nameobjfactory_element_count):
-            element = dol.get_nameobjfactory_element(index)
-            if element.name.startswith("Mini") or element.name.startswith("Surp"):
-                miniature_nameobj_elements.append(element)
-                strings[element.name[4:]] = element.name_pointer
-            elif element.name == "AstroChildRoom":
-                miniature_nameobj_elements.append(gateway_nameobj)
-                strings[element.name] = element.name_pointer
-
-        for index in range(dol.archivelist_element_count):
-            element = dol.get_archivelist_element(index)
-            if element.name.startswith("Mini"):
-                miniature_archivelist_elements.append(element)
-            elif element.name == "AstroChildRoom":
-                miniature_archivelist_elements.append(gateway_archivelist)
-        
-        index = 0
-        for galaxy in dome_galaxies:
-            in_game_name = region_list[galaxy.name].in_game_name
-            name_pointer = strings[in_game_name]
-            
-            nameobj_element: NameObjFactoryElement = next((element for element in miniature_nameobj_elements
-                                                           if element.name[4:] == in_game_name), gateway_nameobj)
-            archivelist_element = miniature_archivelist_elements[index]
-            index += 0
-
-            mini_name = "Mini" + in_game_name
-
-            new_nameobj_element = NameObjFactoryElement(mini_name, name_pointer,
-                                                        dol.create_nameobj_miniature_galaxy_function,
-                                                        "", 0, nameobj_element.index)
-            new_archivelist_element = ArchiveListElement(mini_name, name_pointer,
-                                                         dol.make_archivelist_miniature_galaxy_function,
-                                                         archivelist_element.index)
-            
-            dol.set_nameobjfactory_element(new_nameobj_element)
-            dol.set_archivelist_element(new_archivelist_element)
-            dol.write_data(fs.write_magic_str, name_pointer, "Mini", 4)
+        """
+        address = 0x8037db18
+        new_instruction = b'\x38\xc0\x00\x01'
+        dol.write_data(fs.write_bytes, address, new_instruction)
 
 
-        unlabeled_table = dol.unlabeled_table
-        name_index = unlabeled_table.get_field_index("name")
-        opencondition0_index = unlabeled_table.get_field_index("OpenCondition0")
-        opencondition1_index = unlabeled_table.get_field_index("OpenCondition1")
-        powerstarnum_index = unlabeled_table.get_field_index("PowerStarNum")
-        grandgalaxyno_index = unlabeled_table.get_field_index("GrandGalaxyNo")
-        print(dome_galaxies)
-        for galaxy in dome_galaxies:
-            in_game_name = region_list[galaxy.name].in_game_name
-            print(galaxy)
-            for entry_index in range(unlabeled_table.entry_count):
-                name = unlabeled_table.get_value_by_index(entry_index, name_index)
-                if name == in_game_name:
-                    if galaxy.dome_index == 1:
-                        unlabeled_table.set_value_by_index(entry_index, opencondition0_index, '')
-                    else:
-                        unlabeled_table.set_value_by_index(entry_index, opencondition0_index, f"SpecialStarGrand{galaxy.dome_index - 1}")
-                    unlabeled_table.set_value_by_index(entry_index, opencondition1_index, '')
-
-                    key = "D" + str(galaxy.dome_index) + "G" + str(galaxy.orbit_index + 1)
-                    #unlabeled_table.set_value_by_index(entry_index, powerstarnum_index, galaxy_counts[key])
-
-                    unlabeled_table.set_value_by_index(entry_index, grandgalaxyno_index, galaxy.dome_index)
-        
         dol.save()
         
 
@@ -879,47 +837,15 @@ class SuperMarioGalaxyRandomiser:
 
         patch.update_mario()
 
-        """What needs to be done:
-        Update GameEventFlagTable
-            ???    
-        
-        Dome -> Dome
-            ???
-
-        Luma -> Luma
-            ???
-
-        Dome -> Luma
-            Change AstroGalaxy objinfo, might have to go through all layers
-                The Surp galaxy needs to be changed to Mini galaxy
-        
-        Luma -> Dome
-            Create new arc file called Mini[galaxyname]
-                Needs to contain 'mini[galaxyname].bdl' for the model and 'mini[galaxyname].btk' for the animation
-            Change corresponding make archivelist element
-                Name must be Mini[galaxyname] and MakeArchiveListMiniatureGalaxy function
-            Change corresponding nameobjfactory element
-        
-        Dome -> Gateway
-            ???
-
-        Gateway -> Dome
-            Create new arc file ???
-            ???
-        
-        Luma -> Gateway
-            ???
-        
-        Gateway -> Luma
-            ???
-        """
+        # TEMPORARY
         dome_shuffle = {1: 3,
                         2: 2,
                         3: 4,
                         4: 1,
                         5: 6,
                         6: 5}
-        patch.update_astrogalaxy(dome_shuffle)
+        
+        #patch.update_astrogalaxy_domes(dome_shuffle)
 
         galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies, dome_shuffle).galaxy_destinations
         
@@ -928,10 +854,12 @@ class SuperMarioGalaxyRandomiser:
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"]
 
 
-        patch.update_astrodome(dome_galaxies, dome_shuffle)
+        #patch.update_astrodome(dome_galaxies, dome_shuffle)
 
         patch.update_dol(dome_galaxies, galaxy_counts)
         
+
+
         patch.repack_iso()
 
 
@@ -949,7 +877,7 @@ if __name__ == "__main__":
     
     SuperMarioGalaxyRandomiser.create_randomiser(base_path, iso_path, output)
 
-
+"""
 def change_galaxies(astrodome: RARC, dol: DOL, galaxies: dict[str, str]):
     mini_to_surp_galaxies = {}
     mini_to_mini_galaxies = {}
@@ -1120,7 +1048,7 @@ def update_iso(iso: WiiISO, example_input, galaxy_counts):
 
     update_dol(dol, example_input, galaxy_counts)
     dol.save_changes()
-"""
+
 if __name__ == '__main__':
     base_path = r"worlds/smgalaxy/Patch/"
     iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"

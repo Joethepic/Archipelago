@@ -83,7 +83,7 @@ region_list: dict[str, SMGRegionData] = {
                                     {"Grand Star": 5}),
     regname.LIBRARY: SMGRegionData("Dome", [regname.SHIP], [], [], {}),
     regname.COTU: SMGRegionData("Dome", [regname.SHIP], [], [regname.BOWSER3], {"Grand Star": 5, "Power Star": 60}),
-    regname.GATEWAY: SMGRegionData("Special", [regname.SHIP], [], [], {}, 0x0, "AstroChildRoom"),
+    regname.GATEWAY: SMGRegionData("Special", [regname.SHIP], [], [], {}, 0x0, "HeavensDoorGalaxy"),
     regname.SWEETSWEET: SMGRegionData("Special", [regname.SHIP], [], [], {}, 0x14, "BeltConveyerExGalaxy"),
     regname.SLINGPOD: SMGRegionData("Special", [regname.SHIP], [], [], {}, 0x2C, "CocoonExGalaxy"),
     regname.DRIPDROP: SMGRegionData("Special", [regname.SHIP], [], [], {}, 0x44, "TearDropGalaxy"),

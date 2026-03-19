@@ -68,6 +68,9 @@ class SMGDOL(DOLExtended):
         self.unlabeled_table_bytes = self.read_data(fs.read_bytes, self.unlabeled_table_start_address, self.unlabeled_table_size)
         self.unlabeled_table = BCSV(BytesIO(self.unlabeled_table_bytes))
 
+        self.nameobjfactory_elements = [self.get_nameobjfactory_element(index) for index in range(self.nameobjfactory_element_count)]
+        self.archivelist_elements = [self.get_archivelist_element(index) for index in range(self.archivelist_element_count)]
+
     def get_nameobjfactory_offset(self, index: int):
         return self.nameobjfactory_address + self.nameobjfactory_element_size * index
 
@@ -86,13 +89,6 @@ class SMGDOL(DOLExtended):
             archive_name = ''
 
         return NameObjFactoryElement(name, name_pointer, create_pointer, archive_name, archive_pointer, index)
-
-    def get_nameobjfactory_elements(self) -> list[NameObjFactoryElement]:
-        nameobjfactory = []
-        for index in range(self.nameobjfactory_element_count):
-            nameobjfactory.append(self.get_nameobjfactory_element(index))
-        
-        return nameobjfactory
 
     def set_nameobjfactory_element(self, element: NameObjFactoryElement):
         offset = self.get_nameobjfactory_offset(element.index)
@@ -114,13 +110,6 @@ class SMGDOL(DOLExtended):
 
         return ArchiveListElement(name, name_pointer, make_archivelist_pointer, index)
 
-    def get_archivelist_elements(self) -> list[ArchiveListElement]:
-        archivelist = []
-        for index in range(self.archivelist_element_count):
-            archivelist.append(self.get_archivelist_element(index))
-        
-        return archivelist
-
     def set_archivelist_element(self, element: ArchiveListElement):
         offset = self.get_archivelist_offset(element.index)
         self.write_data(fs.write_and_pack_bytes, offset,
@@ -128,7 +117,7 @@ class SMGDOL(DOLExtended):
 
     def save(self):
         self.unlabeled_table.save_changes()
-        #self.write_data(fs.write_bytes, self.unlabeled_table_start_address, self.unlabeled_table.data.getvalue())
+        self.write_data(fs.write_bytes, self.unlabeled_table_start_address, self.unlabeled_table.data.getvalue())
         self.save_changes()
 
         with open(self.file_path, 'wb') as f:
