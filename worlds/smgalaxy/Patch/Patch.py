@@ -1,30 +1,16 @@
 import hashlib
 from pathlib import Path
-import os, time, random
+import os, time
 
 from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
-from .dicts import miniature_to_galaxy, galaxy_to_miniature
-from gclib.rarc import RARC
-from gclib.dol import DOL
-from gclib.j3d import BDL
-from gclib.yaz0_yay0 import Yaz0
-import gclib.texture_utils as txt_util
 import gclib.fs_helpers as fs
-from io import BytesIO
 from typing import NamedTuple
 
-import random
-from .bcsv import BCSV
-from .change_mario_colours import change_mario_colours
-from .change_dome_galaxies import change_dome_miniature
-from .add_miniature import replace_miniatures, adjust_nameobjfactory_table
-from .change_observatory import update_observatory, update_domes
-from .change_dol import *
-from .extensions import SMGDOL, RARCExtended, NameObjFactoryElement, ArchiveListElement
-from ..regions import major_galaxy_list, minor_galaxy_list, specials_galaxy_list, boss_galaxy_list, all_galaxy_slots, region_list
-from ..Options import MarioColors
-from ..Constants.Names.region_names import GATEWAY
-from PIL import Image
+from .extensions import SMGDOL, RARCExtended
+from .SMGObjects.Mario import Mario
+from .SMGStages.AstroDome import AstroDome
+from .SMGStages.AstroDomeScenario import AstroDomeScenario
+from .SMGStages.AstroGalaxy import AstroGalaxy
 
 class InvalidCleanISOError(Exception): pass
 
@@ -180,536 +166,11 @@ class WiiISO:
                 self.progress = progress
                 print(f"Progress {out}: {self.progress}%")
 
-miniature_galaxies = galaxy_to_miniature.keys()
-
-major_galaxies = """Good Egg Galaxy
-Honeyhive Galaxy
-Space Junk Galaxy
-Battlerock Galaxy
-Beach Bowl Galaxy
-Ghostly Galaxy
-Gusty Garden Galaxy
-Freezeflame Galaxy
-Dusty Dunes Galaxy
-Gold Leaf Galaxy
-Sea Slide Galaxy
-Toy Time Galaxy
-Deep Dark Galaxy
-Dreadnought Galaxy
-Melty Molten Galaxy"""
-
-minor_galaxies = """Gateway Galaxy
-Sweet Sweet Galaxy
-Sling Pod Galaxy
-Drip Drop Galaxy
-Bigmouth Galaxy
-Sand Spiral Galaxy
-Snow Cap Galaxy
-Boo's Boneyard Galaxy
-Rolling Gizmo Galaxy
-Loopdeeswoop Galaxy
-Bubble Blast Galaxy
-Loopdeeloop Galaxy
-Flipswitch Galaxy
-Rolling Green Galaxy
-Hurry-Scurry Galaxy
-Bubble Breeze Galaxy
-Buoy Base Galaxy
-Honeyclimb Galaxy
-Bonefin Galaxy
-Matter Splatter Galaxy"""
-
-boss_galaxies = """Bowser Jr.'s Robot Reactor
-Bowser Jr.'s Airship Armada
-Bowser Jr.'s Lava Reactor
-Bowser's Star Reactor
-Bowser's Dark Matter Plant"""
-
-default_galaxies: dict[str, str] =  {"Dome 1 First Orbit Galaxy" : "Good Egg Galaxy",
-                                     "Dome 2 First Orbit Galaxy" : "Space Junk Galaxy",
-                                     "Dome 3 First Orbit Galaxy" : "Beach Bowl Galaxy",
-                                     "Dome 4 First Orbit Galaxy" : "Gusty Garden Galaxy",
-                                     "Dome 5 First Orbit Galaxy" : "Gold Leaf Galaxy",
-                                     "Dome 6 First Orbit Galaxy" : "Deep Dark Galaxy",
-                                     "Dome 1 Second Orbit Galaxy": "Honeyhive Galaxy",
-                                     "Dome 2 Third Orbit Galaxy" : "Battlerock Galaxy",
-                                     "Dome 3 Third Orbit Galaxy" : "Ghostly Galaxy",
-                                     "Dome 4 Second Orbit Galaxy": "Freezeflame Galaxy",
-                                     "Dome 5 Second Orbit Galaxy": "Sea Slide Galaxy",
-                                     "Dome 6 Second Orbit Galaxy": "Dreadnought Galaxy",
-                                     "Dome 4 Third Orbit Galaxy" : "Dusty Dune Galaxy",
-                                     "Dome 5 Third Orbit Galaxy" : "Toy Time Galaxy",
-                                     "Dome 6 Fourth Orbit Galaxy" : "Melty Molten Galaxy",
-                                     "Dome 1 Third Orbit Galaxy" : "Loopdeeloop Galaxy",
-                                     "Dome 2 Second Orbit Galaxy": "Rolling Green Galaxy",
-                                     "Dome 3 Second Orbit Galaxy": "Bubble Breeze Galaxy",
-                                     "Dome 4 Fourth Orbit Galaxy": "Honeyclimb Galaxy",
-                                     "Dome 5 Fourth Orbit Galaxy": "Bonefin Galaxy",
-                                     "Dome 6 Third Orbit Galaxy" : "Matter Splatter Galaxy",
-                                     "Dome 1 Fourth Orbit Galaxy": "Flipswitch Galaxy",
-                                     "Dome 2 Fourth Orbit Galaxy": "Hurry-Scurry Galaxy",
-                                     "Dome 3 Fourth Orbit Galaxy": "Buoy Base Galaxy",
-                                     "Sweet Sweet Hungry Luma"   : "Sweet Sweet Galaxy",
-                                     "Sling Pod Hungry Luma"     : "Sling Pod Galaxy",
-                                     "Drip Drop Hungry Luma"     : "Drip Drop Galaxy",
-                                     "Bigmouth Hungry Luma"      : "Bigmouth Galaxy",
-                                     "Sand Spiral Hungry Luma"   : "Sand Spiral Galaxy",
-                                     "Snow Cap Hungry Luma"      : "Snow Cap Galaxy",
-                                     "Gateway Dome"              : "Gateway Galaxy",
-                                     "Boo's Boneyard Hungry Luma": "Boo's Boneyard Galaxy",
-                                     "Rolling Gizmo Launch Star" : "Rolling Gizmo Galaxy",
-                                     "Loopdeeswoop Launch Star"  : "Loopdeeswoop Galaxy",
-                                     "Bubble Blast Launch Star"  : "Bubble Blast Galaxy",
-                                     "Dome 1 Fifth Orbit Galaxy" : "Bowser Jr.'s Robot Reactor",
-                                     "Dome 2 Fifth Orbit Galaxy" : "Bowser's Star Reactor",
-                                     "Dome 3 Fifth Orbit Galaxy" : "Bowser Jr.'s Airship Armada",
-                                     "Dome 4 Fifth Orbit Galaxy" : "Bowser's Dark Matter Plant",
-                                     "Dome 5 Fifth Orbit Galaxy" : "Bowser Jr.'s Lava Reactor"}
-
-example_input = {
-        "Dome 1 First Orbit Galaxy" : "Honeyhive Galaxy",
-        "Dome 1 Second Orbit Galaxy": "Dusty Dune Galaxy",
-        "Dome 1 Third Orbit Galaxy" : "Loopdeeloop Galaxy",
-        "Dome 1 Fourth Orbit Galaxy": "Bowser's Dark Matter Plant",
-        "Dome 2 First Orbit Galaxy" : "Battlerock Galaxy",
-        "Dome 2 Second Orbit Galaxy": "Honeyclimb Galaxy",
-        "Dome 2 Third Orbit Galaxy" : "Good Egg Galaxy",
-        "Dome 2 Fourth Orbit Galaxy": "Bowser's Star Reactor",
-        "Dome 3 First Orbit Galaxy" : "Sea Slide Galaxy",
-        "Dome 3 Second Orbit Galaxy": "Sling Pod Galaxy",
-        "Dome 3 Third Orbit Galaxy" : "Melty Molten Galaxy",
-        "Dome 3 Fourth Orbit Galaxy": "Snow Cap Galaxy",
-        "Dome 4 First Orbit Galaxy" : "Ghostly Galaxy",
-        "Dome 4 Second Orbit Galaxy": "Dreadnought Galaxy",
-        "Dome 4 Third Orbit Galaxy" : "Gusty Garden Galaxy",
-        "Dome 4 Fourth Orbit Galaxy": "Loopdeeswoop Galaxy",
-        "Dome 5 First Orbit Galaxy" : "Toy Time Galaxy",
-        "Dome 5 Second Orbit Galaxy": "Space Junk Galaxy",
-        "Dome 5 Third Orbit Galaxy" : "Deep Dark Galaxy",
-        "Dome 5 Fourth Orbit Galaxy": "Gateway Galaxy",
-        "Dome 6 First Orbit Galaxy" : "Gold Leaf Galaxy",
-        "Dome 6 Second Orbit Galaxy": "Beach Bowl Galaxy",
-        "Dome 6 Third Orbit Galaxy" : "Rolling Green Galaxy",
-        "Dome 6 Fourth Orbit Galaxy": "Freezeflame Galaxy",
-        "Sweet Sweet Hungry Luma"   : "Flipswitch Galaxy",
-        "Sling Pod Hungry Luma"     : "Drip Drop Galaxy",
-        "Drip Drop Hungry Luma"     : "Matter Splatter Galaxy",
-        "Bigmouth Hungry Luma"      : "Bowser Jr.'s Robot Reactor",
-        "Sand Spiral Hungry Luma"   : "Hurry-Scurry Galaxy",
-        "Snow Cap Hungry Luma"      : "Bowser Jr.'s Lava Reactor",
-        "Gateway Dome"              : "Sweet Sweet Galaxy",
-        "Boo's Boneyard Hungry Luma": "Bubble Breeze Galaxy",
-        "Rolling Gizmo Launch Star" : "Bigmouth Galaxy",
-        "Loopdeeswoop Launch Star"  : "Boo's Boneyard Galaxy",
-        "Bubble Blast Launch Star"  : "Bubble Blast Galaxy",
-        "Dome 1 Fifth Orbit Galaxy" : "Bowser Jr.'s Airship Armada",
-        "Dome 2 Fifth Orbit Galaxy" : "Rolling Gizmo Galaxy",
-        "Dome 3 Fifth Orbit Galaxy" : "Buoy Base Galaxy",
-        "Dome 4 Fifth Orbit Galaxy" : "Bonefin Galaxy",
-        "Dome 5 Fifth Orbit Galaxy" : "Sand Spiral Galaxy"}
-
-Galaxy_Counts = {"D1G1": 0,
-                 "D1G2": 0,
-                 "D1G3": 1,
-                 "D1G4": 0,
-                 "D1G5": 0,
-                 "D2G1": 8,
-                 "D2G2": 9,
-                 "D2G3": 3,
-                 "D2G4": 10,
-                 "D2G5": 4,
-                 "D3G1": 20,
-                 "D3G2": 12,
-                 "D3G3": 15,
-                 "D3G4": 12,
-                 "D3G5": 18,
-                 "D4G1": 20,
-                 "D4G2": 20,
-                 "D4G3": 20,
-                 "D4G4": 22,
-                 "D4G5": 20,
-                 "D5G1": 31,
-                 "D5G2": 26,
-                 "D5G3": 22,
-                 "D5G4": 22,
-                 "D5G5": 22,
-                 "D6G1": 31,
-                 "D6G2": 31,
-                 "D6G3": 31,
-                 "D6G4": 49}
-
-converter = {"First" : 1,
-             "Second": 2,
-             "Third" : 3,
-             "Fourth": 4,
-             "Fifth" : 5}
-
-shuffle = {1: 3,
-           2: 2,
-           3: 4,
-           4: 1,
-           5: 6,
-           6: 5}
-
-class MarioColours:
-    """
-    A utility class for modifying Mario character colors in Super Mario Galaxy.
-    This class handles the extraction, manipulation, and replacement of color values
-    in Mario's character model textures (hat, overalls, gloves, and shoes) by working
-    with BDL (Binary Display List) files. It uses pixel threshold detection to identify
-    and replace specific colored regions in texture images.
-    """
-    HAT_THRESHOLD: tuple = (255,50,50)
-    OVERALLS_THRESHOLD: tuple = (50,55,255)
-    GLOVES_THRESHOLD: tuple = (0,0,0) # To be determined whenever i give a fuck
-    SHOES_THRESHOLD: tuple = (0,0,0) # fuck you +2
-
-    convert_colour: dict[str, tuple] = {"Red"   : (255,  0,  0),
-                                        "Orange": (255,165,  0),
-                                        "Yellow": (255,255,  0),
-                                        "Green" : (  0,128,  0),
-                                        "Blue"  : (  0,  0,255),
-                                        "Purple": (128,  0,128),
-                                        "Black" : (  0,  0,  0),
-                                        "Brown" : (165, 42, 42),
-                                        "White" : (255,255,255),
-                                        "Pink"  : (255,192,203),
-                                        "Gray"  : (128,128,128)}
-
-    def __init__(self, mario_arc: RARC):
-        self.mario_arc = mario_arc
-
-        if "mario.bdl" not in [file.name for file in self.mario_arc.file_entries]:
-            raise ValueError("Arc file is not expected arc file: Mario.arc")            
-        
-        self.bdl =  self.mario_arc.get_file("mario.bdl", BDL)
-        
-    def get_img(self, texture_name: str) -> Image:    
-        if texture_name not in self.bdl.tex1.textures_by_name:
-            raise ValueError(f"Texture not found in bdl file: {texture_name}")
-
-        bti = self.bdl.tex1.textures_by_name[texture_name][0]
-        img = txt_util.decode_image(bti.image_data, bti.palette_data,
-                                    bti.image_format, bti.palette_format,
-                                    bti.num_colors, bti.width, bti.height)
-        self.img = img
-
-    def set_img(self, texture_name: str) -> None:
-        if texture_name not in self.bdl.tex1.textures_by_name:
-            raise ValueError(f"Texture not found in bdl file: {texture_name}")
-
-        bti = self.bdl.tex1.textures_by_name[texture_name][0]
-        bti.replace_image(self.img)
-        self.bdl.tex1.textures_by_name[texture_name][0] = bti
-
-    def replace_pixels(self, threshold_values: tuple, new_colour: tuple) -> None:
-        img = self.img
-        pixels = img.load()
-        width = img.size[0]
-        height = img.size[1]
-
-        for x in range(width):
-            for y in range(height):
-                if False not in [pixels[x,y][i] <= threshold_values[i] for i in [0,1,2]]:
-                    pixels[x, y] = (*new_colour, 255)
-    
-    def update_part(self, mario_part: str, colour: str) -> None:
-        if mario_part not in MarioColors.valid_keys:
-            raise ValueError(f"Mario part is not an accepted part: {mario_part}")
-
-        print(f"Updating {mario_part.lower()} to {colour.lower()}")
-
-        colour = self.convert_colour[colour]
-
-        if mario_part == "Hat & Shirt":
-            texture_name = "MarioCap.0"
-            threshold = self.HAT_THRESHOLD
-        elif mario_part == "Overalls":
-            texture_name = "MarioBody.0"
-            threshold = self.OVERALLS_THRESHOLD
-        elif mario_part == "Shoes":
-            texture_name = "MarioBody.0"
-            threshold = self.SHOES_THRESHOLD
-        elif mario_part == "Gloves":
-            texture_name = "MarioBody.0"
-            threshold = self.GLOVES_THRESHOLD
-
-        self.get_img(texture_name)
-        self.replace_pixels(threshold, colour)
-        self.set_img(texture_name)
-
-        self.bdl.save()
-        for ch in self.bdl.chunks:
-            ch.save()
-
-
-class SurprisedGalaxy(RARCExtended):
-    objectdata_path = "/DATA/files/ObjectData/"
-    file_name = "MiniSurprisedGalaxy.arc"
-
-    bdl_base_name = "minisurprisedgalaxy.bdl"
-    btk_base_name = "minisurprisedgalaxy.btk"
-
-    scaled = False
-
-    def __init__(self, base_path):
-        self.objectdata_path = base_path + self.objectdata_path
-        self.file_path = self.objectdata_path + self.file_name
-        super().__init__(self.file_path)
-
-        self.bdl_entry = self.get_file_entry(self.bdl_base_name)
-        self.btk_entry = self.get_file_entry(self.btk_base_name)
-    
-    def scale_joints(self, bdl: BDL):
-        if not self.scaled:
-            self.scaled = True
-            for joint in bdl.jnt1.joints:
-                scale = 3.14
-                joint.bounding_sphere_radius *= scale
-                joint.scale.x *= scale
-                joint.scale.y *= scale
-                joint.scale.z *= scale
-                joint.bounding_box_min.x *= scale
-                joint.bounding_box_min.y *= scale
-                joint.bounding_box_min.z *= scale
-                joint.bounding_box_max.x *= scale
-                joint.bounding_box_max.y *= scale
-                joint.bounding_box_max.z *= scale
-
-    def create_luma_miniature(self, luma_galaxy_name: str):
-        name = luma_galaxy_name.lower()
-        self.bdl_entry.name = name +'.bdl'
-        
-        bdl = BDL(self.bdl_entry)
-        
-        self.scale_joints(bdl)
-        
-        bdl.jnt1.save()
-        for chunk in bdl.chunks:
-            chunk.save()
-        bdl.save()
-        self.bdl_entry.save_changes()
-        
-        self.btk_entry.name = name +'.btk'
-        self.btk_entry.save_changes()
-        self.save_changes()
-
-        with open(self.objectdata_path + luma_galaxy_name + '.arc', 'wb') as f:
-            f.write(Yaz0.compress(self.data).getvalue())
-        
-
-class Gateway(RARCExtended):
-    path = "/DATA/files/ObjectData/AstroChildRoom.arc"
-    bdl_base_name = "astrochildroom.bdl"
-
-    def __init__(self, base_path):
-        self.file_path = base_path + self.path
-        super().__init__(self.file_path)
-
-    def get_bdl_entry(self):
-        return self.get_file_entry(self.bdl_base_name)
-
-class Mario(RARCExtended):
-    path = "/DATA/files/ObjectData/Mario.arc"
-
-    def __init__(self, base_path):
-        self.file_path = base_path + self.path
-        super().__init__(self.file_path)
-
-        self.colours = MarioColours(self)
-    
-    def update_colours(self, items: dict[str, str]) -> None:
-        for mario_part, colour in items.items():
-            self.colours.update_part(mario_part, colour)
-
-
 class GalaxyDestination(NamedTuple):
     name: str
     type: str
     dome_index: int
     orbit_index: int
-
-
-class AstroDome(RARCExtended):
-    path = "/DATA/files/StageData/AstroDome.arc"
-
-    index_to_layer = {1: 'layera',
-                      2: 'layerb',
-                      3: 'layerc',
-                      4: 'layerd',
-                      5: 'layere',
-                      6: 'layerf'}
-    
-    def __init__(self, base_path):
-        self.file_path = base_path + self.path
-        super().__init__(self.file_path)
-
-        self.surprised_galaxy = SurprisedGalaxy(base_path)
-        self.gateway_galaxy = Gateway(base_path)
-
-    def create_gateway_miniature(self):
-        empty_miniature = RARC()
-        empty_miniature.add_root_directory()
-        root = empty_miniature.nodes[0]
-        root.name = "miniastrochildroom"
-
-        bdl_entry = self.gateway_galaxy.get_bdl_entry()
-        bdl_entry.name = "miniastrochildroom.bdl"
-        bdl = BDL(bdl_entry)
-        
-        empty_miniature.add_new_file("miniheavensdoorgalaxy.bdl", bdl.data, root)
-
-        empty_miniature.save_changes()
-
-        with open(self.surprised_galaxy.objectdata_path + "MiniAstroChildRoom.arc", 'wb') as f:
-            f.write(Yaz0.compress(empty_miniature.data).getvalue())
-
-    def create_luma_miniature(self, name: str):
-        self.surprised_galaxy.create_luma_miniature(name)
-
-    def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int):
-        layer = self.index_to_layer[dome_index]
-        objinfo = next((BCSV(file) for file in self.get_node_by_path(f"jmp/placement/{layer}").files if file.name == "objinfo"), None)
-        
-        name_index = objinfo.get_field_index("name")
-        objarg0_index = objinfo.get_field_index('Obj_arg0')
-        miniature_indices = []
-
-        for entry_index in range(objinfo.entry_count):
-            name = objinfo.get_value_by_index(entry_index, name_index)
-            if name.startswith("Mini"):
-                miniature_indices.append(entry_index)
-
-        luma_miniatures  = []
-        index = 0
-        for galaxy in new_galaxies:
-            entry_index = miniature_indices[index]
-            index += 1
-
-            print(f"Dome {dome_index} orbit {galaxy.orbit_index + 1} -> {galaxy.name}")
-
-            name = "Mini" + region_list[galaxy.name].in_game_name
-            objinfo.set_value_by_index(entry_index, name_index, name)
-            
-            obj_arg0 = galaxy.orbit_index << 16
-
-            if galaxy.name in major_galaxy_list:
-                obj_arg0 += 0
-            elif galaxy.name in minor_galaxy_list or galaxy.name in specials_galaxy_list:
-                obj_arg0 += 1
-            elif galaxy.name in boss_galaxy_list:
-                obj_arg0 += 2
-
-            objinfo.set_value_by_index(entry_index, objarg0_index, obj_arg0)
-
-            if galaxy.name == GATEWAY:
-                #self.create_gateway_miniature()
-                self.create_luma_miniature(name)
-            elif galaxy.name in specials_galaxy_list:
-                self.create_luma_miniature(name)
-
-        objinfo.save_changes()
-
-
-class AstroDomeScenario(RARCExtended):
-    path = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
-
-    def __init__(self, base_path):
-        self.file_path = base_path + self.path
-        super().__init__(self.file_path)
-
-        for file in self.get_node_by_path('').files:
-            if file.name == "scenariodata.bcsv":
-                self.scenariodata = BCSV(file)
-
-    def update(self, dome_shuffle: dict[int, int]) -> None:
-        scenariono_index = self.scenariodata.get_field_index("ScenarioNo")
-        astrodome_index = self.scenariodata.get_field_index("AstroDome")
-
-        print("Updating dome loading zones...")
-
-        for entry_index in range(self.scenariodata.entry_count):
-            scenariono = self.scenariodata.get_value_by_index(entry_index, scenariono_index)
-            new_value = 2**(dome_shuffle[scenariono] - 1)
-
-            print(f"Loading zone dome {scenariono} -> dome {dome_shuffle[scenariono]}")
-
-            self.scenariodata.set_value_by_index(entry_index, astrodome_index, new_value)
-
-        self.scenariodata.save_changes()
-
-
-class AstroGalaxy(RARCExtended):
-    path = "/DATA/files/StageData/AstroGalaxy.arc"
-
-    def __init__(self, base_path):
-        self.file_path = base_path + self.path
-        super().__init__(self.file_path)
-    
-    def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
-        """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
-        for index in range(1,7):
-            if index not in dome_shuffle.keys() or index not in dome_shuffle.values():
-                return False
-        return True
-    
-    def shuffle_domes(self, shuffle: dict[int, int]) -> None:
-        # Make sure its a valid shuffle
-        if not self.is_valid_shuffle(shuffle):
-            raise ValueError(f"Invalid shuffle: {shuffle}")
-
-        # Get the common objinfo bcsv
-        for file in self.get_node_by_path('jmp/placement/common').files:
-            if file.name == 'objinfo':
-                objinfo = BCSV(file)
-        
-        # Get the indices of the fields
-        name_index = objinfo.get_field_index("name")
-        objarg0_index = objinfo.get_field_index("Obj_arg0")
-        posx_index = objinfo.get_field_index("pos_x")
-        posy_index = objinfo.get_field_index("pos_y")
-        posz_index = objinfo.get_field_index("pos_z")
-        dirx_index = objinfo.get_field_index("dir_x")
-        diry_index = objinfo.get_field_index("dir_y")
-        dirz_index = objinfo.get_field_index("dir_z")
-
-        domes = {}
-
-        for entry_index in range(objinfo.entry_count):
-            if objinfo.get_value_by_index(entry_index, name_index) == "AstroDomeEntrance":
-                objarg0 = objinfo.get_value_by_index(entry_index, objarg0_index)
-
-                # Create dictionary element of the dome information
-                domes[objarg0] = {'entry_index': entry_index,
-                                  'pos_x': objinfo.get_value_by_index(entry_index, posx_index),
-                                  'pos_y': objinfo.get_value_by_index(entry_index, posy_index),
-                                  'pos_z': objinfo.get_value_by_index(entry_index, posz_index),
-                                  'dir_x': objinfo.get_value_by_index(entry_index, dirx_index),
-                                  'dir_y': objinfo.get_value_by_index(entry_index, diry_index),
-                                  'dir_z': objinfo.get_value_by_index(entry_index, dirz_index)}
-
-        reverse_shuffle = {}
-        for key, value in shuffle.items():
-            reverse_shuffle[value] = key
-
-        print("Shuffling domes...")
-        
-        for objarg0 in domes.keys():
-            entry_index = domes[objarg0]['entry_index']
-            new_dome = reverse_shuffle[objarg0]
-            new_values = domes[new_dome]
-            
-            print(f"Dome {objarg0} -> Dome {new_dome}")
-
-            # Set the new values
-            objinfo.set_value_by_index(entry_index, posx_index, new_values['pos_x'])
-            objinfo.set_value_by_index(entry_index, posy_index, new_values['pos_y'])
-            objinfo.set_value_by_index(entry_index, posz_index, new_values['pos_z'])
-            objinfo.set_value_by_index(entry_index, dirx_index, new_values['dir_x'])
-            objinfo.set_value_by_index(entry_index, diry_index, new_values['dir_y'])
-            objinfo.set_value_by_index(entry_index, dirz_index, new_values['dir_z'])
-
-        objinfo.save_changes()
 
 class GalaxyShuffle:
     converter = {"First" : 1,
@@ -726,7 +187,7 @@ class GalaxyShuffle:
             if location.startswith("Dome"):
                 elements = location.split(' ')
                 dome_index = int(elements[1])
-                orbit_index = converter[elements[2]] - 1
+                orbit_index = self.converter[elements[2]] - 1
                 reverse_shuffle = {value: key for key, value in dome_shuffle.items()}
                 
                 new_galaxy = GalaxyDestination(galaxy, "dome", reverse_shuffle[dome_index], orbit_index)
@@ -737,14 +198,13 @@ class GalaxyShuffle:
             
             self.galaxy_destinations.append(new_galaxy)
 
-
-
-
 class Patch:
     def __init__(self, base_path: str, iso_path: str, output: dict):
         self.iso_path = iso_path
         self.temp_path = base_path + 'temp'
         self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
+
+        RARCExtended.iso_base_path = self.temp_path
 
         self.counts = output['Galaxy Counts']
         self.galaxies = output['Galaxies']
@@ -763,7 +223,7 @@ class Patch:
 
 
     def update_mario(self):
-        mario = Mario(self.temp_path)
+        mario = Mario()
 
         mario.update_colours(self.mario_colours)
         # In the future possibly more functionality
@@ -772,8 +232,8 @@ class Patch:
 
 
     def update_astrogalaxy_domes(self, shuffle: dict[int, int]):
-        astrogalaxy = AstroGalaxy(self.temp_path)
-        astrodomescenario = AstroDomeScenario(self.temp_path)
+        astrogalaxy = AstroGalaxy()
+        astrodomescenario = AstroDomeScenario()
 
         astrogalaxy.shuffle_domes(shuffle)
         astrodomescenario.update(shuffle)
@@ -782,7 +242,7 @@ class Patch:
         astrodomescenario.save()
 
     def update_astrodome(self, shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]):
-        astrodome = AstroDome(self.temp_path)
+        astrodome = AstroDome()
 
         for dome_index in range(1,7):
             reverse_shuffle = {item: key for key, item in dome_shuffle.items()}
@@ -794,7 +254,7 @@ class Patch:
 
     def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]):
         dol = SMGDOL(self.temp_path)
-        """
+        
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
         address = 0x801ffc44
@@ -815,7 +275,7 @@ class Patch:
         address = 0x801ad614
         new_instruction = b'\x38\x60\x00\x05'
         dol.write_data(fs.write_bytes, address, new_instruction)
-        """
+        
         address = 0x8037db18
         new_instruction = b'\x38\xc0\x00\x01'
         dol.write_data(fs.write_bytes, address, new_instruction)
@@ -823,8 +283,6 @@ class Patch:
 
         dol.save()
         
-
-
 
 class SuperMarioGalaxyRandomiser:
     @staticmethod
@@ -845,7 +303,7 @@ class SuperMarioGalaxyRandomiser:
                         5: 6,
                         6: 5}
         
-        #patch.update_astrogalaxy_domes(dome_shuffle)
+        patch.update_astrogalaxy_domes(dome_shuffle)
 
         galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies, dome_shuffle).galaxy_destinations
         
@@ -854,7 +312,7 @@ class SuperMarioGalaxyRandomiser:
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"]
 
 
-        #patch.update_astrodome(dome_galaxies, dome_shuffle)
+        patch.update_astrodome(dome_galaxies, dome_shuffle)
 
         patch.update_dol(dome_galaxies, galaxy_counts)
         
@@ -876,191 +334,3 @@ if __name__ == "__main__":
         output = eval(f.read())
     
     SuperMarioGalaxyRandomiser.create_randomiser(base_path, iso_path, output)
-
-"""
-def change_galaxies(astrodome: RARC, dol: DOL, galaxies: dict[str, str]):
-    mini_to_surp_galaxies = {}
-    mini_to_mini_galaxies = {}
-
-    old_galaxies = [[] for i in range(6)]
-    new_galaxies = [[] for i in range(6)]
-    values = [[] for i in range(6)]
-
-    for location in galaxies.keys():
-        default_galaxy = default_galaxies[location]
-        new_galaxy = galaxies[location]
-        
-        if 'Gateway' in location or 'Gateway' in new_galaxy:
-            continue
-        elif location.startswith("Dome"):
-            dome_index = int(location[5]) - 1
-            orbit_index = converter[location[7:-13]] - 1
-            old_galaxy = galaxy_to_miniature[default_galaxy]
-
-            print(miniature_to_galaxy[old_galaxy] + ' -> ' + new_galaxy)
-            
-            if new_galaxy in major_galaxies:
-                obj_arg0 = 0
-            elif new_galaxy in minor_galaxies:
-                obj_arg0 = 1
-            elif new_galaxy in boss_galaxies:
-                obj_arg0 = 2
-
-            new_galaxy = galaxy_to_miniature[new_galaxy]
-            
-            if new_galaxy.startswith('Surp'):
-                mini_to_surp_galaxies[old_galaxy] = new_galaxy
-            else:
-                mini_to_mini_galaxies[old_galaxy] = new_galaxy
-
-            old_galaxies[dome_index].append(old_galaxy)
-            new_galaxies[dome_index].append(new_galaxy)
-            values[dome_index].append((orbit_index << 16) | obj_arg0)
-    
-    change_dome_miniature(astrodome, old_galaxies, new_galaxies, values)
-    
-    old_galaxies = list(mini_to_mini_galaxies.keys())
-    new_galaxies = list(mini_to_mini_galaxies.values())
-    adjust_nameobjfactory_table(dol, old_galaxies, new_galaxies)
-    #replace_miniatures(dol, iso.temp_dir + "/DATA/files/ObjectData/", mini_to_surp_galaxies)
-
-def update_gameeventflagtable(dol: DOL):
-    # Set all these flags to require having 0 power stars
-    addresses = [0x8053bbd0, # SpecialStarGreen1
-                 0x8053bd60, # AppearBeltConveyerExGalaxy
-                 0x8053bd74, # AppearCocoonExGalaxy
-                 0x8053bd88, # AppearTearDropGalaxy
-                 0x8053bd9c, # AppearFishTunnelGalaxy
-                 0x8053bdb0, # AppearTransformationExGalaxy
-                 0x8053bdc4, # AppearTeresaMario2DGalaxy
-                 0x8053bdd8, # AppearSnowCapsuleGalaxy
-    ]
-
-    for address in addresses:
-        print(read_string_from_pointer(dol, address - 0x4))
-        write_to_dol(dol, address + 0x0, b'\x01') # Type
-        write_to_dol(dol, address + 0x1, b'\x01') # Saveflag
-        write_to_dol(dol, address + 0x2, b'\x00') # Condition 1
-        write_to_dol(dol, address + 0x3, b'\x00') # Condition 2
-        write_to_dol(dol, address + 0x4, b'\x00\x00\x00\x00') # Unknown
-        write_to_dol(dol, address + 0x8, b'\x00\x00\x00\x00') # Condition 3
-        write_to_dol(dol, address + 0xC, b'\x00\x00\x00\x00') # Condition 4
-
-def update_star_requirements(dol: DOL, example_input, galaxy_counts):
-    begin_address = 0x8053c800
-    end_address = 0x8053d520
-    size = end_address - begin_address
-
-    bcsv_data = read_from_dol(dol, begin_address, size)
-    bcsv = BCSV(BytesIO(bcsv_data))
-    
-    opencondition0_index = bcsv.get_field_index("OpenCondition0")
-    opencondition1_index = bcsv.get_field_index("OpenCondition1")
-    powerstarnum_index = bcsv.get_field_index("PowerStarNum")
-    grandgalaxyno_index = bcsv.get_field_index("GrandGalaxyNo")
-
-    for location, galaxy in example_input.items():
-        if 'Gateway' in galaxy:
-            continue
-        entry_name = galaxy_to_miniature[galaxy][4:]
-        entry_index = bcsv.get_entry_index_by_name(entry_name)
-
-        if location.startswith('Dome'):
-            dome_index = int(location[5])
-            orbit_index = converter[location[7:-13]]
-
-            star_requirement_key = 'D' + str(dome_index) + 'G' + str(orbit_index)
-            star_requirement = galaxy_counts[star_requirement_key]
-
-            bcsv.set_value_by_index(entry_index, opencondition0_index, f"SpecialStarGrand{dome_index}")
-            bcsv.set_value_by_index(entry_index, opencondition1_index, '')
-            bcsv.set_value_by_index(entry_index, powerstarnum_index, star_requirement)
-            bcsv.set_value_by_index(entry_index, grandgalaxyno_index, dome_index)
-    
-    bcsv.save_changes()
-    if bcsv.data.seek(0,2) > size:
-        raise ValueError(f"BCSV has gotten too big. Max allowed size: {size}, current size: {bcsv.data.seek(0,2)}")
-    write_to_dol(dol, begin_address, bcsv.data.getvalue(), verbose=False)
-    for entry in bcsv.entries:
-        print(entry)
-
-def update_dol(dol: DOL, example_input, galaxy_counts):
-    # Overwrite calculating miniature galaxy index
-    # Ignore arg0 for koopa model
-    address = 0x801ffc44
-    old_instruction = b'\x80\x03\x00\x8c'
-    new_instruction = b'\x38\x00\x00\x02'
-    replace_instruction(dol, address, old_instruction, new_instruction)
-    
-    # Get obj_arg0 from miniature galaxy
-    address = 0x80200758
-    old_instruction = b'\x7f\xe4\xfb\x78'
-    new_instruction = b'\x80\x7f\x00\x8c'
-    replace_instruction(dol, address, old_instruction, new_instruction)
-
-    # Shift 16 bits to the right to get the custom index
-    address = 0x8020075c
-    old_instruction = b'\x4b\xff\xfe\x01'
-    new_instruction = b'\x54\x63\x84\x3e'
-    replace_instruction(dol, address, old_instruction, new_instruction)
-    update_star_requirements(dol, example_input, galaxy_counts)
-    update_gameeventflagtable(dol)
-
-def update_iso(iso: WiiISO, example_input, galaxy_counts):
-    mario_file = iso.temp_dir + "/DATA/files/ObjectData/Mario.arc"
-    mario = RARC(mario_file)
-    
-    change_mario_colours(mario, 'Hat', (random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-    change_mario_colours(mario, 'Overalls', (random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-
-    with open(mario_file, 'wb') as f:
-        f.write(Yaz0.compress(mario.data).getvalue())
-    
-    # Get the AstroDome file from the ISO
-    astrodome_file = iso.temp_dir + "/DATA/files/StageData/AstroDome.arc"
-    astrodome = RARC(astrodome_file)
-    
-    dol_path = iso.temp_dir + "/DATA/sys/main.dol"
-    dol = get_dol(dol_path)
-
-    change_galaxies(astrodome, dol, example_input)
-    astrodome.save_changes()
-
-    with open(astrodome_file, 'wb') as f:
-        f.write(Yaz0.compress(astrodome.data).getvalue())
-    
-    astrogalaxy_path = iso.temp_dir + "/DATA/files/StageData/AstroGalaxy.arc"
-    astrogalaxy = RARC(astrogalaxy_path)
-    update_observatory(astrogalaxy, shuffle)
-
-    with open(astrogalaxy_path, 'wb') as f:
-        f.write(Yaz0.compress(astrogalaxy.data).getvalue())
-
-    astrodomescenario_file = iso.temp_dir + "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
-    astrodomescenario = RARC(astrodomescenario_file)
-    update_domes(astrodomescenario, shuffle)
-
-    with open(astrodomescenario_file, 'wb') as f:
-        f.write(Yaz0.compress(astrodomescenario.data).getvalue())
-
-    write_to_dol(dol, 0x80536fb0, b'\x80\x59\x81\xcb')
-    write_to_dol(dol, 0x80536fb8, b'\x80\x5a\x7c\xbf')
-
-    update_dol(dol, example_input, galaxy_counts)
-    dol.save_changes()
-
-if __name__ == '__main__':
-    base_path = r"worlds/smgalaxy/Patch/"
-    iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
-    iso = WiiISO(iso_path, dest_path=base_path, temp_dir=base_path + "temp")
-    
-    #iso.verify_base_rom()
-    iso.extract()
-
-    update_iso(iso, example_input, Galaxy_Counts)
-
-    iso.repack(delete=True, verbose=False)
-
-    import winsound
-    winsound.MessageBeep(winsound.MB_OK)
-"""

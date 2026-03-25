@@ -23,7 +23,6 @@ class DOLExtended(DOL):
         with open(self.file_path, 'wb') as f:
             f.write(self.data.getvalue())
 
-
 class NameObjFactoryElement(NamedTuple):
     name: str
     name_pointer: int
@@ -31,7 +30,6 @@ class NameObjFactoryElement(NamedTuple):
     archive_name: str
     archive_pointer: int
     index: int
-
 
 class ArchiveListElement(NamedTuple):
     name: str
@@ -124,14 +122,33 @@ class SMGDOL(DOLExtended):
             f.write(self.data.getvalue())
 
 class RARCExtended(RARC):
-    """Extends the functionality of the gclib RARC class"""
-    def __init__(self, file_path):
-        self.file_path = file_path
-        super().__init__(self.file_path)
+    """Extends the functionality of the gclib RARC class. Is meant as a base class for other classes to inherit from.
+    Assumes the file path is an absolute path to the .arc file and uses that to write it back when saving.
+    Set iso_path before instantiating inheriting classes.
+    Set relative_path before initialising inheriting class instance"""
+    # Path to be set before calling classes that inherit from this class
+    iso_base_path = ''
+
+    # Path to be set in each class that inherits this class
+    relative_path = ''
+
+    def __init__(self):
+        if self.iso_base_path is '' or self.relative_path is '':
+            raise ValueError(f"ISO path and relative path must not be empty. \
+                             \nISO path: {self.iso_base_path}\nRelative path: {self.relative_path}")
+        
+        self.absolute_file_path = self.iso_base_path + self.relative_path
+        super().__init__(self.absolute_file_path)
 
     def save(self) -> None:
         """Save the changes back to the file"""
         self.save_changes()
 
-        with open(self.file_path, 'wb') as f:
+        with open(self.absolute_file_path, 'wb') as f:
+            f.write(Yaz0.compress(self.data).getvalue())
+    
+    def save_to_new_file(self, new_file_path: str) -> None:
+        self.save_changes()
+
+        with open(new_file_path, 'wb') as f:
             f.write(Yaz0.compress(self.data).getvalue())
