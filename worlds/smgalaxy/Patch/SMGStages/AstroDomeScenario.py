@@ -39,7 +39,7 @@ class AstroDomeScenario(RARCExtended):
             scenariono = self.scenariodata.get_value_by_index(entry_index, scenariono_index)
             new_value = 2**(reverse_shuffle[scenariono] - 1)
 
-            print(f"Loading zone dome {scenariono} -> dome {dome_shuffle[scenariono]}")
+            print(f"Loading zone dome {scenariono} -> dome {reverse_shuffle[scenariono]}")
 
             self.scenariodata.set_value_by_index(entry_index, astrodome_index, new_value)
 
