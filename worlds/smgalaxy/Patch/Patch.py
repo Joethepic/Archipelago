@@ -6,7 +6,8 @@ from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
 import gclib.fs_helpers as fs
 from typing import NamedTuple
 
-from .extensions import SMGDOL, RARCExtended
+from .extensions import RARCExtended, DOLExtended
+from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGStages.AstroDome import AstroDome
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
@@ -205,6 +206,7 @@ class Patch:
         self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
 
         RARCExtended.iso_base_path = self.temp_path
+        DOLExtended.iso_base_path = self.temp_path
 
         self.counts = output['Galaxy Counts']
         self.galaxies = output['Galaxies']
@@ -240,7 +242,7 @@ class Patch:
 
         astrogalaxy.save()
         astrodomescenario.save()
-
+        
     def update_astrodome(self, shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]):
         astrodome = AstroDome()
 
