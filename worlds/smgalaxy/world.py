@@ -117,9 +117,14 @@ class SMGWorld(World):
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
         # make sure we don't create more stars than locations, somehow
-        star_count = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
-        local_pool += [self.create_item("Power Star") for i in range(star_count)]
-
+        
+        local_pool += [self.create_item("Power Star") for i in range(self.options.stars_to_finish.value)]
+        leftoverlocations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
+        items = ["Power Star", "1up Mushroom"]
+        for _ in range(leftoverlocations):
+            item_name = self.random.choice(items)
+            item = self.create_item(item_name)
+            local_pool.append(item)
         # Calculate the number of additional filler items to create to fill all locations
         n_locations = len(self.multiworld.get_unfilled_locations(self.player))
         n_items = len(local_pool)
@@ -146,7 +151,6 @@ class SMGWorld(World):
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         # Output seed name and slot number to seed RNG in randomizer client
-        self.galaxy_counts.update({"D1G1": 0})
         output_data: dict = {
             AP_WORLD_VERSION_NAME: CLIENT_VERSION,
             "Seed": self.multiworld.seed,
@@ -170,13 +174,6 @@ class SMGWorld(World):
                 output_data["Options"][field.name] = list(output_data["Options"][field.name])
         output_data["Options"]["character_select"] = getattr(self.options, "character_select").value
         output_data["Options"]["mario_colors"] = getattr(self.options, "mario_colors").value
-
-
-        k = ["Dome 1", "Dome 2", "Dome 3", "Dome 4", "Dome 5", "Dome 6"]
-        if self.options.dome_shuffle.value:
-            self.random.shuffle(k)
-        v = [regname.TERRACE, regname.FOUNTAIN, regname.KITCHEN, regname.BEDROOM, regname.ENGINE, regname.GARDEN]
-        output_data["Options"]["dome_shuffle"] = dict(zip(k, v))
 
         # Output which item has been placed at each location
         for location in list(smgloc for smgloc in self.get_locations() if isinstance(smgloc, SMGLocation)):
