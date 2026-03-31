@@ -107,7 +107,7 @@ class SMGWorld(World):
         return item
 
     def get_filler_item_name(self) -> str:
-        return "Nothing"
+        return "1up Mushroom"
     
     def create_items(self):
         # creates the green stars in each player's itempool
@@ -117,18 +117,16 @@ class SMGWorld(World):
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
         # make sure we don't create more stars than locations, somehow
-        
         local_pool += [self.create_item("Power Star") for i in range(self.options.stars_to_finish.value)]
-        leftoverlocations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
-        items = ["Power Star", "1up Mushroom"]
-        for _ in range(leftoverlocations):
-            item_name = self.random.choice(items)
-            item = self.create_item(item_name)
-            local_pool.append(item)
+        
         # Calculate the number of additional filler items to create to fill all locations
         n_locations = len(self.multiworld.get_unfilled_locations(self.player))
-        n_items = len(local_pool)
-        n_filler_items = n_locations - n_items
+        leftover_locations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
+        
+        # Add a random number of extra stars. Later, this can be made into an option.
+        extra_stars: int = self.random.randint(0, leftover_locations)
+        local_pool += [self.create_item("Power Star") for i in range(extra_stars)]
+        n_filler_items = n_locations - len(local_pool)
 
         # Create filler
         for _ in range(n_filler_items):
