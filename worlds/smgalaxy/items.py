@@ -24,7 +24,8 @@ item_table: dict[str, SMGItemData] = {
   "Power Star": SMGItemData(["Power Star"], 170000004, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
   "Grand Star": SMGItemData(["Grand Star", "Power Star"], 170000005, IC.progression),
   "Green Star": SMGItemData(["Green Star", "Power Star"], 170000006, IC.progression),
-  "Nothing": SMGItemData(["Nothing Item"], 170000007, IC.filler),
+  "1up Mushroom": SMGItemData(["Nothing Item"], 170000007, IC.filler),
+  
   "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
   "Peach": SMGItemData(["Victory"], None, IC.progression)
 
