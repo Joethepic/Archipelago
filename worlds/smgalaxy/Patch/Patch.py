@@ -255,7 +255,7 @@ class Patch:
 
 
     def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]):
-        dol = SMGDOL(self.temp_path)
+        dol = SMGDOL()
         
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model

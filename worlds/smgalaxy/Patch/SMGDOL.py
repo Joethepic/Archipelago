@@ -13,6 +13,10 @@ NAME_TO_CREATE_FUNCTION_START_ADDRESS = 0x80533980
 NAME_TO_CREATE_FUNCTION_ELEMENT_COUNT = 1183
 NAME_TO_CREATE_FUNCTION_ELEMENT_SIZE = 0xC
 
+NAME_TO_ARCHIVE_START_ADDRESS = 0x805370f4
+NAME_TO_ARCHIVE_ELEMENT_COUNT = 440
+NAME_TO_ARCHIVE_ELEMENT_SIZE = 0x8
+
 NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_START_ADDRESS = 0x80537eb4
 NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_COUNT = 91
 NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_SIZE = 0x8
@@ -49,13 +53,19 @@ class CharPointer(Pointer):
     def read_pointer(self):
         super().read_pointer()
 
-        if self.pointing_address is not 0:
+        if self.pointing_address != 0:
             self.string = self.dol.read_data(fs.read_str_until_null_character, self.pointing_address)
         else:
             self.string = None
+    
+    def write_string(self):
+        self.dol.write_data(fs.write_str_with_null_byte, self.pointing_address, self.string)
 
 class FunctionPointer(Pointer):
-    pass
+    def write_function_address(self, new_function_address: int):
+        self.pointing_address = new_function_address
+
+        self.write_pointer()
 
 class Name2CreateFuncElement:
     name_pointer: CharPointer
@@ -65,6 +75,14 @@ class Name2CreateFuncElement:
     def __init__(self, name_pointer: CharPointer, create_function_pointer: FunctionPointer, archive_name_pointer: CharPointer):
         self.name_pointer = name_pointer
         self.create_function_pointer = create_function_pointer
+        self.archive_name_pointer = archive_name_pointer
+
+class Name2ArchiveElement:
+    object_name_pointer: CharPointer
+    archive_name_pointer: CharPointer
+
+    def __init__(self, object_name_pointer: CharPointer, archive_name_pointer: CharPointer):
+        self.object_name_pointer = object_name_pointer
         self.archive_name_pointer = archive_name_pointer
 
 class Name2MakeArchiveListFuncElement:
@@ -77,11 +95,13 @@ class Name2MakeArchiveListFuncElement:
 
 class NameObjFactory:
     name_to_create_function_elements: list[Name2CreateFuncElement]
+    name_to_archive_elements: list[Name2ArchiveElement]
     name_to_make_archive_list_function_elements: list[Name2MakeArchiveListFuncElement]
 
     def __init__(self, dol: DOL):
         self.dol = dol
 
+        # Initialise the Name2CreateFunction list
         start_address = NAME_TO_CREATE_FUNCTION_START_ADDRESS
         element_count = NAME_TO_CREATE_FUNCTION_ELEMENT_COUNT
         element_size = NAME_TO_CREATE_FUNCTION_ELEMENT_SIZE
@@ -101,7 +121,27 @@ class NameObjFactory:
             element: Name2CreateFuncElement = Name2CreateFuncElement(name_pointer, create_function_pointer, archive_name_pointer)
 
             self.name_to_create_function_elements.append(element)
-    
+
+        # Initialise the Name2Archive list    
+        start_address = NAME_TO_ARCHIVE_START_ADDRESS
+        element_count = NAME_TO_ARCHIVE_ELEMENT_COUNT
+        element_size = NAME_TO_ARCHIVE_ELEMENT_SIZE
+
+        self.name_to_archive_elements = []
+
+        for element_index in range(element_count):
+            offset = start_address + element_size * element_index
+            object_name_address = offset + 0x0
+            archive_name_address = offset + 0x4
+
+            object_name_pointer: CharPointer = CharPointer(self.dol, object_name_address)
+            archive_name_pointer: CharPointer = CharPointer(self.dol, archive_name_address)
+
+            element: Name2ArchiveElement = Name2ArchiveElement(object_name_pointer, archive_name_pointer)
+
+            self.name_to_archive_elements.append(element)
+
+        # Initialise the Name2MakeArchiveList list
         start_address = NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_START_ADDRESS
         element_count = NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_COUNT
         element_size = NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_SIZE
@@ -164,15 +204,15 @@ class GalaxyUnlockTable:
         table_bytes: bytes = dol.read_data(fs.read_bytes, start_address, size)
         self.table = BCSV(BytesIO(table_bytes))
 
-        self.name_index = self.table.get_entry_index_by_name(GalaxyUnlockTableFieldNames.NAME)
-        self.open_condition0_index = self.table.get_entry_index_by_name(GalaxyUnlockTableFieldNames.OPEN_CONDITION0)
-        self.open_condition1_index = self.table.get_entry_index_by_name(GalaxyUnlockTableFieldNames.OPEN_CONDITION1)
-        self.power_star_requirement_index = self.table.get_entry_index_by_name(GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT)
-        self.return_dome_index = self.table.get_entry_index_by_name(GalaxyUnlockTableFieldNames.RETURN_DOME)
-
+        self.name_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.NAME)
+        self.open_condition0_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.OPEN_CONDITION0)
+        self.open_condition1_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.OPEN_CONDITION1)
+        self.power_star_requirement_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT)
+        self.return_dome_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.RETURN_DOME)
+        
         for entry_index in range(self.table.entry_count):
             entry = self.get_entry(entry_index)
-            self.entries.append(entry)
+            self.table.entries.append(entry)
     
     def get_entry(self, entry_index: int) -> GalaxyUnlockTableEntry:
         name = self.table.get_value_by_index(entry_index, self.name_index)
@@ -190,7 +230,6 @@ class GalaxyUnlockTable:
         self.table.set_value_by_index(entry.entry_index, self.open_condition1_index, entry.open_condition1)
         self.table.set_value_by_index(entry.entry_index, self.power_star_requirement_index, entry.power_star_requirement)
         self.table.set_value_by_index(entry.entry_index, self.return_dome_index, entry.return_dome)
-    
 
 class SMGDOL(DOLExtended):
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""

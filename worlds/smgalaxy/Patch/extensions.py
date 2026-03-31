@@ -12,7 +12,7 @@ class DOLExtended(DOL):
     relative_path = ''
 
     def __init__(self):
-        if self.iso_base_path is '' or self.relative_path is '':
+        if self.iso_base_path == '' or self.relative_path == '':
             raise ValueError(f"ISO path and relative path must not be empty. \
                              \nISO path: {self.iso_base_path}\nRelative path: {self.relative_path}")
         
@@ -42,7 +42,7 @@ class RARCExtended(RARC):
     relative_path = ''
 
     def __init__(self):
-        if self.iso_base_path is '' or self.relative_path is '':
+        if self.iso_base_path == '' or self.relative_path == '':
             raise ValueError(f"ISO path and relative path must not be empty. \
                              \nISO path: {self.iso_base_path}\nRelative path: {self.relative_path}")
         

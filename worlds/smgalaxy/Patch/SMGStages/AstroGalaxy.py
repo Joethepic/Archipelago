@@ -79,13 +79,11 @@ class AstroGalaxy(RARCExtended):
                 dome_index = self.objinfo.get_value_by_index(entry_index, self.obj_arg0_index)
                 dome_entrances[dome_index] = entry_index
 
-        reverse_shuffle: dict[int, int] = {value: key for key, value in shuffle.items()}
-
         print("Shuffling domes...")
         
         # Set all the new obj_arg0 of each dome
         for old_dome_index, entry_index in dome_entrances.items():
-            new_dome_index = reverse_shuffle[old_dome_index]
+            new_dome_index = shuffle[old_dome_index]
 
             print(f"Dome {old_dome_index} -> Dome {new_dome_index}")
             
