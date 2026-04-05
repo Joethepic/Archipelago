@@ -8,6 +8,7 @@ ASTRO_GALAXY_RELATIVE_PATH: str = "/DATA/files/StageData/AstroGalaxy.arc"
 ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 
 COMMON_PATH: str = "jmp/placement/common"
+FILE_NAME: str = "objinfo"
 
 class ObjInfoFieldNames(StrEnum):
     NAME: str = "name"
@@ -51,9 +52,7 @@ class AstroGalaxy(RARCExtended):
         super().__init__()
 
         # Get the common objinfo bcsv
-        for file in self.get_node_by_path(COMMON_PATH).files:
-            if file.name == 'objinfo':
-                self.objinfo = BCSV(file)
+        self.objinfo = self.get_bcsv_file(COMMON_PATH, FILE_NAME)
         
         # Get the indices of the fields
         self.name_index = self.objinfo.get_field_index(ObjInfoFieldNames.NAME)
@@ -67,6 +66,14 @@ class AstroGalaxy(RARCExtended):
         return True
     
     def shuffle_domes(self, shuffle: dict[int, int]) -> None:
+        """
+        Shuffle the visual dome entrances within the observatory. The shuffle maps the old dome index to the new dome index (from 1 to 6).
+        The shuffle dict must contain all indices from 1 to 6 as both keys and values. The information to load the dome is contained in
+        jmp/placement/common/objinfo. Field "obj_arg0" determines which dome it should load and gets set according to the shuffle dict.
+        shuffle:
+            key: old dome index (1-6)
+            value: new dome index (1-6)
+        """
         # Make sure its a valid shuffle
         if not self.is_valid_shuffle(shuffle):
             raise ValueError(f"Invalid shuffle: {shuffle}")

@@ -184,8 +184,10 @@ class GalaxyShuffle:
         self.galaxies = galaxies
         self.galaxy_destinations: list[GalaxyDestination] = []
 
+        # Generate a list of GalaxyDestinations from the galaxies dict
         for location, galaxy in self.galaxies.items():
             if location.startswith("Dome"):
+                # Extract the dome index and orbit index
                 elements = location.split(' ')
                 dome_index = int(elements[1])
                 orbit_index = self.converter[elements[2]] - 1
@@ -214,7 +216,13 @@ class Patch:
 
         self.old_galaxies = self.galaxies.keys()
         self.new_galaxies = self.galaxies.values()
-    
+
+        self.mario = Mario()
+        self.astrogalaxy = AstroGalaxy()
+        self.astrodomescenario = AstroDomeScenario()
+        self.astrodome = AstroDome()
+        self.dol = SMGDOL()
+        
     def unpack_iso(self) -> None:
         """Unpack the contents of the ISO file."""
         self.iso.extract()
@@ -223,72 +231,86 @@ class Patch:
         """Repack the contents of the ISO file."""
         self.iso.repack(delete, verbose)
 
-
-    def update_mario(self):
-        mario = Mario()
-
-        mario.update_colours(self.mario_colours)
+    def update_mario(self) -> None:
+        """
+        Update mario. Currently only updates his outfit colours, but might do more stuff in the future.
+        """
         # In the future possibly more functionality
+        self.mario.update_colours(self.mario_colours)
 
-        mario.save()
+    def update_astrogalaxy_domes(self, dome_shuffle: dict[int, int]) -> None:
+        """
+        Shuffle the domes within the observatory. This includes both the visual domes (within AstroGalaxy) and the loading
+        zones (within AstroDomeScenario). The dome shuffle dict must contain all indices from 1 to 6 as both keys and values.
+        dome_shuffle:
+            key: old dome index (1-6)
+            value: new dome index (1-6)
+        """
+        self.astrogalaxy.shuffle_domes(dome_shuffle)
+        self.astrodomescenario.shuffle_loading_zones(dome_shuffle)
 
-
-    def update_astrogalaxy_domes(self, shuffle: dict[int, int]):
-        astrogalaxy = AstroGalaxy()
-        astrodomescenario = AstroDomeScenario()
-
-        astrogalaxy.shuffle_domes(shuffle)
-        astrodomescenario.update(shuffle)
-
-        astrogalaxy.save()
-        astrodomescenario.save()
-        
-    def update_astrodome(self, shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]):
-        astrodome = AstroDome()
-
+    def update_astrodomes(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]) -> None:
+        """
+        Shuffle the galaxies within a dome. This iterates over all the 6 domes and updates the entry according to the galaxy shuffle.
+        Galaxy shuffle is a list of GalaxyDestinations and if a dome and orbit index exists, it expects the type to be "dome". Dome shuffle
+        is a mapping of the old dome index to the new dome index. Each key and value must contain all indices from 1 to 6 and is not checked.
+        dome_shuffle:
+            key: old dome index (1-6)
+            value: new dome index (1-6)
+        """
         for dome_index in range(1,7):
             reverse_shuffle = {item: key for key, item in dome_shuffle.items()}
             new_index = reverse_shuffle[dome_index]
-            astrodome.update_dome([galaxy for galaxy in shuffle if galaxy.dome_index == new_index], dome_index)
+            self.astrodome.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == new_index], dome_index)
 
-        astrodome.save()
+    def update_lumas(self, galaxy_shuffle: list[GalaxyDestination]) -> None:
+        for galaxy in galaxy_shuffle:
 
-
-    def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]):
-        dol = SMGDOL()
-        
+    def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]) -> None:
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
         address = 0x801ffc44
         new_instruction = b'\x38\x00\x00\x02'
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
         
         # Get obj_arg0 from miniature galaxy
         address = 0x80200758
         new_instruction = b'\x80\x7f\x00\x8c'
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         # Shift 16 bits to the right to get the custom index
         address = 0x8020075c
         new_instruction = b'\x54\x63\x84\x3e'
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         # TEMPORARY overwrite miniature count detection, always return 5
         address = 0x801ad614
         new_instruction = b'\x38\x60\x00\x05'
-        dol.write_data(fs.write_bytes, address, new_instruction)
-        
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
         address = 0x8037db18
         new_instruction = b'\x38\xc0\x00\x01'
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+    def save_all(self) -> None:
+        """
+        Save all the changes made to the different files back to the ISO.
+        Saves:
+            Mario.arc
+            AstroGalaxy.arc
+            AstroDomeScenario.arc
+            AstroDome.arc
+            main.dol
+        """
+        self.mario.save()
+        self.astrogalaxy.save()
+        self.astrodomescenario.save()
+        self.astrodome.save()
+        self.dol.save()
 
-        dol.save()
-        
 
 class SuperMarioGalaxyRandomiser:
     @staticmethod
-    def create_randomiser(base_path: str, iso_path: str, output: dict):
+    def create_randomiser(base_path: str, iso_path: str, output: dict) -> None:
         patch = Patch(base_path, iso_path, output)
         galaxies: dict[str, str] = output["Galaxies"]
         galaxy_counts: dict[str, int] = output["Galaxy Counts"]
@@ -314,7 +336,8 @@ class SuperMarioGalaxyRandomiser:
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"]
 
 
-        patch.update_astrodome(dome_galaxies, dome_shuffle)
+        patch.update_astrodomes(dome_galaxies, dome_shuffle)
+        patch.update_lumas(luma_galaxies)
 
         patch.update_dol(dome_galaxies, galaxy_counts)
         
