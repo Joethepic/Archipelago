@@ -12,6 +12,7 @@ from .SMGObjects.Mario import Mario
 from .SMGStages.AstroDome import AstroDome
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
+from ..regions import region_list
 
 class InvalidCleanISOError(Exception): pass
 
@@ -217,6 +218,8 @@ class Patch:
         self.old_galaxies = self.galaxies.keys()
         self.new_galaxies = self.galaxies.values()
 
+        self.unpack_iso()
+
         self.mario = Mario()
         self.astrogalaxy = AstroGalaxy()
         self.astrodomescenario = AstroDomeScenario()
@@ -265,8 +268,17 @@ class Patch:
 
     def update_lumas(self, galaxy_shuffle: list[GalaxyDestination]) -> None:
         for galaxy in galaxy_shuffle:
+            pass
 
-    def update_dol(self, dome_galaxies: list[GalaxyDestination], galaxy_counts: dict[str, int]) -> None:
+    def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
+        dome_galaxy_names = [region_list[galaxy.name].in_game_name for galaxy in dome_galaxies]
+        luma_galaxy_names = [region_list[galaxy.name].in_game_name for galaxy in luma_galaxies]
+
+        print(dome_galaxy_names)
+        print(luma_galaxy_names)
+        self.dol.name_object_factory.set_galaxies(dome_galaxy_names, luma_galaxy_names)
+
+    def update_instructions(self) -> None:
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
         address = 0x801ffc44
@@ -315,8 +327,6 @@ class SuperMarioGalaxyRandomiser:
         galaxies: dict[str, str] = output["Galaxies"]
         galaxy_counts: dict[str, int] = output["Galaxy Counts"]
 
-        patch.unpack_iso()
-
         patch.update_mario()
 
         # TEMPORARY
@@ -337,11 +347,11 @@ class SuperMarioGalaxyRandomiser:
 
 
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
-        patch.update_lumas(luma_galaxies)
+        patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
 
-        patch.update_dol(dome_galaxies, galaxy_counts)
-        
+        patch.update_instructions()
 
+        patch.save_all()
 
         patch.repack_iso()
 

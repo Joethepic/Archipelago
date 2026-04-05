@@ -1,3 +1,4 @@
+from tkinter.font import names
 from typing import Self, NamedTuple
 from io import BytesIO
 from enum import StrEnum
@@ -23,6 +24,10 @@ NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_SIZE = 0x8
 
 GALAXY_UNLOCK_TABLE_START_ADDRESS = 0x8053c800
 GALAXY_UNLOCK_TABLE_END_ADDRESS = 0x8053d520
+
+CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS = 0x8026a8cc
+CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS = 0x8026a90c
+STRING_ADDRESS_MiniSurprisedGalaxy = 0x8059838c
 
 class Pointer:
     base_address: int
@@ -101,6 +106,10 @@ class NameObjFactory:
     def __init__(self, dol: DOL):
         self.dol = dol
 
+        self.miniature_function_address = CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS
+        self.surprised_function_address = CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS
+        self.surprised_galaxy_string_address = STRING_ADDRESS_MiniSurprisedGalaxy
+
         # Initialise the Name2CreateFunction list
         start_address = NAME_TO_CREATE_FUNCTION_START_ADDRESS
         element_count = NAME_TO_CREATE_FUNCTION_ELEMENT_COUNT
@@ -171,6 +180,66 @@ class NameObjFactory:
     def get_name_to_create_function_elements_by_archive_name(self, archive_name: str) -> list[Name2CreateFuncElement]:
         return [element for element in self.name_to_create_function_elements
                 if element.archive_name_pointer.string == archive_name]
+
+    def get_miniature_galaxy_name_to_make_archive_list_function_elements(self) -> list[Name2MakeArchiveListFuncElement]:
+        return [element for element in self.name_to_make_archive_list_function_elements
+                if element.name_pointer.string.startswith("Mini")][:-2]
+
+    def set_miniature_galaxy_name_to_make_archive_list_function_elements(self, miniature_names: list[CharPointer]) -> None:
+        miniature_galaxies = self.get_miniature_galaxy_name_to_make_archive_list_function_elements()
+        print(len(miniature_galaxies),len(miniature_names))
+        assert len(miniature_galaxies) == len(miniature_names)
+
+        for pointer, element in zip(miniature_names, miniature_galaxies):
+            element.name_pointer.swap_with_pointer(pointer)
+
+    def set_miniature_galaxy_name_to_create_function_element(self, element: Name2CreateFuncElement) -> None:
+        # Replace the first 4 characters of the name with "Mini"
+        name = element.name_pointer.string
+        element.name_pointer.string = "Mini" + name[4:]
+        element.name_pointer.write_string()
+
+        # Set the create function as the create miniature galaxy function
+        element.create_function_pointer.write_function_address(self.miniature_function_address)
+        
+        # Empty the archive name
+        element.archive_name_pointer.pointing_address = 0
+        element.archive_name_pointer.write_pointer()
+
+    def set_as_miniature_galaxies(self, miniature_elements: list[Name2CreateFuncElement]) -> None:
+        self.set_miniature_galaxy_name_to_make_archive_list_function_elements([element.name_pointer for element in miniature_elements])
+
+        for element in miniature_elements:
+            self.set_miniature_galaxy_name_to_create_function_element(element)
+
+    def set_name_to_create_function_element_as_surprised(self, element: Name2CreateFuncElement) -> None:
+        # Replace the first 4 characters of the name with "Surp"
+        name = element.name_pointer.string
+        element.name_pointer.string = "Surp" + name[4:]
+        element.name_pointer.write_string()
+
+        # Set the create function as the create surprised galaxy function
+        element.create_function_pointer.write_function_address(self.surprised_function_address)
+
+        # Set the archive name to "MiniSurprisedGalaxy"
+        element.archive_name_pointer.pointer_address = self.surprised_galaxy_string_address
+        element.archive_name_pointer.write_pointer()
+
+    def set_as_surprised_galaxies(self, surprised_elements: list[Name2CreateFuncElement]) -> None:
+        for element in surprised_elements:
+            self.set_name_to_create_function_element_as_surprised(element)
+
+    def set_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
+        miniature_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
+                                                            if element.name_pointer.string[4:] in miniature_galaxy_names]
+        surprised_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
+                                                             if element.name_pointer.string[4:] in surprised_galaxy_names]
+
+        self.set_as_miniature_galaxies(miniature_elements)
+        self.set_as_surprised_galaxies(surprised_elements)
+
+    def swap_pointers(self, pointer1: Pointer, pointer2: Pointer) -> None:
+        pointer1.swap_with_pointer(pointer2)
 
 class GalaxyUnlockTableFieldNames(StrEnum):
     NAME: str = "name"
