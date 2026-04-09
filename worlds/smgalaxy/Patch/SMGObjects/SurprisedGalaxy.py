@@ -5,8 +5,8 @@ OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
 SURPRISED_GALAXY_RELATIVE_PATH = "/DATA/files/ObjectData/MiniSurprisedGalaxy.arc"
 
 class SurprisedGalaxy(RARCExtended):
-    bdl_base_name = "minisurprisedgalaxy.bdl"
-    btk_base_name = "minisurprisedgalaxy.btk"
+    bdl_base_name: str = "minisurprisedgalaxy.bdl"
+    btk_base_name: str = "minisurprisedgalaxy.btk"
 
     scaled = False
 
@@ -35,7 +35,7 @@ class SurprisedGalaxy(RARCExtended):
                 joint.bounding_box_max.z *= scale
 
     def create_luma_miniature(self, luma_galaxy_name: str):
-        name = luma_galaxy_name.lower()
+        name: str = luma_galaxy_name.lower()
         self.bdl_entry.name = name +'.bdl'
         
         bdl = BDL(self.bdl_entry)
@@ -52,4 +52,7 @@ class SurprisedGalaxy(RARCExtended):
         self.btk_entry.save_changes()
 
         new_file_path = self.object_data_absolute_path + luma_galaxy_name + '.arc'
+
+        print(f"Creating {luma_galaxy_name}.arc")
+
         self.save_to_new_file(new_file_path)

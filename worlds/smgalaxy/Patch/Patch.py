@@ -302,28 +302,54 @@ class Patch:
             self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_instructions(self) -> None:
-        # Overwrite calculating miniature galaxy index
-        # Ignore arg0 for koopa model
-        address = 0x801ffc44
-        new_instruction = b'\x38\x00\x00\x02'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
-        
+        #######################################
+        # Miniature galaxy orbit manipulation #
+        #######################################
         # Get obj_arg0 from miniature galaxy
         address = 0x80200758
         new_instruction = b'\x80\x7f\x00\x8c'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
-        # Shift 16 bits to the right to get the custom index
+        # Shift 16 bits to the right to get the upper bits where the custom index is stored
         address = 0x8020075c
         new_instruction = b'\x54\x63\x84\x3e'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
-        # TEMPORARY overwrite miniature count detection, always return 5
-        address = 0x801ad614
-        new_instruction = b'\x38\x60\x00\x05'
+        ################################
+        # Scenario select star loading #
+        ################################
+        # Keep loading regular stars even if they're not available yet
+        address = 0x8037d9ec
+        new_instruction = b'\x38\x60\x00\x01'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Calculate all secret/comet stars, including possibly normally unavailable ones
+        address = 0x8037da44
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Show secret/comet stars as calculated above
+        address = 0x8037db54
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Set visibility to 1 (not collected) if appearing as collected has failed (ensuring it shows up even if not available)
         address = 0x8037db18
         new_instruction = b'\x38\xc0\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Always show up and appear correctly as collected/not collected
+        address = 0x8037db74
+        new_instruction = b'\x38\xc6\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        ############################################################
+        # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPOR #
+        ##### Overwrite miniature count detection, always return 5 #
+        ############################################################
+        # Set the count as 5
+        address = 0x801ad614
+        new_instruction = b'\x38\x60\x00\x05'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
     def save_all(self) -> None:
@@ -342,7 +368,13 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
+        self.save_copies()
+
+    def save_copies(self):
+        self.mario.save_to_new_file("MarioCopy.arc")
         self.astrogalaxy.save_to_new_file("AstroGalaxyCopy.arc")
+        self.astrodomescenario.save_to_new_file("AstroDomeScenarioCopy.arc")
+        self.astrodome.save_to_new_file("AstroDomeCopy.arc")
 
 class SuperMarioGalaxyRandomiser:
     @staticmethod

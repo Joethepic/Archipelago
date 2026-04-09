@@ -5,7 +5,7 @@ from ..extensions import RARCExtended
 from ..SMGObjects.SurprisedGalaxy import SurprisedGalaxy
 from ..SMGObjects.Gateway import Gateway
 from ...Constants.Names.region_names import GATEWAY
-from ...regions import major_galaxy_list, minor_galaxy_list, specials_galaxy_list, boss_galaxy_list, all_galaxy_slots, region_list
+from ...regions import region_list
 
 ASTRODOME_RELATIVE_PATH = "/DATA/files/StageData/AstroDome.arc"
 PLACEMENT_PATH = "jmp/placement/"
@@ -69,18 +69,23 @@ class AstroDome(RARCExtended):
         self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy()
         self.gateway_galaxy: Gateway = Gateway()
 
-    def create_luma_miniature(self, name: str):
-        self.surprised_galaxy.create_luma_miniature(name)
-
-    def create_gateway_miniature(self):
-        self.gateway_galaxy.create_miniature()
+        # Get the in-game names from the region list
+        self.major_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
+                                             if data.type == "Major"]
+        self.minor_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
+                                             if data.type == "Minor"]
+        self.boss_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
+                                            if data.type == "Boss"]
+        self.special_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
+                                      if data.type == "Special"]
+        self.gateway: str = region_list[GATEWAY].in_game_name
 
     def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int):
         """
         Update the dome with new galaxies. The dome to update is determined by the dome index (from 1 to 6). The list of new galaxies
         is expected to all have type "dome" and contain all the galaxies that should be in the dome. The dome index of the new galaxies
         are ignored and should be used to determine the list to input in this function. The orbit index of the new galaxies is not
-        checked for duplicates.
+        checked for duplicates. Creates mini gateway and surprised galaxies if necessary.
         """
         # Get the objinfo of the dome corresponding to the dome index.
         layer = index_to_layer[dome_index]
@@ -112,16 +117,16 @@ class AstroDome(RARCExtended):
             obj_arg0 = galaxy.orbit_index << 16
 
             # Store the galaxy type in the lower bits
-            if galaxy.name in major_galaxy_list:
+            if galaxy.name in self.major_galaxy_list:
                 obj_arg0 += 0
-            elif galaxy.name in minor_galaxy_list or galaxy.name in specials_galaxy_list:
+            elif galaxy.name in self.minor_galaxy_list or galaxy.name in self.special_galaxy_list:
                 obj_arg0 += 1
 
-                if galaxy.name == GATEWAY:
-                    self.create_gateway_miniature()
-                elif galaxy.name in specials_galaxy_list:
-                    self.create_luma_miniature(name)
-            elif galaxy.name in boss_galaxy_list:
+                if galaxy.name == self.gateway:
+                    self.gateway_galaxy.create_miniature()
+                elif galaxy.name in self.special_galaxy_list:
+                    self.surprised_galaxy.create_luma_miniature(name)
+            elif galaxy.name in self.boss_galaxy_list:
                 obj_arg0 += 2
 
             objinfo.set_value_by_index(entry_index, objarg0_index, obj_arg0)
