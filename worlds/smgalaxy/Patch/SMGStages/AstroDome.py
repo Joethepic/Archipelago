@@ -1,7 +1,6 @@
 from typing import NamedTuple
 from enum import StrEnum
 
-from ..bcsv import BCSV
 from ..extensions import RARCExtended
 from ..SMGObjects.SurprisedGalaxy import SurprisedGalaxy
 from ..SMGObjects.Gateway import Gateway
@@ -53,6 +52,7 @@ class GalaxyDestination(NamedTuple):
     type: str
     dome_index: int
     orbit_index: int
+    old_luma_name: str
 
 index_to_layer = {1: 'layera',
                   2: 'layerb',
@@ -93,7 +93,7 @@ class AstroDome(RARCExtended):
 
         # Get the entry indices of the current miniatures in the dome
         for entry_index in range(objinfo.entry_count):
-            name = objinfo.get_value_by_index(entry_index, name_index)
+            name: str = objinfo.get_value_by_index(entry_index, name_index)
             if name.startswith("Mini"):
                 miniature_indices.append(entry_index)
 
@@ -102,10 +102,10 @@ class AstroDome(RARCExtended):
         for galaxy in new_galaxies:
             entry_index = miniature_indices[index]
             index += 1
+            name = "Mini" + galaxy.name
+            
+            print(f"Dome {dome_index} orbit {galaxy.orbit_index + 1} -> {name}")
 
-            print(f"Dome {dome_index} orbit {galaxy.orbit_index + 1} -> {galaxy.name}")
-
-            name = "Mini" + region_list[galaxy.name].in_game_name
             objinfo.set_value_by_index(entry_index, name_index, name)
             
             # Store the orbit index in the upper bits

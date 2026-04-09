@@ -2,12 +2,13 @@ from enum import StrEnum
 from typing import NamedTuple
 
 from ..extensions import RARCExtended
-from ..bcsv import BCSV
 
 ASTRO_GALAXY_RELATIVE_PATH: str = "/DATA/files/StageData/AstroGalaxy.arc"
 ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 
 COMMON_PATH: str = "jmp/placement/common"
+LAYERA_PATH: str = "jmp/placement/layera"
+LAYERB_PATH: str = "jmp/placement/layerb"
 FILE_NAME: str = "objinfo"
 
 class ObjInfoFieldNames(StrEnum):
@@ -46,14 +47,23 @@ class ObjInfoFieldNames(StrEnum):
     DEMO_GROUP_ID: str = "DemoGroupId"
     MAP_PARTS_ID: str = "MapParts_ID"
 
+class GalaxyDestination(NamedTuple):
+    name: str
+    type: str
+    dome_index: int
+    orbit_index: int
+    old_luma_name: str
+
 class AstroGalaxy(RARCExtended):
     def __init__(self):
         self.relative_path = ASTRO_GALAXY_RELATIVE_PATH
         super().__init__()
 
-        # Get the common objinfo bcsv
+        # Get the objinfo bcsvs
         self.objinfo = self.get_bcsv_file(COMMON_PATH, FILE_NAME)
-        
+        self.objinfo_layera = self.get_bcsv_file(LAYERA_PATH, FILE_NAME)
+        self.objinfo_layerb = self.get_bcsv_file(LAYERB_PATH, FILE_NAME)
+
         # Get the indices of the fields
         self.name_index = self.objinfo.get_field_index(ObjInfoFieldNames.NAME)
         self.obj_arg0_index = self.objinfo.get_field_index(ObjInfoFieldNames.OBJECT_ARGUMENT0)
@@ -95,5 +105,37 @@ class AstroGalaxy(RARCExtended):
             print(f"Dome {old_dome_index} -> Dome {new_dome_index}")
             
             self.objinfo.set_value_by_index(entry_index, self.obj_arg0_index, new_dome_index)
+    
+    def shuffle_lumas(self, new_galaxies: list[GalaxyDestination]) -> None:
+        """
+        Shuffle the lumas within the observatory. The list of new galaxies is expected to all have type "luma". The old luma name
+        is used to determine which name to replace with the name. The old luma names are not checked for duplicates.
+        """
+        # Convert to a dict for easy lookup
+        new_galaxies_dict: dict[str, str] = {galaxy.old_luma_name: galaxy.name for galaxy in new_galaxies}
+        
+        def rename_bcsv_entries(bcsv):
+            for entry_index in range(bcsv.entry_count):
+                entry_name: str = bcsv.get_value_by_index(entry_index, self.name_index)
+
+                if entry_name.startswith("Surp"):
+                    entry_name = entry_name[4:]
+
+                    if entry_name in new_galaxies_dict.keys():
+                        new_entry_name: str = "Surp" + new_galaxies_dict[entry_name]
+
+                        print(f"Luma Surp{entry_name} -> {new_entry_name}")
+
+                        bcsv.set_value_by_index(entry_index, self.name_index, new_entry_name)
             
+            return bcsv
+
+        # Check the objinfos for the luma galaxies
+        self.objinfo = rename_bcsv_entries(self.objinfo)
+        self.objinfo_layera = rename_bcsv_entries(self.objinfo_layera)
+        self.objinfo_layerb = rename_bcsv_entries(self.objinfo_layerb)
+
+    def save_objinfo(self) -> None:
         self.objinfo.save_changes()
+        self.objinfo_layera.save_changes()
+        self.objinfo_layerb.save_changes()

@@ -1,5 +1,4 @@
-from tkinter.font import names
-from typing import Self, NamedTuple
+from typing import Self
 from io import BytesIO
 from enum import StrEnum
 import gclib.fs_helpers as fs
@@ -27,7 +26,7 @@ GALAXY_UNLOCK_TABLE_END_ADDRESS = 0x8053d520
 
 CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS = 0x8026a8cc
 CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS = 0x8026a90c
-STRING_ADDRESS_MiniSurprisedGalaxy = 0x8059838c
+STRING_ADDRESS_MINISURPRISEDGALAXY = 0x8059838c
 
 class Pointer:
     base_address: int
@@ -47,6 +46,8 @@ class Pointer:
         self.dol.write_data(fs.write_u32, self.base_address, self.pointing_address)
 
     def swap_with_pointer(self, other: Self):
+        print(self.pointing_address, other.pointing_address)
+        print(self.string, other.string)
         self.pointing_address, other.pointing_address = other.pointing_address, self.pointing_address
 
         self.write_pointer()
@@ -63,8 +64,12 @@ class CharPointer(Pointer):
         else:
             self.string = None
     
-    def write_string(self):
+    def write_string(self) -> None:
         self.dol.write_data(fs.write_str_with_null_byte, self.pointing_address, self.string)
+
+    def replace_prefix(self, new_prefix: str) -> None:
+        self.string = new_prefix + self.string[len(new_prefix):]
+        self.write_string()
 
 class FunctionPointer(Pointer):
     def write_function_address(self, new_function_address: int):
@@ -108,7 +113,7 @@ class NameObjFactory:
 
         self.miniature_function_address = CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS
         self.surprised_function_address = CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS
-        self.surprised_galaxy_string_address = STRING_ADDRESS_MiniSurprisedGalaxy
+        self.surprised_galaxy_string_address = STRING_ADDRESS_MINISURPRISEDGALAXY
 
         # Initialise the Name2CreateFunction list
         start_address = NAME_TO_CREATE_FUNCTION_START_ADDRESS
@@ -185,19 +190,16 @@ class NameObjFactory:
         return [element for element in self.name_to_make_archive_list_function_elements
                 if element.name_pointer.string.startswith("Mini")][:-2]
 
-    def set_miniature_galaxy_name_to_make_archive_list_function_elements(self, miniature_names: list[CharPointer]) -> None:
-        miniature_galaxies = self.get_miniature_galaxy_name_to_make_archive_list_function_elements()
-        print(len(miniature_galaxies),len(miniature_names))
-        assert len(miniature_galaxies) == len(miniature_names)
-
-        for pointer, element in zip(miniature_names, miniature_galaxies):
-            element.name_pointer.swap_with_pointer(pointer)
+    def set_miniature_galaxy_name_to_make_archive_list_function_elements(self, new_miniature_name_pointers: list[CharPointer]) -> None:
+        archive_miniature_elements = self.get_miniature_galaxy_name_to_make_archive_list_function_elements()
+        
+        for archive_miniature_element, new_miniature_name_pointer in zip(archive_miniature_elements, new_miniature_name_pointers):
+            archive_miniature_element.name_pointer.pointing_address = new_miniature_name_pointer.pointing_address
+            archive_miniature_element.name_pointer.write_pointer()
 
     def set_miniature_galaxy_name_to_create_function_element(self, element: Name2CreateFuncElement) -> None:
         # Replace the first 4 characters of the name with "Mini"
-        name = element.name_pointer.string
-        element.name_pointer.string = "Mini" + name[4:]
-        element.name_pointer.write_string()
+        element.name_pointer.replace_prefix("Mini")
 
         # Set the create function as the create miniature galaxy function
         element.create_function_pointer.write_function_address(self.miniature_function_address)
@@ -214,15 +216,13 @@ class NameObjFactory:
 
     def set_name_to_create_function_element_as_surprised(self, element: Name2CreateFuncElement) -> None:
         # Replace the first 4 characters of the name with "Surp"
-        name = element.name_pointer.string
-        element.name_pointer.string = "Surp" + name[4:]
-        element.name_pointer.write_string()
+        element.name_pointer.replace_prefix("Surp")
 
         # Set the create function as the create surprised galaxy function
         element.create_function_pointer.write_function_address(self.surprised_function_address)
 
         # Set the archive name to "MiniSurprisedGalaxy"
-        element.archive_name_pointer.pointer_address = self.surprised_galaxy_string_address
+        element.archive_name_pointer.pointing_address = self.surprised_galaxy_string_address
         element.archive_name_pointer.write_pointer()
 
     def set_as_surprised_galaxies(self, surprised_elements: list[Name2CreateFuncElement]) -> None:
@@ -230,13 +230,16 @@ class NameObjFactory:
             self.set_name_to_create_function_element_as_surprised(element)
 
     def set_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
-        miniature_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
-                                                            if element.name_pointer.string[4:] in miniature_galaxy_names]
-        surprised_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
-                                                             if element.name_pointer.string[4:] in surprised_galaxy_names]
+        # Get the elements in the array that should be converted to dome and luma galaxies
+        to_miniature_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
+                                                               if element.name_pointer.string[4:] in miniature_galaxy_names]
+        to_surprised_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
+                                                               if element.name_pointer.string[4:] in surprised_galaxy_names]
 
-        self.set_as_miniature_galaxies(miniature_elements)
-        self.set_as_surprised_galaxies(surprised_elements)
+        # TODO: Add gateway galaxy (somehow)
+
+        self.set_as_miniature_galaxies(to_miniature_elements)
+        self.set_as_surprised_galaxies(to_surprised_elements)
 
     def swap_pointers(self, pointer1: Pointer, pointer2: Pointer) -> None:
         pointer1.swap_with_pointer(pointer2)
@@ -260,17 +263,31 @@ class GalaxyUnlockTableEntry:
         self.power_star_requirement: int = power_star_requirement
         self.return_dome: int = return_dome
 
+    def __str__(self):
+        return ' '.join([str(self.entry_index),
+                        str(self.name),
+                        str(self.open_condition0),
+                        str(self.open_condition1),
+                        str(self.power_star_requirement),
+                        str(self.return_dome)])
+
 class GalaxyUnlockTable:
     table: BCSV
+
+    start_address: int
+    end_address: int
+    size: int
 
     entries: list[GalaxyUnlockTableEntry]
 
     def __init__(self, dol: DOL):
-        start_address = GALAXY_UNLOCK_TABLE_START_ADDRESS
-        end_address = GALAXY_UNLOCK_TABLE_END_ADDRESS
-        size = end_address - start_address
+        self.start_address = GALAXY_UNLOCK_TABLE_START_ADDRESS
+        self.end_address = GALAXY_UNLOCK_TABLE_END_ADDRESS
+        self.size = self.end_address - self.start_address
 
-        table_bytes: bytes = dol.read_data(fs.read_bytes, start_address, size)
+        self.entries = []
+
+        table_bytes: bytes = dol.read_data(fs.read_bytes, self.start_address, self.size)
         self.table = BCSV(BytesIO(table_bytes))
 
         self.name_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.NAME)
@@ -281,8 +298,16 @@ class GalaxyUnlockTable:
         
         for entry_index in range(self.table.entry_count):
             entry = self.get_entry(entry_index)
-            self.table.entries.append(entry)
-    
+
+            # Set empty by default, to be overridden later
+            entry.open_condition0 = ''
+            entry.open_condition1 = ''
+            entry.power_star_requirement = 0
+            entry.return_dome = 0
+            self.set_entry(entry)
+            
+            self.entries.append(entry)
+
     def get_entry(self, entry_index: int) -> GalaxyUnlockTableEntry:
         name = self.table.get_value_by_index(entry_index, self.name_index)
         open_condition0 = self.table.get_value_by_index(entry_index, self.open_condition0_index)
@@ -300,12 +325,12 @@ class GalaxyUnlockTable:
         self.table.set_value_by_index(entry.entry_index, self.power_star_requirement_index, entry.power_star_requirement)
         self.table.set_value_by_index(entry.entry_index, self.return_dome_index, entry.return_dome)
 
+    def save_to_dol(self, dol: DOL, address: int) -> None:
+        self.table.save_changes()
+        dol.write_data(fs.write_bytes, address, self.table.data.getvalue())
+
 class SMGDOL(DOLExtended):
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
-    unlabeled_table_start_address = 0x8053c800
-    unlabeled_table_end_address = 0x8053d520
-    unlabeled_table_size = unlabeled_table_end_address - unlabeled_table_start_address
-
     name_object_factory: NameObjFactory
     galaxy_unlock_table: GalaxyUnlockTable
 
@@ -313,16 +338,19 @@ class SMGDOL(DOLExtended):
         self.relative_path = DOL_RELATIVE_PATH
         super().__init__()
         
-        self.unlabeled_table_bytes = self.read_data(fs.read_bytes, self.unlabeled_table_start_address, self.unlabeled_table_size)
-        self.unlabeled_table = BCSV(BytesIO(self.unlabeled_table_bytes))
-
         self.name_object_factory = NameObjFactory(self)
         self.galaxy_unlock_table = GalaxyUnlockTable(self)
 
+    def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
+        self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
+
+    def get_galaxy_unlock_table_entry_by_name(self, name: str) -> GalaxyUnlockTableEntry:
+        for entry in self.galaxy_unlock_table.entries:
+            if entry.name == name:
+                return entry
+
     def save(self):
-        self.unlabeled_table.save_changes()
-        self.write_data(fs.write_bytes, self.unlabeled_table_start_address, self.unlabeled_table.data.getvalue())
-        self.save_changes()
+        self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
 
         with open(self.absolute_file_path, 'wb') as f:
             f.write(self.data.getvalue())

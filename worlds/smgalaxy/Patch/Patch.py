@@ -4,7 +4,7 @@ import os, time
 
 from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
 import gclib.fs_helpers as fs
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 from .extensions import RARCExtended, DOLExtended
 from .SMGDOL import SMGDOL
@@ -173,6 +173,7 @@ class GalaxyDestination(NamedTuple):
     type: str
     dome_index: int
     orbit_index: int
+    old_luma_name: str
 
 class GalaxyShuffle:
     converter = {"First" : 1,
@@ -180,52 +181,59 @@ class GalaxyShuffle:
                  "Third" : 3,
                  "Fourth": 4,
                  "Fifth" : 5}
+    galaxy_destinations: list[GalaxyDestination]
     
     def __init__(self, galaxies: dict[str, str], dome_shuffle: dict[int, int]):
         self.galaxies = galaxies
-        self.galaxy_destinations: list[GalaxyDestination] = []
+        self.galaxy_destinations = []
 
         # Generate a list of GalaxyDestinations from the galaxies dict
         for location, galaxy in self.galaxies.items():
+            # Convert to its in-game name
+            galaxy = region_list[galaxy].in_game_name
+
             if location.startswith("Dome"):
                 # Extract the dome index and orbit index
-                elements = location.split(' ')
-                dome_index = int(elements[1])
-                orbit_index = self.converter[elements[2]] - 1
-                reverse_shuffle = {value: key for key, value in dome_shuffle.items()}
+                elements: list[str] = location.split(' ')
+                dome_index: int = int(elements[1])
+                orbit_index: int = self.converter[elements[2]] - 1
+                reverse_shuffle: dict[int, int] = {value: key for key, value in dome_shuffle.items()}
                 
-                new_galaxy = GalaxyDestination(galaxy, "dome", reverse_shuffle[dome_index], orbit_index)
+                new_galaxy = GalaxyDestination(galaxy, "dome", reverse_shuffle[dome_index], orbit_index, None)
+
             elif location.startswith("Gateway"):
-                new_galaxy = GalaxyDestination(galaxy, "gateway", None, None)
+                new_galaxy = GalaxyDestination(galaxy, "gateway", None, None, None)
+
             else:
-                new_galaxy = GalaxyDestination(galaxy, "luma", None, None)
+                luma_name: str = location.replace("Hungry Luma", "Galaxy").replace("Launch Star", "Galaxy")
+                new_galaxy = GalaxyDestination(galaxy, "luma", None, None, region_list[luma_name].in_game_name)
             
             self.galaxy_destinations.append(new_galaxy)
 
 class Patch:
     def __init__(self, base_path: str, iso_path: str, output: dict):
-        self.iso_path = iso_path
-        self.temp_path = base_path + 'temp'
+        self.iso_path: str = iso_path
+        self.temp_path: str = base_path + 'temp'
         self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
 
         RARCExtended.iso_base_path = self.temp_path
         DOLExtended.iso_base_path = self.temp_path
 
-        self.counts = output['Galaxy Counts']
-        self.galaxies = output['Galaxies']
-        self.mario_colours = output['Options']['mario_colors']
+        self.counts: dict[str, int] = output['Galaxy Counts']
+        self.galaxies: dict[str, str] = output['Galaxies']
+        self.mario_colours: dict[str, str] = output['Options']['mario_colors']
 
-        self.old_galaxies = self.galaxies.keys()
-        self.new_galaxies = self.galaxies.values()
+        self.old_galaxies: str = self.galaxies.keys()
+        self.new_galaxies: str = self.galaxies.values()
 
         self.unpack_iso()
 
-        self.mario = Mario()
-        self.astrogalaxy = AstroGalaxy()
-        self.astrodomescenario = AstroDomeScenario()
-        self.astrodome = AstroDome()
-        self.dol = SMGDOL()
-        
+        self.mario: Mario = Mario()
+        self.astrogalaxy: AstroGalaxy = AstroGalaxy()
+        self.astrodomescenario: AstroDomeScenario = AstroDomeScenario()
+        self.astrodome: AstroDome = AstroDome()
+        self.dol: SMGDOL = SMGDOL()
+
     def unpack_iso(self) -> None:
         """Unpack the contents of the ISO file."""
         self.iso.extract()
@@ -241,15 +249,19 @@ class Patch:
         # In the future possibly more functionality
         self.mario.update_colours(self.mario_colours)
 
-    def update_astrogalaxy_domes(self, dome_shuffle: dict[int, int]) -> None:
+    def update_astrogalaxy(self, dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
         """
-        Shuffle the domes within the observatory. This includes both the visual domes (within AstroGalaxy) and the loading
-        zones (within AstroDomeScenario). The dome shuffle dict must contain all indices from 1 to 6 as both keys and values.
+        Shuffle the domes and luma galaxies within the observatory. This includes both the visual domes (within AstroGalaxy) and the
+        loading zones (within AstroDomeScenario). The dome shuffle dict must contain all indices from 1 to 6 as both keys and values.
+        Luma shuffle is a list of GalaxyDestinations and if a luma name exists it expect the type to be "luma".
         dome_shuffle:
             key: old dome index (1-6)
             value: new dome index (1-6)
         """
         self.astrogalaxy.shuffle_domes(dome_shuffle)
+        self.astrogalaxy.shuffle_lumas(luma_shuffle)
+        self.astrogalaxy.save_objinfo()
+
         self.astrodomescenario.shuffle_loading_zones(dome_shuffle)
 
     def update_astrodomes(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]) -> None:
@@ -266,25 +278,36 @@ class Patch:
             new_index = reverse_shuffle[dome_index]
             self.astrodome.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == new_index], dome_index)
 
-    def update_lumas(self, galaxy_shuffle: list[GalaxyDestination]) -> None:
-        for galaxy in galaxy_shuffle:
-            pass
-
     def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
-        dome_galaxy_names = [region_list[galaxy.name].in_game_name for galaxy in dome_galaxies]
-        luma_galaxy_names = [region_list[galaxy.name].in_game_name for galaxy in luma_galaxies]
+        dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
+        luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
 
-        print(dome_galaxy_names)
-        print(luma_galaxy_names)
-        self.dol.name_object_factory.set_galaxies(dome_galaxy_names, luma_galaxy_names)
+        self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
+
+    def update_galaxyunlocktable(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], dome_shuffle) -> None:
+        requirements: dict[int, dict[int, int]] = {i: {} for i in range(1,7)}
+        
+        for location, requirement in star_requirements.items():
+            dome_index: int = dome_shuffle[int(location[1])]
+            orbit_index: int = int(location[3:])
+
+            requirements[dome_index][orbit_index] = requirement
+        
+        for galaxy in dome_galaxies:
+            star_requirement: int = requirements[galaxy.dome_index][galaxy.orbit_index + 1]
+
+            entry = self.dol.get_galaxy_unlock_table_entry_by_name(galaxy.name)
+            entry.power_star_requirement = star_requirement
+            entry.return_dome = galaxy.dome_index
+            self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_instructions(self) -> None:
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
+        """
         address = 0x801ffc44
         new_instruction = b'\x38\x00\x00\x02'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
-        
         # Get obj_arg0 from miniature galaxy
         address = 0x80200758
         new_instruction = b'\x80\x7f\x00\x8c'
@@ -319,6 +342,7 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
+        self.astrogalaxy.save_to_new_file("AstroGalaxyCopy.arc")
 
 class SuperMarioGalaxyRandomiser:
     @staticmethod
@@ -337,17 +361,17 @@ class SuperMarioGalaxyRandomiser:
                         5: 6,
                         6: 5}
         
-        patch.update_astrogalaxy_domes(dome_shuffle)
-
         galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies, dome_shuffle).galaxy_destinations
         
         dome_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "dome"]
         luma_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "luma"]
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"]
-
+        
+        patch.update_astrogalaxy(dome_shuffle, luma_galaxies)
 
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
+        patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts, dome_shuffle)
 
         patch.update_instructions()
 

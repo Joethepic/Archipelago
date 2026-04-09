@@ -1,7 +1,6 @@
 from enum import StrEnum
 
 from ..extensions import RARCExtended
-from ..bcsv import BCSV
 
 ASTRO_DOME_SCENARIO_RELATIVE_PATH = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
 SCENARIO_DATA_FILE_NAME = "scenariodata.bcsv"
