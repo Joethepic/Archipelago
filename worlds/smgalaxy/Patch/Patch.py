@@ -304,10 +304,10 @@ class Patch:
     def update_instructions(self) -> None:
         # Overwrite calculating miniature galaxy index
         # Ignore arg0 for koopa model
-        """
         address = 0x801ffc44
         new_instruction = b'\x38\x00\x00\x02'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
+        
         # Get obj_arg0 from miniature galaxy
         address = 0x80200758
         new_instruction = b'\x80\x7f\x00\x8c'
