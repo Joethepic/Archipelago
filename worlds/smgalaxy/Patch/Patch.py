@@ -302,6 +302,33 @@ class Patch:
             self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_instructions(self) -> None:
+        # BROKEN, NEED TO FIX
+        """
+        ############################################
+        # Skip the prologue (cutscene + gateway 1) #
+        ############################################
+        # Select the grand star 1 return demo to prepare
+        address = 0x803bb434
+        new_instruction = b'\x38\x84\xc3\x68'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Set stage name to AstroGalaxy to load
+        address = 0x803bb43c
+        new_instruction = b'\x38\x7f\x03\xf8'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Set scenario number to 4 to load
+        address = 0x803bb440
+        new_instruction = b'\x38\x00\x00\x04'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+        """
+        ########################
+        # Set swing permission #
+        ########################
+        address = 0x803b55b0
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
@@ -351,7 +378,7 @@ class Patch:
         address = 0x801ad614
         new_instruction = b'\x38\x60\x00\x05'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
-
+        
     def save_all(self) -> None:
         """
         Save all the changes made to the different files back to the ISO.
@@ -368,7 +395,7 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
-        #self.save_copies()
+        self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
