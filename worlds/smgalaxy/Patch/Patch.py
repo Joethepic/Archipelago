@@ -281,7 +281,7 @@ class Patch:
     def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
         dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
         luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
-
+        
         self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
 
     def update_galaxyunlocktable(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], dome_shuffle) -> None:
@@ -368,7 +368,7 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
-        self.save_copies()
+        #self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")

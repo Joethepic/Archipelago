@@ -7,6 +7,11 @@ from gclib.dol import DOL
 from .extensions import DOLExtended
 from .bcsv import BCSV
 
+from ..Constants.Names.region_names import GATEWAY
+from ..regions import region_list
+
+GATEWAY: str = region_list[GATEWAY].in_game_name
+
 DOL_RELATIVE_PATH: str = "/DATA/sys/main.dol"
 
 NAME_TO_CREATE_FUNCTION_START_ADDRESS = 0x80533980
@@ -46,8 +51,6 @@ class Pointer:
         self.dol.write_data(fs.write_u32, self.base_address, self.pointing_address)
 
     def swap_with_pointer(self, other: Self):
-        print(self.pointing_address, other.pointing_address)
-        print(self.string, other.string)
         self.pointing_address, other.pointing_address = other.pointing_address, self.pointing_address
 
         self.write_pointer()
@@ -136,6 +139,9 @@ class NameObjFactory:
 
             self.name_to_create_function_elements.append(element)
 
+            if name_pointer.string == "MiniKoopaBattleVs3Galaxy":
+                self.extra_create_element: Name2CreateFuncElement = element
+
         # Initialise the Name2Archive list    
         start_address = NAME_TO_ARCHIVE_START_ADDRESS
         element_count = NAME_TO_ARCHIVE_ELEMENT_COUNT
@@ -174,6 +180,9 @@ class NameObjFactory:
 
             self.name_to_make_archive_list_function_elements.append(element)
 
+            if name_pointer.string == "MiniKoopaBattleVs3Galaxy":
+                self.extra_archive_element: Name2MakeArchiveListFuncElement = element
+
     def get_name_to_create_function_elements_by_name(self, name: str) -> list[Name2CreateFuncElement]:
         return [element for element in self.name_to_create_function_elements
                 if element.name_pointer.string == name]
@@ -188,7 +197,7 @@ class NameObjFactory:
 
     def get_miniature_galaxy_name_to_make_archive_list_function_elements(self) -> list[Name2MakeArchiveListFuncElement]:
         return [element for element in self.name_to_make_archive_list_function_elements
-                if element.name_pointer.string.startswith("Mini")][:-2]
+                if element.name_pointer.string.startswith("Mini")][:-1]
 
     def set_miniature_galaxy_name_to_make_archive_list_function_elements(self, new_miniature_name_pointers: list[CharPointer]) -> None:
         archive_miniature_elements = self.get_miniature_galaxy_name_to_make_archive_list_function_elements()
@@ -236,8 +245,11 @@ class NameObjFactory:
         to_surprised_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
                                                                if element.name_pointer.string[4:] in surprised_galaxy_names]
 
-        # TODO: Add gateway galaxy (somehow)
-
+        if GATEWAY in miniature_galaxy_names:
+            self.extra_create_element.name_pointer.string = "Mini" + GATEWAY
+            self.extra_create_element.name_pointer.write_string()
+            to_miniature_elements.append(self.extra_create_element)
+        
         self.set_as_miniature_galaxies(to_miniature_elements)
         self.set_as_surprised_galaxies(to_surprised_elements)
 
