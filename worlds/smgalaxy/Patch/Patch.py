@@ -379,6 +379,24 @@ class Patch:
         new_instruction = b'\x38\x60\x00\x05'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
+        #######################################
+        # Read star count from memory address #
+        #######################################
+        # Load upper 2 bytes of memory pointer (0x8000)
+        address = 0x803b10fc
+        new_instruction = b'\x3f\x80\x80\x00'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
+        address = 0x803b1000
+        new_instruction = b'\x88\x7c\x18\x80'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        # Skip the rest of the normal function
+        address = 0x803b1004
+        new_instruction = b'\x48\x00\x00\x38'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+        
     def save_all(self) -> None:
         """
         Save all the changes made to the different files back to the ISO.
