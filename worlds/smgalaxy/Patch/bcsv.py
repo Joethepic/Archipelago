@@ -2,7 +2,7 @@ from gclib.gclib_file import GCLibFile
 import gclib.fs_helpers as fs
 from io import BytesIO
 from .hashtable import hash_to_name
-import struct
+import struct, copy
 
 class BCSVField:
     def __init__(self, data: BytesIO):
@@ -95,9 +95,11 @@ class BCSV(GCLibFile):
 
         self.field_offset = 0x10
         self.fields: list[BCSVField] = []
-        self.entries: list = []
+        self.entries: list[list] = []
         self.strings: list[str] = []
         self.string_offsets: list[int] = []
+
+        self.hidden_strings: list[str] = []
 
         if flexible_data is not None:
             self.read()
@@ -137,6 +139,23 @@ class BCSV(GCLibFile):
                     string_index = self.string_offsets.index(self.entries[-1][-1])
                     self.entries[-1][-1] = self.strings[string_index]
     
+        # Apparently there are hidden strings
+        # They exist in the string pool BUT ARE NEVER USED BUT ARE SOMETIMES NECESSARY
+        actual_strings: list[str] = []
+
+        for entry_index, entry in enumerate(self.entries):
+            for field_index, field in enumerate(self.fields):
+                if field.type != 6:
+                    continue
+
+                string = self.entries[entry_index][field_index]
+                if string not in actual_strings:
+                    actual_strings.append(string)
+        
+        for string in self.strings:
+            if string not in actual_strings:
+                self.hidden_strings.append(string)
+
     def get_value_by_index(self, entry_index: int, field_index: int):
         if entry_index < 0 or entry_index >= len(self.entries):
             raise IndexError(f"Entry index out of range. Entries: {len(self.entries)}, index: {entry_index}.")
@@ -172,11 +191,13 @@ class BCSV(GCLibFile):
         self.get_strings()
 
     def get_strings(self):
-        self.strings = ['Mario']
+        self.strings = copy.deepcopy(self.hidden_strings)
         for entry_index, entry in enumerate(self.entries):
             for field_index, field in enumerate(self.fields):
                 if field.type == 6:
-                    self.strings.append(self.entries[entry_index][field_index])
+                    string = self.entries[entry_index][field_index]
+                    if string not in self.strings:
+                        self.strings.append(string)
         
         self.calculate_string_offsets()
 
@@ -186,6 +207,9 @@ class BCSV(GCLibFile):
             # Encode to shift-jis before getting the length since japanese characters
             # have a different length decoded vs encoded
             self.string_offsets.append(self.string_offsets[-1] + len(string.encode('shift-jis')) + 1)
+        
+        # Remove the last entry since it will never get used
+        self.string_offsets.pop()
 
     def get_field_index(self, field_name: str) -> int:
         for i, field in enumerate(self.fields):
@@ -233,8 +257,11 @@ class BCSV(GCLibFile):
             fs.write_bytes(self.data, entry_offset, entry_data.getvalue())
         
         strings_offset = self.entry_offset + self.entry_count*self.entry_size
-        for string_index, string in enumerate(self.strings):
-            string_offset = strings_offset + self.string_offsets[string_index]
+        
+        self.calculate_string_offsets()
+
+        for string, offset in zip(self.strings, self.string_offsets):
+            string_offset = strings_offset + offset
             fs.write_str_with_null_byte(self.data, string_offset, string)
         
         data_length = self.data.seek(0, 2)
