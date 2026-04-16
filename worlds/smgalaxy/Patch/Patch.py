@@ -303,7 +303,6 @@ class Patch:
 
     def update_instructions(self) -> None:
         # BROKEN, NEED TO FIX
-        """
         ############################################
         # Skip the prologue (cutscene + gateway 1) #
         ############################################
@@ -321,7 +320,7 @@ class Patch:
         address = 0x803bb440
         new_instruction = b'\x38\x00\x00\x04'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
-        """
+        
         ########################
         # Set swing permission #
         ########################
@@ -388,12 +387,12 @@ class Patch:
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
-        address = 0x803b1000
+        address = 0x803b1100
         new_instruction = b'\x88\x7c\x18\x80'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         # Skip the rest of the normal function
-        address = 0x803b1004
+        address = 0x803b1104
         new_instruction = b'\x48\x00\x00\x38'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
