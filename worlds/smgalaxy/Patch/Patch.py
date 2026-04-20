@@ -13,6 +13,7 @@ from .SMGStages.AstroDome import AstroDome
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
 from ..regions import region_list
+from ..Constants.Names.region_names import GATEWAY
 
 class InvalidCleanISOError(Exception): pass
 
@@ -278,6 +279,26 @@ class Patch:
             new_index = reverse_shuffle[dome_index]
             self.astrodome.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == new_index], dome_index)
 
+    def update_gateway_location(self, gateway_galaxy: GalaxyDestination):
+        galaxy_name = gateway_galaxy.name
+        if galaxy_name == GATEWAY:
+            return
+        
+        mini_galaxy = self.dol.name_object_factory.get_name_to_create_function_elements_by_name("Mini" + galaxy_name)
+        surp_galaxy = self.dol.name_object_factory.get_name_to_create_function_elements_by_name("Surp" + galaxy_name)
+
+        if mini_galaxy:
+            name_address = mini_galaxy[0].name_pointer.pointing_address
+        elif surp_galaxy:
+            name_address = surp_galaxy[0].name_pointer.pointing_address
+        else:
+            raise ValueError(f"{galaxy_name} cannot be found.")
+
+        print(f"Loading zone gateway -> {galaxy_name}")
+
+        self.astrodome.gateway_galaxy.replace_loading(self.dol, name_address + 4)
+        return
+
     def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
         dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
         luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
@@ -302,7 +323,6 @@ class Patch:
             self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_instructions(self) -> None:
-        # BROKEN, NEED TO FIX
         ############################################
         # Skip the prologue (cutscene + gateway 1) #
         ############################################
@@ -412,7 +432,7 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
-        self.save_copies()
+        #self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
@@ -441,14 +461,16 @@ class SuperMarioGalaxyRandomiser:
         
         dome_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "dome"]
         luma_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "luma"]
-        gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"]
+        gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"][0]
         
         patch.update_astrogalaxy(dome_shuffle, luma_galaxies)
 
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
-        patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
-        patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts, dome_shuffle)
 
+        patch.update_gateway_location(gateway_galaxy)
+
+        patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
+        #patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts, dome_shuffle)
         patch.update_instructions()
 
         patch.save_all()

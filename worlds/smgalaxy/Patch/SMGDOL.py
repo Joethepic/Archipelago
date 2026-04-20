@@ -362,6 +362,7 @@ class SMGDOL(DOLExtended):
                 return entry
 
     def save(self):
+        self.write_data(fs.write_bytes, self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
         self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
 
         with open(self.absolute_file_path, 'wb') as f:

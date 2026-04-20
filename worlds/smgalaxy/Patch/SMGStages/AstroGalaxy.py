@@ -67,6 +67,7 @@ class AstroGalaxy(RARCExtended):
         # Get the indices of the fields
         self.name_index = self.objinfo.get_field_index(ObjInfoFieldNames.NAME)
         self.obj_arg0_index = self.objinfo.get_field_index(ObjInfoFieldNames.OBJECT_ARGUMENT0)
+        self.switch_A_index = self.objinfo.get_field_index(ObjInfoFieldNames.SWITCH_A)
     
     def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
         """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
@@ -95,7 +96,7 @@ class AstroGalaxy(RARCExtended):
             if self.objinfo.get_value_by_index(entry_index, self.name_index) == ASTRO_DOME_ENTRANCE_NAME:
                 dome_index = self.objinfo.get_value_by_index(entry_index, self.obj_arg0_index)
                 dome_entrances[dome_index] = entry_index
-
+        
         print("Shuffling domes...")
         
         # Set all the new obj_arg0 of each dome
@@ -105,6 +106,9 @@ class AstroGalaxy(RARCExtended):
             print(f"Dome {old_dome_index} -> Dome {new_dome_index}")
             
             self.objinfo.set_value_by_index(entry_index, self.obj_arg0_index, new_dome_index)
+
+            if old_dome_index == 1:
+                self.objinfo.set_value_by_index(entry_index, self.switch_A_index, -1)
     
     def shuffle_lumas(self, new_galaxies: list[GalaxyDestination]) -> None:
         """
@@ -114,26 +118,44 @@ class AstroGalaxy(RARCExtended):
         # Convert to a dict for easy lookup
         new_galaxies_dict: dict[str, str] = {galaxy.old_luma_name: galaxy.name for galaxy in new_galaxies}
         
-        def rename_bcsv_entries(bcsv):
-            for entry_index in range(bcsv.entry_count):
-                entry_name: str = bcsv.get_value_by_index(entry_index, self.name_index)
+        for entry_index in range(self.objinfo.entry_count):
+            entry_name: str = self.objinfo.get_value_by_index(entry_index, self.name_index)
 
-                if entry_name.startswith("Surp"):
-                    entry_name = entry_name[4:]
+            if entry_name.startswith("Surp"):
+                entry_name = entry_name[4:]
 
-                    if entry_name in new_galaxies_dict.keys():
-                        new_entry_name: str = "Surp" + new_galaxies_dict[entry_name]
+                if entry_name in new_galaxies_dict.keys():
+                    new_entry_name: str = "Surp" + new_galaxies_dict[entry_name]
 
-                        print(f"Luma Surp{entry_name} -> {new_entry_name}")
+                    print(f"Luma Surp{entry_name} -> {new_entry_name}")
 
-                        bcsv.set_value_by_index(entry_index, self.name_index, new_entry_name)
-            
-            return bcsv
+                    self.objinfo.set_value_by_index(entry_index, self.name_index, new_entry_name)
+        
+        for entry_index in range(self.objinfo_layera.entry_count):
+            entry_name: str = self.objinfo_layera.get_value_by_index(entry_index, self.name_index)
 
-        # Check the objinfos for the luma galaxies
-        self.objinfo = rename_bcsv_entries(self.objinfo)
-        self.objinfo_layera = rename_bcsv_entries(self.objinfo_layera)
-        self.objinfo_layerb = rename_bcsv_entries(self.objinfo_layerb)
+            if entry_name.startswith("Surp"):
+                entry_name = entry_name[4:]
+
+                if entry_name in new_galaxies_dict.keys():
+                    new_entry_name: str = "Surp" + new_galaxies_dict[entry_name]
+
+                    print(f"Luma Surp{entry_name} -> {new_entry_name}")
+
+                    self.objinfo_layera.set_value_by_index(entry_index, self.name_index, new_entry_name)
+        
+        for entry_index in range(self.objinfo_layerb.entry_count):
+            entry_name: str = self.objinfo_layerb.get_value_by_index(entry_index, self.name_index)
+
+            if entry_name.startswith("Surp"):
+                entry_name = entry_name[4:]
+
+                if entry_name in new_galaxies_dict.keys():
+                    new_entry_name: str = "Surp" + new_galaxies_dict[entry_name]
+
+                    print(f"Luma Surp{entry_name} -> {new_entry_name}")
+
+                    self.objinfo_layerb.set_value_by_index(entry_index, self.name_index, new_entry_name)
 
     def save_objinfo(self) -> None:
         self.objinfo.save_changes()
