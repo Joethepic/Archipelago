@@ -1,10 +1,12 @@
-import hashlib
+import hashlib, os, time, zipfile, json
 from pathlib import Path
-import os, time
+from typing import NamedTuple, Optional
 
 from disc_riider_py import WiiIsoExtractor, rebuild_from_directory
 import gclib.fs_helpers as fs
-from typing import NamedTuple, Optional
+
+from worlds.Files import APAutoPatchInterface, APPlayerContainer, AutoPatchRegister
+from NetUtils import convert_to_base_types
 
 from .extensions import RARCExtended, DOLExtended
 from .SMGDOL import SMGDOL
@@ -28,26 +30,24 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, clean_iso_path: str, iso_name: str = RANDOMIZER_NAME + " Patched", dest_path: str = r"", temp_dir: str = r"temp"):
+    def __init__(self, patch_name: str):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
-            clean_iso_path (str): Path to the unmodified ISO file to be patched.
-            iso_name (str): Name for the newly created patched ISO file. 
-                            Defaults to RANDOMIZER_NAME + " Patched".
-            dest_path (str): Directory path where the repacked ISO will be saved. 
-                             Defaults to current directory if empty string.
-            temp_dir (str): Temporary directory path for extracting ISO contents during patching.
-                            Defaults to "temp". This directory will be cleaned up after patching.
+            patch_name (str): Name of the patch file
         Attributes:
             clean_iso_path (str): Path of the unmodified ISO.
             dest_path (str): Output directory for the patched ISO.
             temp_dir (str): Temporary extraction directory.
             iso_name (str): Name of the new ISO file.
         """
+        clean_iso_path: str = self.get_base_rom_path()
+        dest_path: str = os.path.split(clean_iso_path)[0]
+        temp_dir = os.path.join(dest_path, "temp")
+
         self.clean_iso_path = clean_iso_path
         self.dest_path = dest_path
         self.temp_dir = temp_dir
-        self.iso_name = iso_name
+        self.iso_name = patch_name
 
         self.progress = None
         self.calling_function = None
@@ -92,7 +92,19 @@ class WiiISO:
                 raise InvalidCleanISOError(f"Non-{RANDOMIZER_NAME} game detected. Please re-select the vanilla " +
                     f"{RANDOMIZER_NAME}'s ISO (North American version).")
         return
+    
+    @staticmethod
+    def get_base_rom_path() -> str:
+        from settings import get_settings, Settings
+        import Utils
 
+        """Gets the base rom path from the host.yml settings."""
+        options: Settings = get_settings()
+        file_name = options["smgalaxy.world_options"]["iso_file"]
+        if not os.path.exists(file_name):
+            file_name = Utils.user_path(file_name)
+        return file_name
+    
     def extract(self):
         """Extracts the ISO into the output directory, preserving the orignal file/folder structure within the ISO.
         Once extracted, you can then read these files individually to change/edit, create new folders/files in the
@@ -212,13 +224,11 @@ class GalaxyShuffle:
             self.galaxy_destinations.append(new_galaxy)
 
 class Patch:
-    def __init__(self, base_path: str, iso_path: str, output: dict):
-        self.iso_path: str = iso_path
-        self.temp_path: str = base_path + 'temp'
-        self.iso: WiiISO = WiiISO(clean_iso_path=self.iso_path, dest_path=base_path, temp_dir=self.temp_path)
+    def __init__(self, patch_name: str, output: dict):
+        self.iso: WiiISO = WiiISO(patch_name)
 
-        RARCExtended.iso_base_path = self.temp_path
-        DOLExtended.iso_base_path = self.temp_path
+        RARCExtended.iso_base_path = self.iso.temp_dir
+        DOLExtended.iso_base_path = self.iso.temp_dir
 
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
@@ -440,14 +450,22 @@ class Patch:
         self.astrodomescenario.save_to_new_file("AstroDomeScenarioCopy.arc")
         self.astrodome.save_to_new_file("AstroDomeCopy.arc")
 
-class SuperMarioGalaxyRandomiser:
-    @staticmethod
-    def create_randomiser(base_path: str, iso_path: str, output: dict) -> None:
-        patch = Patch(base_path, iso_path, output)
-        galaxies: dict[str, str] = output["Galaxies"]
-        galaxy_counts: dict[str, int] = output["Galaxy Counts"]
+class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
+    game = RANDOMIZER_NAME
+    patch_file_ending = ".apsmg"
+    result_file_ending = ".iso"
 
-        patch.update_mario()
+    @staticmethod
+    def patch(patch_path: str) -> None:
+        # Get the data from the generated output to use for patching
+        with zipfile.ZipFile(patch_path, "r") as zf:
+            output = json.loads(zf.read("patch.json").decode('shift-jis'))
+
+        patch_name: str = os.path.split(patch_path)[1].split('.')[0]
+        patch = Patch(patch_name, output)
+
+        galaxies: dict[str, str] = patch.galaxies
+        galaxy_counts: dict[str, int] = patch.counts
 
         # TEMPORARY
         dome_shuffle = {1: 3,
@@ -456,6 +474,8 @@ class SuperMarioGalaxyRandomiser:
                         4: 1,
                         5: 6,
                         6: 5}
+
+        patch.update_mario()
         
         galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies, dome_shuffle).galaxy_destinations
         
@@ -464,9 +484,7 @@ class SuperMarioGalaxyRandomiser:
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"][0]
         
         patch.update_astrogalaxy(dome_shuffle, luma_galaxies)
-
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
-
         patch.update_gateway_location(gateway_galaxy)
 
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
@@ -474,20 +492,27 @@ class SuperMarioGalaxyRandomiser:
         patch.update_instructions()
 
         patch.save_all()
-
         patch.repack_iso()
 
-
-
+        # REMOVE WHEN RELEASED
         import winsound
         winsound.MessageBeep(winsound.MB_OK)
 
+class SMGPlayerContainer(APPlayerContainer):
+    game = RANDOMIZER_NAME
+    compression_method = zipfile.ZIP_DEFLATED
+    patch_file_ending = ".apsmg"
+
+    def __init__(self, player_choices: dict, patch_path: str, player_name: str, player: int,
+        server: str = ""):
+        self.output_data = player_choices
+        super().__init__(patch_path, player, player_name, server)
+
+    def write_contents(self, opened_zipfile: zipfile.ZipFile) -> None:
+        opened_zipfile.writestr("patch.json", json.dumps(self.output_data, indent=4, default=convert_to_base_types))
+        super().write_contents(opened_zipfile)
 
 if __name__ == "__main__":
-    base_path = r"worlds/smgalaxy/Patch/"
-    iso_path = base_path + "Super Mario Galaxy (USA) (En,Fr,Es).iso"
+    patch_path = r"C:/Users/sebas/Documents/GitHub/Archipelago/output/AP_91073106683428351458_P1_Player1.apsmg"
     
-    with open(base_path + 'example_output.txt', 'r') as f:
-        output = eval(f.read())
-    
-    SuperMarioGalaxyRandomiser.create_randomiser(base_path, iso_path, output)
+    SuperMarioGalaxyRandomiser.patch(patch_path)
