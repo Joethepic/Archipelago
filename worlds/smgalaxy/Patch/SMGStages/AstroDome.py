@@ -80,12 +80,13 @@ class AstroDome(RARCExtended):
                                       if data.type == "Special"]
         self.gateway: str = region_list[GATEWAY].in_game_name
 
-    def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int):
+    def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int):
         """
         Update the dome with new galaxies. The dome to update is determined by the dome index (from 1 to 6). The list of new galaxies
         is expected to all have type "dome" and contain all the galaxies that should be in the dome. The dome index of the new galaxies
         are ignored and should be used to determine the list to input in this function. The orbit index of the new galaxies is not
-        checked for duplicates. Creates mini gateway and surprised galaxies if necessary.
+        checked for duplicates. Creates mini gateway and surprised galaxies if necessary. Interior dome index determines what the inside
+        of the dome should look like in correspondance with the given index.
         """
         # Get the objinfo of the dome corresponding to the dome index.
         layer = index_to_layer[dome_index]
@@ -97,10 +98,14 @@ class AstroDome(RARCExtended):
         miniature_indices = []
 
         # Get the entry indices of the current miniatures in the dome
+        # and set the AstroDome and AstroDomeSky values
         for entry_index in range(objinfo.entry_count):
             name: str = objinfo.get_value_by_index(entry_index, name_index)
             if name.startswith("Mini"):
                 miniature_indices.append(entry_index)
+            
+            if name.startswith("AstroDome"):
+                objinfo.set_value_by_index(entry_index, objarg0_index, interior_dome_index)
 
         # Iterate over all the galaxies in the new_galaxies list and update the corresponding entry
         index = 0

@@ -33,6 +33,11 @@ CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS = 0x8026a8cc
 CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS = 0x8026a90c
 STRING_ADDRESS_MINISURPRISEDGALAXY = 0x8059838c
 
+ASTRO_DOME_ARRAY_ADDRESS = 0x8057a9e0
+ASTRO_DOME_SKY_ARRAY_ADDRESS = 0x8057aa24
+ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS = 0x8057aad4
+ASTRO_STAR_PLATE_ARRAY_ADDRESS = 0x8057ab70
+
 class Pointer:
     base_address: int
     pointing_address: int
@@ -341,6 +346,50 @@ class GalaxyUnlockTable:
         self.table.save_changes()
         dol.write_data(fs.write_bytes, address, self.table.data.getvalue())
 
+class AstroDomeModels:
+    astro_dome: list[CharPointer]
+    astro_dome_sky: list[CharPointer]
+    astro_dome_entrance: list[CharPointer]
+    astro_star_plate: list[CharPointer]
+
+    def __init__(self, dol: DOL):
+        self.astro_dome_address: int = ASTRO_DOME_ARRAY_ADDRESS
+        self.astro_dome_sky_address: int = ASTRO_DOME_SKY_ARRAY_ADDRESS
+        self.astro_dome_entrance_address: int = ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS
+        self.astro_star_plate_address: int = ASTRO_STAR_PLATE_ARRAY_ADDRESS
+
+        self.astro_dome = []
+        self.astro_dome_sky = []
+        self.astro_dome_entrance = []
+        self.astro_star_plate = []
+        
+        for index in range(6):
+            astro_dome_pointer = CharPointer(dol, self.astro_dome_address + index * 0x4)
+            astro_dome_sky_pointer = CharPointer(dol, self.astro_dome_sky_address + index * 0x4)
+            astro_dome_entrance_pointer = CharPointer(dol, self.astro_dome_entrance_address + index * 0x4)
+            astro_star_plate_pointer = CharPointer(dol, self.astro_star_plate_address + index * 0x4)
+
+            self.astro_dome.append(astro_dome_pointer)
+            self.astro_dome_sky.append(astro_dome_sky_pointer)
+            self.astro_dome_entrance.append(astro_dome_entrance_pointer)
+            self.astro_star_plate.append(astro_star_plate_pointer)
+    
+    def shuffle_list(self, pointer_list: list[CharPointer], shuffle: dict[int, int]):
+        assert len(pointer_list) == 6
+        
+        reverse_shuffle: dict[int, int] = {value: key for key, value in shuffle.items()}
+        addresses: list[int] = [pointer_list[i].pointing_address for i in range(6)]
+        for index, address in enumerate(addresses):
+            new_index = reverse_shuffle[index + 1] - 1
+            pointer_list[new_index].pointing_address = address
+            pointer_list[new_index].write_pointer()
+    
+    def shuffle(self, shuffle: dict[int, int]):
+        #self.shuffle_list(self.astro_dome, shuffle)
+        #self.shuffle_list(self.astro_dome_sky, shuffle)
+        self.shuffle_list(self.astro_dome_entrance, shuffle)
+        #self.shuffle_list(self.astro_dome, shuffle)
+
 class SMGDOL(DOLExtended):
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
     name_object_factory: NameObjFactory
@@ -352,6 +401,7 @@ class SMGDOL(DOLExtended):
         
         self.name_object_factory = NameObjFactory(self)
         self.galaxy_unlock_table = GalaxyUnlockTable(self)
+        self.astro_dome_models = AstroDomeModels(self)
 
     def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
         self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)

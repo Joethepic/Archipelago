@@ -196,7 +196,7 @@ class GalaxyShuffle:
                  "Fifth" : 5}
     galaxy_destinations: list[GalaxyDestination]
     
-    def __init__(self, galaxies: dict[str, str], dome_shuffle: dict[int, int]):
+    def __init__(self, galaxies: dict[str, str]):
         self.galaxies = galaxies
         self.galaxy_destinations = []
 
@@ -210,9 +210,8 @@ class GalaxyShuffle:
                 elements: list[str] = location.split(' ')
                 dome_index: int = int(elements[1])
                 orbit_index: int = self.converter[elements[2]] - 1
-                reverse_shuffle: dict[int, int] = {value: key for key, value in dome_shuffle.items()}
                 
-                new_galaxy = GalaxyDestination(galaxy, "dome", reverse_shuffle[dome_index], orbit_index, None)
+                new_galaxy = GalaxyDestination(galaxy, "dome", dome_index, orbit_index, None)
 
             elif location.startswith("Gateway"):
                 new_galaxy = GalaxyDestination(galaxy, "gateway", None, None, None)
@@ -260,36 +259,28 @@ class Patch:
         # In the future possibly more functionality
         self.mario.update_colours(self.mario_colours)
 
-    def update_astrogalaxy(self, dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
+    def update_astrogalaxy(self, luma_shuffle: list[GalaxyDestination]) -> None:
         """
-        Shuffle the domes and luma galaxies within the observatory. This includes both the visual domes (within AstroGalaxy) and the
-        loading zones (within AstroDomeScenario). The dome shuffle dict must contain all indices from 1 to 6 as both keys and values.
+        Shuffle the luma galaxies within the observatory.
         Luma shuffle is a list of GalaxyDestinations and if a luma name exists it expect the type to be "luma".
-        dome_shuffle:
-            key: old dome index (1-6)
-            value: new dome index (1-6)
         """
-        self.astrogalaxy.shuffle_domes(dome_shuffle)
         self.astrogalaxy.shuffle_lumas(luma_shuffle)
-        self.astrogalaxy.save_objinfo()
-
-        self.astrodomescenario.shuffle_loading_zones(dome_shuffle)
 
     def update_astrodomes(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int]) -> None:
         """
-        Shuffle the galaxies within a dome. This iterates over all the 6 domes and updates the entry according to the galaxy shuffle.
-        Galaxy shuffle is a list of GalaxyDestinations and if a dome and orbit index exists, it expects the type to be "dome". Dome shuffle
-        is a mapping of the old dome index to the new dome index. Each key and value must contain all indices from 1 to 6 and is not checked.
-        dome_shuffle:
-            key: old dome index (1-6)
-            value: new dome index (1-6)
+        Shuffle the galaxies within a dome. Galaxy shuffle is a list of GalaxyDestinations and if a dome and orbit index exists,
+        it expects the type to be "dome".
         """
-        for dome_index in range(1,7):
-            reverse_shuffle = {item: key for key, item in dome_shuffle.items()}
-            new_index = reverse_shuffle[dome_index]
-            self.astrodome.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == new_index], dome_index)
+        for index in range(1,7):
+            self.astrodome.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index])
 
-    def update_gateway_location(self, gateway_galaxy: GalaxyDestination):
+    def update_visual_astrodomes(self, dome_shuffle: dict[int, int]) -> None:
+        """
+        Update the Astro Dome arrays within the DOL.
+        """
+        self.dol.astro_dome_models.shuffle(dome_shuffle)
+        
+    def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
         galaxy_name = gateway_galaxy.name
         if galaxy_name == GATEWAY:
             return
@@ -306,6 +297,7 @@ class Patch:
 
         print(f"Loading zone gateway -> {galaxy_name}")
 
+        # +4 to the name address to skip over the galaxy identifier tag (Mini/Surp)
         self.astrodome.gateway_galaxy.replace_loading(self.dol, name_address + 4)
         return
 
@@ -315,11 +307,11 @@ class Patch:
         
         self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
 
-    def update_galaxyunlocktable(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], dome_shuffle) -> None:
+    def update_galaxyunlocktable(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int]) -> None:
         requirements: dict[int, dict[int, int]] = {i: {} for i in range(1,7)}
         
         for location, requirement in star_requirements.items():
-            dome_index: int = dome_shuffle[int(location[1])]
+            dome_index: int = int(location[1])
             orbit_index: int = int(location[3:])
 
             requirements[dome_index][orbit_index] = requirement
@@ -442,7 +434,7 @@ class Patch:
         self.astrodome.save()
         self.dol.save()
 
-        #self.save_copies()
+        self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
@@ -477,18 +469,20 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         patch.update_mario()
         
-        galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies, dome_shuffle).galaxy_destinations
+        galaxy_shuffle: list[GalaxyDestination] = GalaxyShuffle(galaxies).galaxy_destinations
         
         dome_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "dome"]
         luma_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "luma"]
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"][0]
         
-        patch.update_astrogalaxy(dome_shuffle, luma_galaxies)
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
+        patch.update_astrogalaxy(luma_galaxies)
         patch.update_gateway_location(gateway_galaxy)
 
+        patch.update_visual_astrodomes(dome_shuffle)
+
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
-        #patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts, dome_shuffle)
+        patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts)
         patch.update_instructions()
 
         patch.save_all()

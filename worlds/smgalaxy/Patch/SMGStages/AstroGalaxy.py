@@ -66,49 +66,6 @@ class AstroGalaxy(RARCExtended):
 
         # Get the indices of the fields
         self.name_index = self.objinfo.get_field_index(ObjInfoFieldNames.NAME)
-        self.obj_arg0_index = self.objinfo.get_field_index(ObjInfoFieldNames.OBJECT_ARGUMENT0)
-        self.switch_A_index = self.objinfo.get_field_index(ObjInfoFieldNames.SWITCH_A)
-    
-    def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
-        """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
-        for index in range(1,7):
-            if index not in dome_shuffle.keys() or index not in dome_shuffle.values():
-                return False
-        return True
-    
-    def shuffle_domes(self, shuffle: dict[int, int]) -> None:
-        """
-        Shuffle the visual dome entrances within the observatory. The shuffle maps the old dome index to the new dome index (from 1 to 6).
-        The shuffle dict must contain all indices from 1 to 6 as both keys and values. The information to load the dome is contained in
-        jmp/placement/common/objinfo. Field "obj_arg0" determines which dome it should load and gets set according to the shuffle dict.
-        shuffle:
-            key: old dome index (1-6)
-            value: new dome index (1-6)
-        """
-        # Make sure its a valid shuffle
-        if not self.is_valid_shuffle(shuffle):
-            raise ValueError(f"Invalid shuffle: {shuffle}")
-
-        dome_entrances: dict[int, int] = {}
-
-        # Get all the obj_arg0 of each dome
-        for entry_index in range(self.objinfo.entry_count):
-            if self.objinfo.get_value_by_index(entry_index, self.name_index) == ASTRO_DOME_ENTRANCE_NAME:
-                dome_index = self.objinfo.get_value_by_index(entry_index, self.obj_arg0_index)
-                dome_entrances[dome_index] = entry_index
-        
-        print("Shuffling domes...")
-        
-        # Set all the new obj_arg0 of each dome
-        for old_dome_index, entry_index in dome_entrances.items():
-            new_dome_index = shuffle[old_dome_index]
-
-            print(f"Dome {old_dome_index} -> Dome {new_dome_index}")
-            
-            self.objinfo.set_value_by_index(entry_index, self.obj_arg0_index, new_dome_index)
-
-            if old_dome_index == 1:
-                self.objinfo.set_value_by_index(entry_index, self.switch_A_index, -1)
     
     def shuffle_lumas(self, new_galaxies: list[GalaxyDestination]) -> None:
         """
@@ -130,7 +87,8 @@ class AstroGalaxy(RARCExtended):
                     print(f"Luma Surp{entry_name} -> {new_entry_name}")
 
                     self.objinfo.set_value_by_index(entry_index, self.name_index, new_entry_name)
-        
+        self.objinfo.save_changes()
+
         for entry_index in range(self.objinfo_layera.entry_count):
             entry_name: str = self.objinfo_layera.get_value_by_index(entry_index, self.name_index)
 
@@ -143,7 +101,8 @@ class AstroGalaxy(RARCExtended):
                     print(f"Luma Surp{entry_name} -> {new_entry_name}")
 
                     self.objinfo_layera.set_value_by_index(entry_index, self.name_index, new_entry_name)
-        
+        self.objinfo_layera.save_changes()
+
         for entry_index in range(self.objinfo_layerb.entry_count):
             entry_name: str = self.objinfo_layerb.get_value_by_index(entry_index, self.name_index)
 
@@ -156,8 +115,4 @@ class AstroGalaxy(RARCExtended):
                     print(f"Luma Surp{entry_name} -> {new_entry_name}")
 
                     self.objinfo_layerb.set_value_by_index(entry_index, self.name_index, new_entry_name)
-
-    def save_objinfo(self) -> None:
-        self.objinfo.save_changes()
-        self.objinfo_layera.save_changes()
         self.objinfo_layerb.save_changes()
