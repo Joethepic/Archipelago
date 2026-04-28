@@ -11,6 +11,7 @@ from NetUtils import convert_to_base_types
 from .extensions import RARCExtended, DOLExtended
 from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
+from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
 from .SMGStages.AstroDome import AstroDome
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
@@ -242,6 +243,7 @@ class Patch:
         self.astrogalaxy: AstroGalaxy = AstroGalaxy()
         self.astrodomescenario: AstroDomeScenario = AstroDomeScenario()
         self.astrodome: AstroDome = AstroDome()
+        self.astrodomeentrances: AstroDomeEntrances = AstroDomeEntrances()
         self.dol: SMGDOL = SMGDOL()
 
     def unpack_iso(self) -> None:
@@ -278,7 +280,8 @@ class Patch:
         """
         Update the Astro Dome arrays within the DOL.
         """
-        self.dol.astro_dome_models.shuffle(dome_shuffle)
+        #self.astrodomeentrances.rename_files(dome_shuffle)
+        #self.dol.astro_dome_models.shuffle(dome_shuffle)
         
     def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
         galaxy_name = gateway_galaxy.name
@@ -392,12 +395,14 @@ class Patch:
             AstroGalaxy.arc
             AstroDomeScenario.arc
             AstroDome.arc
+            AstroDomeEntrance[name].arc
             main.dol
         """
         self.mario.save()
         self.astrogalaxy.save()
         self.astrodomescenario.save()
         self.astrodome.save()
+        self.astrodomeentrances.save()
         self.dol.save()
 
         self.save_copies()
@@ -407,6 +412,9 @@ class Patch:
         self.astrogalaxy.save_to_new_file("AstroGalaxyCopy.arc")
         self.astrodomescenario.save_to_new_file("AstroDomeScenarioCopy.arc")
         self.astrodome.save_to_new_file("AstroDomeCopy.arc")
+
+        for entrance in self.astrodomeentrances.entrances:
+            entrance.save_to_new_file(f"AstroDomeEntrance{entrance.name}Copy.arc")
 
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
     game = RANDOMIZER_NAME
@@ -440,12 +448,12 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         dome_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "dome"]
         luma_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "luma"]
         gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"][0]
-        
+
+        patch.update_visual_astrodomes(dome_shuffle)
+
         patch.update_astrodomes(dome_galaxies, dome_shuffle)
         patch.update_astrogalaxy(luma_galaxies)
         patch.update_gateway_location(gateway_galaxy)
-
-        patch.update_visual_astrodomes(dome_shuffle)
 
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
         patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts)
