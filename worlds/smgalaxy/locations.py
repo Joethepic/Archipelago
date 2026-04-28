@@ -44,7 +44,7 @@ locspecialstages_table: dict[str, SMGLocationData]  = {
     "BB: The Floating Fortress": SMGLocationData(["Buoy Base Galaxy", "Power Star"], regname.BUOY, 170000017, game_address=0),
     "BB: The Secret of Buoy Base": SMGLocationData(["Buoy Base Galaxy", "Power Star"], regname.BUOY, 170000018, game_address=0),
     #TODO: FIX duplicate abbreviation 
-    "GG: Grand Star Rescue": SMGLocationData([regname.GATEWAY, "Power Star"], regname.GATEWAY, 170000019, game_address=0),
+    "GG: Grand Star Rescue": SMGLocationData([regname.SHIP, "Power Star"], regname.GATEWAY, 170000019, game_address=0),
     "BF: Kingfin's Fearsome Waters": SMGLocationData(["Bonefin Galaxy", "Power Star"], regname.BONEFIN, 170000021, game_address=0),
     "MS: Watch Your Step": SMGLocationData(["Matter Splatter Galaxy", "Power Star"], regname.MATTER, 170000022, game_address=0),
     "RGT: Gizmos, Gears, and Gadgets": SMGLocationData(["Rolling Gizmo Galaxy", "Power Star"], regname.ROLLINGGIZ, 170000023, game_address=0),
