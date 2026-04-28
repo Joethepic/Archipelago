@@ -6,6 +6,7 @@ import Utils
 
 from typing import Optional
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
@@ -227,8 +228,14 @@ def launch(*launch_args: str):
     import colorama
     Utils.init_logging(clientname)
     logger.info("Starting SMG Client")
+    
     parser = get_base_parser()
+    parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
+
+    if args.apsmg_file:
+        SuperMarioGalaxyRandomiser().patch(args.apsmg_file)
+
     async def _main(connect, password):
         try:
             ctx = GalaxyContext(connect, password)
