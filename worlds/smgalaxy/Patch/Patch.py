@@ -365,15 +365,6 @@ class Patch:
         address = 0x8037db74
         new_instruction = b'\x38\xc6\x00\x01'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
-
-        ############################################################
-        # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPOR #
-        ##### Overwrite miniature count detection, always return 5 #
-        ############################################################
-        # Set the count as 5
-        address = 0x801ad614
-        new_instruction = b'\x38\x60\x00\x05'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
         
         #######################################
         # Read star count from memory address #
