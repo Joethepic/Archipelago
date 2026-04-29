@@ -328,6 +328,13 @@ class Patch:
             self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_instructions(self) -> None:
+        #######################################################
+        # Skip opening cutscene and go immediately to gateway #
+        #######################################################
+        address = 0x803bb3cc
+        new_instruction = b'\x38\x60\x00\x00'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+        
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
