@@ -393,7 +393,30 @@ class Patch:
         address = 0x803b1104
         new_instruction = b'\x48\x00\x00\x38'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
-        
+
+        ###################################
+        # Custom powerstar colour loading #
+        ###################################
+        address = 0x8020f270
+        new_instruction = b'\x7c\x7f\x1b\x78\x48\x1e\x68\x45\x7c\x64\x1b\x78\x48\x1a\x12\xc9\x80\x63\x00\x0c\x48\x1a\x21\x0d\x3c\x80\x80\x00\x60\x84\x18\xff\x1c\x63\x00\x08\x7c\x63\x22\x14\x7c\x63\xf8\xae'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        #########################
+        # Skip wii strap screen #
+        #########################
+        address = 0x80340688
+        new_instruction = b'\x38\x80\x00\x00'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        address = 0x803406ac
+        new_instruction = b'\x38\x80\x00\x00'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        address = 0x803406d0
+        new_instruction = b'\x38\x80\x00\x00'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+
     def save_all(self) -> None:
         """
         Save all the changes made to the different files back to the ISO.
