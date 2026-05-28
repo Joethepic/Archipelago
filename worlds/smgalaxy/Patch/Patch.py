@@ -233,6 +233,7 @@ class Patch:
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
         self.mario_colours: dict[str, str] = output['Options']['mario_colors']
+        self.dome_shuffle: dict[str, str] = output['Options']['dome_shuffle']
 
         self.old_galaxies: str = self.galaxies.keys()
         self.new_galaxies: str = self.galaxies.values()
@@ -281,11 +282,11 @@ class Patch:
         Update the Astro Dome arrays within the DOL.
         """
         #self.astrodomeentrances.rename_files(dome_shuffle)
-        #self.dol.astro_dome_models.shuffle(dome_shuffle)
+        self.dol.astro_dome_models.shuffle(dome_shuffle)
         
     def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
         galaxy_name = gateway_galaxy.name
-        if galaxy_name == GATEWAY:
+        if galaxy_name == "HeavensDoorGalaxy":
             return
         
         mini_galaxy = self.dol.name_object_factory.get_name_to_create_function_elements_by_name("Mini" + galaxy_name)
@@ -416,6 +417,13 @@ class Patch:
         new_instruction = b'\x38\x80\x00\x00'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+        #################################################
+        # Show the bros button to select Mario or Luigi #
+        #################################################
+        address = 0x8017cd70
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
 
     def save_all(self) -> None:
         """
@@ -462,14 +470,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         galaxies: dict[str, str] = patch.galaxies
         galaxy_counts: dict[str, int] = patch.counts
-
-        # TEMPORARY
-        dome_shuffle = {1: 3,
-                        2: 2,
-                        3: 4,
-                        4: 1,
-                        5: 6,
-                        6: 5}
+        dome_shuffle = {i: int(patch.dome_shuffle[f"Dome {i}"].removeprefix("Dome ")) for i in range(1,7)}
 
         patch.update_mario()
         
