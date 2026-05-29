@@ -244,7 +244,6 @@ option_groups = [
        Dome6Offsets
     ]),
     Options.OptionGroup("Cosmetics", [
-        Character,
         MarioColors
     ]),
 ]
