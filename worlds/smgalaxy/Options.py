@@ -4,13 +4,6 @@ from typing import Dict, Any
 import Options
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict
 
-class Character(Choice):
-    """Play as Mario or Luigi?"""
-    display_name = "Character Select"
-    internal_name = "character_select"
-    option_Mario = 0
-    option_Luigi = 1
-
 class GalaxyShuffle(OptionSet):
     """
     Determine what kinds of galaxies should be added to the shuffle pool. Leave empty to disable shuffling
@@ -221,7 +214,6 @@ class  MarioColors(OptionDict):
 class SMGOptions(PerGameCommonOptions):
     enable_purple_coin_stars: EnablePurpleCoinStars
     stars_to_finish: StarstoFinish
-    character_select: Character
     mario_colors: MarioColors
     dome_one_counts: Dome1Offsets
     dome_two_counts: Dome2Offsets
