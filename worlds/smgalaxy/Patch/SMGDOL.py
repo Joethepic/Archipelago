@@ -4,7 +4,7 @@ from enum import StrEnum
 import gclib.fs_helpers as fs
 from gclib.dol import DOL
 
-from .extensions import DOLExtended
+from .extensions import DOLExtended, CustomDOLSection
 from .bcsv import BCSV
 
 from ..Constants.Names.region_names import GATEWAY
@@ -394,6 +394,7 @@ class SMGDOL(DOLExtended):
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
     name_object_factory: NameObjFactory
     galaxy_unlock_table: GalaxyUnlockTable
+    custom_section: CustomDOLSection
 
     def __init__(self):
         self.relative_path = DOL_RELATIVE_PATH
@@ -402,6 +403,8 @@ class SMGDOL(DOLExtended):
         self.name_object_factory = NameObjFactory(self)
         self.galaxy_unlock_table = GalaxyUnlockTable(self)
         self.astro_dome_models = AstroDomeModels(self)
+
+        self.custom_section = self.add_section(0x806ADF90, 0x1000)
 
     def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
         self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
@@ -412,6 +415,7 @@ class SMGDOL(DOLExtended):
                 return entry
 
     def save(self):
+        self.save_changes()
         self.write_data(fs.write_bytes, self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
         self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
 

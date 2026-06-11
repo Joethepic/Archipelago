@@ -405,8 +405,8 @@ class Patch:
         #########################
         # Skip wii strap screen #
         #########################
-        address = 0x80340688
-        new_instruction = b'\x38\x80\x00\x00'
+        address = 0x80340408
+        new_instruction = b'\x38\x8d\xcf\x80'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         address = 0x803406ac
@@ -424,6 +424,16 @@ class Patch:
         new_instruction = b'\x38\x60\x00\x01'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+        ####################
+        # Custom Functions #
+        ####################
+        # Jump to custom section
+        address = 0x803995c0
+        new_instruction = b'\x48\x31\x49\xd1'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        self.dol.custom_section.deathlink()
+        
 
     def save_all(self) -> None:
         """
@@ -453,6 +463,9 @@ class Patch:
 
         for entrance in self.astrodomeentrances.entrances:
             entrance.save_to_new_file(f"AstroDomeEntrance{entrance.name}Copy.arc")
+        
+        with open("main.dol", 'wb') as f:
+            f.write(self.dol.data.getvalue())
 
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
     game = RANDOMIZER_NAME
@@ -496,6 +509,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         # REMOVE WHEN RELEASED
         import winsound
         winsound.MessageBeep(winsound.MB_OK)
+        
 
 class SMGPlayerContainer(APPlayerContainer):
     game = RANDOMIZER_NAME
