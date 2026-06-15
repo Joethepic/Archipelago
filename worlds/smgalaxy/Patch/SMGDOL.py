@@ -1,6 +1,6 @@
 from typing import Self
 from io import BytesIO
-from enum import IntEnum, StrEnum
+from enum import StrEnum
 import gclib.fs_helpers as fs
 from gclib.dol import DOL
 
@@ -32,10 +32,6 @@ GALAXY_UNLOCK_TABLE_END_ADDRESS = 0x8053d520
 CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS = 0x8026a8cc
 CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS = 0x8026a90c
 STRING_ADDRESS_MINISURPRISEDGALAXY = 0x8059838c
-
-GAME_EVENT_FLAG_TABLE_START_ADDRESS = 0x8053b320
-GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE = 0x14
-GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT = 188
 
 ASTRO_DOME_ARRAY_ADDRESS = 0x8057a9e0
 ASTRO_DOME_SKY_ARRAY_ADDRESS = 0x8057aa24
@@ -350,82 +346,6 @@ class GalaxyUnlockTable:
         self.table.save_changes()
         dol.write_data(fs.write_bytes, address, self.table.data.getvalue())
 
-class FlagType(IntEnum):
-    ReturnTrue = 0x00
-    PowerStarCount = 0x01
-    CanOpenGalaxy = 0x02
-    HasBeatenGalaxy = 0x03
-    Type4 = 0x04
-    Type5 = 0x05
-    Galaxy = 0x06
-    HasBeatenGalaxyPlus = 0x07
-    Luma = 0x08
-    Type9 = 0x09
-    Type10 = 0x0A
-    Type11 = 0x0B
-
-class GameEventFlagTableEntry:
-    name: CharPointer
-    flag_type: FlagType
-    condition1: int
-    condition2: int
-    condition3: CharPointer
-    condition4: CharPointer
-
-    def __init__(self, name: CharPointer, flag_type: FlagType, condition1: int, condition2: int, condition3: CharPointer, condition4: CharPointer):
-        self.name = name
-        self.flag_type = flag_type
-        self.condition1 = condition1
-        self.condition2 = condition2
-        self.condition3 = condition3
-        self.condition4 = condition4
-
-class GameEventFlagTable:
-    entries: list[GameEventFlagTableEntry]
-
-    def __init__(self, dol: DOL):
-        self.entries = []
-
-        address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
-
-        for index in range(GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT):
-            name = CharPointer(dol, address)
-            flag_type = FlagType(dol.read_data(fs.read_u8, address + 0x4))
-            condition1 = dol.read_data(fs.read_u8, address + 0x6)
-            condition2 = dol.read_data(fs.read_u8, address + 0x7)
-            condition3 = CharPointer(dol, address + 0xC)
-            condition4 = CharPointer(dol, address + 0x10)
-
-            entry = GameEventFlagTableEntry(name, flag_type, condition1, condition2, condition3, condition4)
-            self.entries.append(entry)
-
-            address += GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE
-    
-    def get_entry_index_by_name(self, name: str) -> int:
-        for index, entry in enumerate(self.entries):
-            if entry.name.string == name:
-                return index
-
-    def write_entry_by_index(self, index: int, entry: GameEventFlagTableEntry) -> None:
-        assert 0 <= index < len(self.entries)
-
-        self.entries[index] = entry
-
-    def write_entry_by_name(self, flag_name: str, entry: GameEventFlagTableEntry) -> None:
-        index = self.get_entry_index_by_name(flag_name)
-        self.write_entry_by_index(index, entry)
-
-    def save_to_dol(self, dol: DOL):
-        address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
-
-        for entry in self.entries:
-            dol.write_data(fs.write_u8, address + 0x4, entry.flag_type)
-            dol.write_data(fs.write_u8, address + 0x6, entry.condition1)
-            dol.write_data(fs.write_u8, address + 0x7, entry.condition2)
-
-            address += GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE
-            print(f"{entry.name.string}, {entry.flag_type}, {entry.condition1}, {entry.condition2}, {entry.condition3.string}, {entry.condition4.string}")
-
 class AstroDomeModels:
     astro_dome: list[CharPointer]
     astro_dome_sky: list[CharPointer]
@@ -474,7 +394,6 @@ class SMGDOL(DOLExtended):
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
     name_object_factory: NameObjFactory
     galaxy_unlock_table: GalaxyUnlockTable
-    game_event_flag_table: GameEventFlagTable
     custom_section: CustomDOLSection
 
     def __init__(self):
@@ -483,7 +402,6 @@ class SMGDOL(DOLExtended):
         
         self.name_object_factory = NameObjFactory(self)
         self.galaxy_unlock_table = GalaxyUnlockTable(self)
-        self.game_event_flag_table = GameEventFlagTable(self)
         self.astro_dome_models = AstroDomeModels(self)
 
         self.custom_section = self.add_section(0x806ADF90, 0x1000)
@@ -500,8 +418,6 @@ class SMGDOL(DOLExtended):
         self.save_changes()
         self.write_data(fs.write_bytes, self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
         self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
-
-        self.game_event_flag_table.save_to_dol(self)
 
         with open(self.absolute_file_path, 'wb') as f:
             f.write(self.data.getvalue())

@@ -328,35 +328,14 @@ class Patch:
             entry.return_dome = galaxy.dome_index
             self.dol.galaxy_unlock_table.set_entry(entry)
 
-    def update_gameeventflagtable(self):
-        for entry in self.dol.game_event_flag_table.entries:
-            if entry.name.string.startswith("SpecialStarGrand"):
-                entry.flag_type = 5
-                entry.condition1 = int(entry.name.string[-1]) - 1
-            
-            if entry.name.string == "SpecialStarGrand1":
-                entry.flag_type = 1
-                entry.condition1 = 0
-
     def update_instructions(self) -> None:
-        ###########################################################
-        # Skip opening cutscene and go immediately to observatory #
-        ###########################################################
-        # Skip luigi/mario check
+        #######################################################
+        # Skip opening cutscene and go immediately to gateway #
+        #######################################################
         address = 0x803bb3cc
         new_instruction = b'\x38\x60\x00\x00'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
-        # Change galaxy name to observatory
-        address = 0x803bb3d8
-        new_instruction = b'\x38\x7f\x03\xf8'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
-
-        # Set scenario number to 4
-        address = 0x803bb3dc
-        new_instruction = b'\x38\x00\x00\x04'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
-
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
@@ -445,19 +424,6 @@ class Patch:
         new_instruction = b'\x38\x60\x00\x01'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
-        ###################################################
-        # Overwrite flag type 5 to check grandstar gotten #
-        ###################################################
-        # Load condition 1 into r4
-        address = 0x803b38d0
-        new_instruction = b'\x88\x9e\x00\x06'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
-
-        # Jump to HasGrandStar
-        address = 0x803b38d4
-        new_instruction = b'\x42\x80\xe4\x35'
-        self.dol.write_data(fs.write_bytes, address, new_instruction)
-
         ####################
         # Custom Functions #
         ####################
@@ -535,7 +501,6 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
         patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts)
-        patch.update_gameeventflagtable()
         patch.update_instructions()
 
         patch.save_all()
