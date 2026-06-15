@@ -9,9 +9,13 @@ class GalaxyShuffle(OptionSet):
     Determine what kinds of galaxies should be added to the shuffle pool. Leave empty to disable shuffling
 
     Full: Any galaxy in any galaxy position
+
     Dome Majors: Add Major galaxies to shuffle pool
+
     Dome Minors: Add Minor galaxies to shuffle pool
+
     Observatory Specials: Add Direct from Observatory galaxies to shuffle pool, such as Trials or Hungry Luma galaxies
+
     Bosses: Add Boss galaxies to shuffle pool
     """
     display_name = "Galaxy Shuffle"
