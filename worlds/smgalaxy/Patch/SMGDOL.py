@@ -423,7 +423,5 @@ class SMGDOL(DOLExtended):
         self.write_data(fs.write_bytes, self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
         self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
 
-        self.game_event_flag_table.save_to_dol(self)
-
         with open(self.absolute_file_path, 'wb') as f:
             f.write(self.data.getvalue())
