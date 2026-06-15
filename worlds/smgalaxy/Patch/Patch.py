@@ -328,6 +328,8 @@ class Patch:
             entry.return_dome = galaxy.dome_index
             self.dol.galaxy_unlock_table.set_entry(entry)
 
+    def update_gameeventflagtable(self):
+                entry.flag_type = 5
     def update_instructions(self) -> None:
         #######################################################
         # Skip opening cutscene and go immediately to gateway #
