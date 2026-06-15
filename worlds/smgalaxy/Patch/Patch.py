@@ -329,24 +329,32 @@ class Patch:
             self.dol.galaxy_unlock_table.set_entry(entry)
 
     def update_gameeventflagtable(self):
+        for entry in self.dol.game_event_flag_table.entries:
+            if entry.name.string.startswith("SpecialStarGrand"):
                 entry.flag_type = 5
+                entry.condition1 = int(entry.name.string[-1]) - 1
+            
+            if entry.name.string == "SpecialStarGrand1":
+                entry.flag_type = 1
+                entry.condition1 = 0
+
     def update_instructions(self) -> None:
-        #######################################################
-        # Skip opening cutscene and go immediately to gateway #
-        #######################################################
+        ###########################################################
+        # Skip opening cutscene and go immediately to observatory #
+        ###########################################################
         # Skip luigi/mario check
         address = 0x803bb3cc
         new_instruction = b'\x38\x60\x00\x00'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
-        # Load observatory
+        # Change galaxy name to observatory
         address = 0x803bb3d8
         new_instruction = b'\x38\x7f\x03\xf8'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
-        # Set scenario num to 4
+        # Set scenario number to 4
         address = 0x803bb3dc
-        new_instruction = b'\x38\x60\x00\x04'
+        new_instruction = b'\x38\x00\x00\x04'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         #######################################
@@ -447,7 +455,7 @@ class Patch:
 
         # Jump to HasGrandStar
         address = 0x803b38d4
-        new_instruction = b'\x4b\xff\xe4\x35'
+        new_instruction = b'\x42\x80\xe4\x35'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
         ####################
@@ -527,6 +535,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
         patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts)
+        patch.update_gameeventflagtable()
         patch.update_instructions()
 
         patch.save_all()
