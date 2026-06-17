@@ -309,6 +309,7 @@ class GalaxyContext(CommonContext):
 
             case "Connection Refused":
                 pass
+
     def on_deathlink(self, data: dict[str, Any]):
         """
         Handle a DeathLink event.
@@ -316,7 +317,9 @@ class GalaxyContext(CommonContext):
         :param data: The data associated with the DeathLink event.
         """
         super().on_deathlink(data)
+
         self.is_dead = True
+        
         dme.write_byte(0x80001af0, 1)
         return
 

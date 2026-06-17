@@ -24,8 +24,8 @@ class MarioColours:
     """
     HAT_THRESHOLD: tuple = (255,50,50)
     OVERALLS_THRESHOLD: tuple = (50,55,255)
-    GLOVES_THRESHOLD: tuple = (0,0,0) # To be determined whenever i give a fuck
-    SHOES_THRESHOLD: tuple = (0,0,0) # fuck you +2
+    GLOVES_THRESHOLD: tuple = (0,0,0)
+    SHOES_THRESHOLD: tuple = (0,0,0)
 
     colour_map: dict[str, tuple] = {"Red"   : (255,  0,  0),
                                     "Orange": (255,165,  0),
