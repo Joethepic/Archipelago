@@ -453,6 +453,12 @@ class Patch:
         self.astrodomeentrances.save()
         self.dol.save()
 
+        with open(self.iso.temp_dir + "/DATA/sys/boot.bin", "wrb+") as f:
+            f.seek(0)
+            f.write('RMGAP1')
+            f.seek(0x20)
+            f.write("SUPER MARIO GALAXY AP")
+
         #self.save_copies()
 
     def save_copies(self):
