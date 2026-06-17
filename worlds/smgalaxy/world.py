@@ -121,11 +121,11 @@ class SMGWorld(World):
         
         # make sure we don't create more stars than locations, somehow
         local_pool += [self.create_item("Power Star") for i in range(self.options.stars_to_finish.value)]
-        
+
         # Calculate the number of additional filler items to create to fill all locations
         n_locations = len(self.multiworld.get_unfilled_locations(self.player))
         leftover_locations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
-        
+
         # Add a random number of extra stars. Later, this can be made into an option.
         extra_stars: int = self.random.randint(0, leftover_locations)
         local_pool += [self.create_item("Power Star") for i in range(extra_stars)]
@@ -155,11 +155,10 @@ class SMGWorld(World):
         # Output seed name and slot number to seed RNG in randomizer client
         output_data: dict = {
             AP_WORLD_VERSION_NAME: CLIENT_VERSION,
-            "Seed": self.multiworld.seed,
+            "Seed": str(self.multiworld.seed_name)[:16],
             "Slot": self.player,
             "Name": self.player_name,
             "Options": {
-                "character_select": getattr(self.options, "character_select").value
             },
             "Locations": {},
             "Galaxies": self.shuffled_levels,
@@ -174,7 +173,6 @@ class SMGWorld(World):
             output_data["Options"][field.name] = getattr(self.options, field.name).value
             if isinstance(output_data["Options"][field.name], set):
                 output_data["Options"][field.name] = list(output_data["Options"][field.name])
-        output_data["Options"]["character_select"] = getattr(self.options, "character_select").value
         output_data["Options"]["mario_colors"] = getattr(self.options, "mario_colors").value
 
         k = ["Dome 1", "Dome 2", "Dome 3", "Dome 4", "Dome 5", "Dome 6"]
@@ -219,7 +217,7 @@ class SMGWorld(World):
 
         patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
                     f"{SMGPlayerContainer.patch_file_ending}")
-        
+
         player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
         player_container.write()
-        
+
