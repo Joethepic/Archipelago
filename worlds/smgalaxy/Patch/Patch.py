@@ -230,6 +230,8 @@ class Patch:
         RARCExtended.iso_base_path = self.iso.temp_dir
         DOLExtended.iso_base_path = self.iso.temp_dir
 
+        self.seed = int(output["Seed"])
+
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
         self.mario_colours: dict[str, str] = output['Options']['mario_colors']
@@ -458,6 +460,8 @@ class Patch:
             f.write('RMGAP1')
             f.seek(0x20)
             f.write("SUPER MARIO GALAXY AP")
+            f.seek(0x38)
+            f.write(int.to_bytes(self.seed, byteorder="big", length=8))
 
         #self.save_copies()
 
