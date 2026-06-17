@@ -57,13 +57,13 @@ class Pointer:
 
     async def recalculate(self):
         """Recalculates the address of the offset chain."""
-        if self.address == -1:
-            raise ValueError("Address of pointer is not initialised")
-        
         self.address = dme.follow_pointers(GAMESYSTEM, self.offsets)
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address."""
+        if self.address == -1:
+            raise ValueError("Address of pointer is not initialised")
+
         value = dme.read_bytes(self.address, self.value_type.value.size)
         return struct.unpack(self.value_type.value.format, value)[0]
     
