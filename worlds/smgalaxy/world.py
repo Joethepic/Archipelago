@@ -15,6 +15,8 @@ from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
 from .regions import disconnect_from_option, region_list, SMGRegionData
+from .SMGSettings import SuperMarioGalaxy
+from .Patch.Patch import SMGPlayerContainer
 
 def runClient(*args):
     from .SMGClient import launch
@@ -37,6 +39,7 @@ class SMGWorld(World):
     #option definitions
     options_dataclass = Options.SMGOptions
     options: Options.SMGOptions
+    settings: ClassVar[SuperMarioGalaxy]
 
     item_name_to_id: ClassVar[dict[str, int]] = ITEM_NAME_TO_ID
     location_name_to_id: ClassVar[dict[str, int]] = LOCATION_NAME_TO_ID
@@ -214,7 +217,9 @@ class SMGWorld(World):
         # # Write the expected output zip container to the Generated Seed folder.
         # smg_container.write()
 
-        json_string = json.dumps(output_data, indent=4)
-        patch_path = os.path.join(output_directory, "smg_output.txt")
-        with open(patch_path, "w") as file:
-            file.write(json_string)
+        patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
+                    f"{SMGPlayerContainer.patch_file_ending}")
+        
+        player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
+        player_container.write()
+        

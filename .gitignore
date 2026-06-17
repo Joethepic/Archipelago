@@ -32,6 +32,9 @@
 *.apsave
 *.BIN
 *.puml
+*.iso
+*.arc
+/temp/
 
 setups
 build
