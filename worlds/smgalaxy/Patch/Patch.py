@@ -453,7 +453,7 @@ class Patch:
         self.astrodomeentrances.save()
         self.dol.save()
 
-        self.save_copies()
+        #self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
