@@ -159,7 +159,6 @@ class SMGWorld(World):
             "Slot": self.player,
             "Name": self.player_name,
             "Options": {
-                "character_select": getattr(self.options, "character_select").value
             },
             "Locations": {},
             "Galaxies": self.shuffled_levels,
