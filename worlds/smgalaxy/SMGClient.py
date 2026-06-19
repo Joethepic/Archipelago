@@ -176,27 +176,27 @@ class GalaxyContext(CommonContext):
         #note will resend items upon reconnection
         for item_id in self.items_received[self.highest_processed_item_index: ]:
             self.highest_processed_item_index += 1
-
             match item_id.item:
                 case 170000007:
                     lives = await self.pointers["Lives"].get_value()
                     self.pointers["Lives"].write_value(lives + 1)
 
-            #note currently adding these in breaks lives adding(might fix once changing that value does something?)
-            #   case 170000004:
-            #     logger.debug("Power Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                case 170000004:
+                  logger.info("Power Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
 
-            #   case 170000005:
-            #     logger.debug("Grand Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                case 170000005:
+                  # TODO: FIGURE OUT HOW TO GIVE GRAND STARS IN GAME
+                  logger.debug("Grand Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
 
-            #   case 170000006:
-            #     logger.debug("Green Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                case 170000006:
+                  # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
+                  logger.debug("Green Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
     
     async def recalculate_pointers(self):
         if self.needs_recalculating:
@@ -283,9 +283,6 @@ class GalaxyContext(CommonContext):
             
             case "Connected":
                 self.highest_processed_item_index = 0
-                #TODO: UNCOMMENT WHEN STAR RECEIVING WORKS PROPERLY
-                # dme.write_bytes(0x80F63CF0, 0.to_bytes(4))
-
             case "Bounced":
                 if args["source"] == self.player_names[self.slot]:
                     return # Don't process our own deathlink
@@ -308,7 +305,6 @@ class GalaxyContext(CommonContext):
     async def kill_player(self):
         if not await self.check_ingame():
             return
-
         dme.write_byte(0x80001af0, 1)
 
     async def server_auth(self, password_requested: bool = False):
