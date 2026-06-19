@@ -179,6 +179,8 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
             for item, count in data.default_access:
                 rule = lambda state,i=item, c=count: state.has(i, world.player, count)
                 add_rule(location, rule, "and")
+        if data.code in [17000003, 17000009, 17000042]:
+            add_rule(location, lambda state: state.can_reach_location("G: Luigi and the Haunted Mansion", world.player))
 
         reg.locations += [location]
 
