@@ -5,14 +5,16 @@ from Utils import visualize_regions
 from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, SuffixIdentifier, Type, components, launch_subprocess
+import typing
+import logging
 
 from . import items, regions, Rules, web_world, Options
 from .Constants.Names import region_names as regname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
-from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation
+from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
-from .regions import disconnect_from_option, region_list, SMGRegionData
+from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.Patch import SMGPlayerContainer
 
@@ -30,7 +32,7 @@ class SMGWorld(World):
     """
 
     game = GAME_NAME
-    topology_present = False
+    topology_present = True
     
     web = web_world.SMGWebWorld()
     
@@ -125,7 +127,10 @@ class SMGWorld(World):
         leftover_locations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
 
         # Add a random number of extra stars. Later, this can be made into an option.
-        extra_stars: int = self.random.randint(0, leftover_locations)
+        if leftover_locations >= 1:
+            extra_stars: int = self.random.randint(0, leftover_locations)
+        else:
+            extra_stars: int = 0
         local_pool += [self.create_item("Power Star") for i in range(extra_stars)]
         n_filler_items = n_locations - len(local_pool)
 
@@ -146,7 +151,6 @@ class SMGWorld(World):
 
     def pre_fill(self) -> None:
         visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml",show_entrance_names=True)
-
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         self.galaxy_counts.update({"D1G1": 0})
@@ -209,4 +213,18 @@ class SMGWorld(World):
 
         player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
         player_container.write()
+    def extend_hint_information(self, hint_data: typing.Dict[int, typing.Dict[int, str]]):
+        if self.topology_present:
+            er_hint_data = {}
+            for galaxy in galaxies_list:
+                slot = [key for key, val in self.shuffled_levels.items() if val == galaxy]
+                logging.info(slot)
+                for region in region_list:
+                    if region == galaxy:
+                        for location in location_table.values():
+                            if location.region == galaxy:
+                                er_hint_data.update({location.code: slot[0]})
+            hint_data[self.player] = er_hint_data
+
+                                
 

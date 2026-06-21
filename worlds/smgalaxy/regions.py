@@ -2,12 +2,12 @@ import copy
 from typing import NamedTuple, Optional, Callable, TYPE_CHECKING
 from BaseClasses import Region, Entrance, MultiWorld
 from entrance_rando import disconnect_entrance_for_randomization
+import logging
 
 from .Constants.Names import region_names as regname
 from .Options import SMGOptions
 from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
 from ..generic.Rules import add_rule
-
 if TYPE_CHECKING:
     from . import SMGWorld
 
@@ -18,7 +18,7 @@ class SMGRegionData(NamedTuple):
     ger_exits: Optional[list[str]] # connected exit regions that can be swapped during Entrance Rando
     default_access: Optional[dict[str, int]]
     region_offset: Optional[int] = None
-    in_game_name: Optional[str] = None
+    in_game_name: Optional[str] = ""
 
 class SMGRegion(Region):
     game: str = "Super Mario Galaxy"
@@ -136,6 +136,11 @@ boss_galaxy_list: list[str] = [key for key, data in region_list.items() if data.
 
 specials_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Special"]
 
+galaxies_list: list[SMGRegionData] = []
+galaxies_list.extend(major_galaxy_list)
+galaxies_list.extend(minor_galaxy_list)
+galaxies_list.extend(boss_galaxy_list)
+galaxies_list.extend(specials_galaxy_list)
 def by_type_shuffle(world: "SMGWorld", entrances: list, galaxies: list[str]):
     for entrance in entrances:
         slot = world.get_entrance(entrance)
