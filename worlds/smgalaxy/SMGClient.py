@@ -6,6 +6,7 @@ import struct
 import sys
 from typing import NamedTuple, Optional
 import copy
+import random
 
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
@@ -17,11 +18,10 @@ from .Constants.constants import *
 from .Constants.ram_constants import *
 
 import dolphin_memory_engine as dme
-
+lives = 0
 class TypeTuple(NamedTuple):
     format: str
     size: int
-
 class ValueType(Enum):
     u8 = TypeTuple(">B", 1)
     u16 = TypeTuple(">H", 2)
@@ -85,7 +85,6 @@ class GalaxyContext(CommonContext):
     needs_recalculating: bool = True
     pointers: dict[str, Pointer] = {}
     highest_processed_item_index: int
-
     def make_gui(self) -> type["kvui.GameManager"]:
         """
         Initialize the GUI for SMG Client.
@@ -131,7 +130,6 @@ class GalaxyContext(CommonContext):
         """Updates the last Galaxy Mario/Luigi was on."""
         if not await self.check_ingame():
             return
-
         curr_galaxy: str = await self.current_galaxy()
 
         if curr_galaxy != self.last_galaxy:
@@ -197,15 +195,14 @@ class GalaxyContext(CommonContext):
                   logger.debug("Green Star Received")
                   stars = dme.read_byte(0x80001880)
                   dme.write_byte(0x80001880, (stars + 1))
-    
     async def recalculate_pointers(self):
         if self.needs_recalculating:
             for pointer in self.pointers.values():
                 await pointer.recalculate()
         
         self.needs_recalculating = False
-
     async def dolphinloop(self):
+        i = 0
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         try:
             while not self.exit_event.is_set():
@@ -221,7 +218,6 @@ class GalaxyContext(CommonContext):
 
                             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
-
                     if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                         #checks the id of the game as a string
                         romgameid: bytes = dme.read_bytes(0x80000000,6)
@@ -252,9 +248,18 @@ class GalaxyContext(CommonContext):
                     await self.recalculate_pointers()
 
                     # Currently verified connected to AP and dolphin is properly loaded
+                    lives = await self.pointers["Lives"].get_value()
+                    messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"]
+                    if i == 0:
+                        prevLives = 0
+                    if lives < prevLives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)) and self.check_ingame() and "DeathLink" in self.ctx.tags:
+                        message = random.nextInt(0, messages.Count)
+                        await self.send_death(self.player_names[self.slot] + messages[message])
+                    prevLives = lives
                     await self.last_visited_galaxy()
                     await self.smg_location_checker()
                     await self.writeitems()
+                    i += 1
                     await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
                 except Exception as dmeEx:
@@ -275,7 +280,6 @@ class GalaxyContext(CommonContext):
 
         except Exception as dolphinEx:
             logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
-
     def on_package(self, cmd, args):
         match cmd:
             case "RoomInfo":
@@ -301,6 +305,7 @@ class GalaxyContext(CommonContext):
         """
         super().on_deathlink(data)
         Utils.async_start(self.kill_player(), "SMG - Kill Player")
+        return
 
     async def kill_player(self):
         if not await self.check_ingame():
