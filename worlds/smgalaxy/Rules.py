@@ -4,7 +4,6 @@ from BaseClasses import Entrance
 from rule_builder.rules import HasGroup, Has
 from .regions import connect_regions, region_list, all_galaxy_slots
 from.Constants.Names import region_names as regname
-from ..generic.Rules import add_rule
 
 if TYPE_CHECKING:
     from . import SMGWorld

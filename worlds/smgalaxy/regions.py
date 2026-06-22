@@ -6,7 +6,6 @@ from entrance_rando import disconnect_entrance_for_randomization
 from .Constants.Names import region_names as regname
 from .Options import SMGOptions
 from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
-from ..generic.Rules import add_rule
 
 if TYPE_CHECKING:
     from . import SMGWorld
@@ -164,9 +163,7 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
         reg = world.get_region(data.region)
         location = SMGLocation(world.player, name, reg)
         if data.default_access:
-            for item, count in data.default_access:
-                rule = lambda state,i=item, c=count: state.has(i, world.player, count)
-                add_rule(location, rule, "and")
+            world.set_rule(location, data.default_access)
 
         reg.locations += [location]
 

@@ -1,5 +1,6 @@
-from typing import Dict, NamedTuple, Optional, Set
+from typing import Dict, NamedTuple, Optional, Set, Any
 from BaseClasses import Location, Region
+from rule_builder.rules import Rule
 
 from.Constants.Names import region_names as regname
 
@@ -14,8 +15,9 @@ class SMGLocationData(NamedTuple):
     location_groups: list[str] # type of randomization option table and group []
     region: str
     code: Optional[int]  # used to create ap_id, None for events
+    default_access: Rule[Any] = True
     game_address: Optional[int] = 0  #
-    default_access: Optional[dict[str, int]] = {}
+
 
 # good egg galaxy
 locGE_table: dict[str, SMGLocationData] = {
