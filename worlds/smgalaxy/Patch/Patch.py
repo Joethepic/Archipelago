@@ -104,6 +104,7 @@ class WiiISO:
         file_name = options["smgalaxy.world_options"]["iso_file"]
         if not os.path.exists(file_name):
             file_name = Utils.user_path(file_name)
+            options["smgalaxy.world_options"]["iso_file"] = file_name
         return file_name
     
     def extract(self):
