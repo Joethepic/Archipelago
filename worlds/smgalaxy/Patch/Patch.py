@@ -338,6 +338,20 @@ class Patch:
         new_instruction = b'\x38\x60\x00\x00'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
+        address = 0x803bb3d8
+        new_instruction = b'\x38\x7f\x03\xf8'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        address = 0x803bb3dc
+        new_instruction = b'\x38\x00\x00\x04'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        #####################################################
+        # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY #
+        #####################################################
+        self.dol.write_data(fs.write_u8, 0x8053bb44, 1)
+        self.dol.write_data(fs.write_u8, 0x8053bb46, 0)
+
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
