@@ -290,7 +290,7 @@ class GalaxyContext(CommonContext):
             case "Bounced":
                 # This currently produces a client error so commenting out for now. (Deathlink should work without it)
                 #if args["source"] == self.player_names[self.slot]:
-                #    return # Don't process our own deathlink
+                return # Don't process our own deathlink
 
             case "ConnectionRefused":
                 self.dolphin_status = AP_REFUSED_STATUS
