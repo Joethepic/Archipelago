@@ -346,6 +346,13 @@ class Patch:
         new_instruction = b'\x38\x00\x00\x04'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+        ########################
+        # Set swing permission #
+        ########################
+        address = 0x803b55b0
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+                                
         #####################################################
         # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY #
         #####################################################
