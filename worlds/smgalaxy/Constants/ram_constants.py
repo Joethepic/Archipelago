@@ -17,3 +17,7 @@ STAR_BIT_FLAG_OFFSET: int = 0x8
 # RAM Address for handling 1-ups
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> GameDataPlayerStatus
 ONEUP_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4]
+
+# RAM address for getting the Mario actor object.
+# GameSystem -> GameSystemSceneController -> Scene -> SceneObjHolder -> MarioHolder -> MarioActor
+MARIO_ACTOR_POINTER_LIST: list[int] = [0x24, 0xAC, 0x10, 0x50, 0xC]
