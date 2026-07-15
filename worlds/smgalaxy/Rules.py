@@ -132,9 +132,9 @@ def rules_from_er_placements(world: "SMGWorld"):
             galaxy_type: str = region_list[galaxy_entr.connected_region.name].type
 
             if star_count <= available_locations:
-                add_rule(galaxy_entr, lambda state, count=star_count: state.has("Power Stars", world.player, count))
+                add_rule(galaxy_entr, lambda state, count=star_count: state.has("Power Star", world.player, count))
             else:
-                add_rule(galaxy_entr, lambda state, count=available_locations: state.has("Power Stars", world.player, count))
+                add_rule(galaxy_entr, lambda state, count=available_locations: state.has("Power Star", world.player, count))
                 world.galaxy_counts[galaxy] = available_locations
 
             available_locations += 4 if galaxy_type == "Major" else 1
