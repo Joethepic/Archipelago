@@ -37,6 +37,7 @@ class TypeTuple(NamedTuple):
     size: int
 
 class ValueType(Enum):
+    BOOL = TypeTuple(">B", 1)
     u8 = TypeTuple(">B", 1)
     u16 = TypeTuple(">H", 2)
     u32 = TypeTuple(">I", 4)
@@ -123,7 +124,8 @@ class GalaxyContext(CommonContext):
         self.pointers = {**star_count_flag_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
+                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL)}
 
     async def wait_for_next_loop(self, time_to_wait: float):
         await asyncio.sleep(time_to_wait)

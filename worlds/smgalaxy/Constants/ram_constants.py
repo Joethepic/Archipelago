@@ -21,3 +21,6 @@ ONEUP_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4]
 # RAM address for getting the Mario actor object.
 # GameSystem -> GameSystemSceneController -> Scene -> SceneObjHolder -> MarioHolder -> MarioActor
 MARIO_ACTOR_POINTER_LIST: list[int] = [0x24, 0xAC, 0x10, 0x50, 0xC]
+
+# RAM address for being able to spin. 0 = disabled, 1 = enabled
+SWING_PERMISSION_POINTER_LIST: list[int] = MARIO_ACTOR_POINTER_LIST + [0xEEB]
