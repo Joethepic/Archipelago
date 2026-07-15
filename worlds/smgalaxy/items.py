@@ -21,12 +21,12 @@ class SMGItem(Item):
 
 # This is all the items that are used by the game we define them here so they can be used.
 item_table: dict[str, SMGItemData] = {
-  "Power Star": SMGItemData(["Power Star"], 170000004, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
-  "Grand Star": SMGItemData(["Grand Star", "Power Star"], 170000005, IC.progression),
-  "Green Star": SMGItemData(["Green Star", "Power Star"], 170000006, IC.progression),
+  "Power Star": SMGItemData(["Power Stars"], 170000004, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
+  "Grand Star": SMGItemData(["Power Stars"], 170000005, IC.progression),
+  "Green Star": SMGItemData(["Green Star", "Power Stars"], 170000006, IC.progression),
   "1up Mushroom": SMGItemData(["Filler Items"], 170000007, IC.filler),
   
-  "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
+  #This is not going to be used in v1 as disccused "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
   "Peach": SMGItemData(["Victory"], None, IC.progression)
 
 }
