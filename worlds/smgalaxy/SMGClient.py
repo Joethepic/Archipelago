@@ -208,6 +208,8 @@ class GalaxyContext(CommonContext):
         if self.needs_recalculating:
             for key, pointer in self.pointers.items():
                 await pointer.recalculate()
+                logger.info(f"{key}: {hex(pointer.address)}")
+
         self.needs_recalculating = False
     async def dolphinloop(self):
         i = 0
@@ -252,6 +254,7 @@ class GalaxyContext(CommonContext):
                         if not self.slot:
                             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
+
                     await self.recalculate_pointers()
 
                     # Currently verified connected to AP and dolphin is properly loaded
