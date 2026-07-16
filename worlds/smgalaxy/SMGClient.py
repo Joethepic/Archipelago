@@ -49,7 +49,7 @@ class Pointer:
         if self.offsets is not None:
             self.address = dme.follow_pointers(self.base, self.offsets)
         else:
-            self.address = self.base
+            self.address = base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address."""
@@ -120,8 +120,8 @@ class GalaxyContext(CommonContext):
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         #Currently usused and breaks client in current state "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
     async def check_ingame(self) -> bool:
         """Checks to see if Mario/Luigi is in game and not at file select."""
@@ -209,7 +209,6 @@ class GalaxyContext(CommonContext):
             for key, pointer in self.pointers.items():
                 await pointer.recalculate()
                 logger.info(f"{key}: {hex(pointer.address)}")
-
         self.needs_recalculating = False
     async def dolphinloop(self):
         i = 0
@@ -254,7 +253,6 @@ class GalaxyContext(CommonContext):
                         if not self.slot:
                             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
-
                     await self.recalculate_pointers()
 
                     # Currently verified connected to AP and dolphin is properly loaded
@@ -262,9 +260,11 @@ class GalaxyContext(CommonContext):
                     messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"]
                     if i == 0:
                         prevLives = 0
-                    if lives < prevLives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)) and self.check_ingame() and "DeathLink" in self.ctx.tags:
-                        message = random.nextInt(0, messages.Count)
-                        await self.send_death(self.player_names[self.slot] + messages[message])
+                    if lives < prevLives and time.time() >= float(int(self.last_death_link) + (WAIT_TIMER_LONG_TIMEOUT * 3)) and await self.check_ingame() and "DeathLink" in self.tags:
+                        logger.info("Deathlink being sent")
+                        logger.info(len(messages))
+                        message = random.randint(0, len(messages))
+                        await self.send_death(self.player_names[self.slot] + " " + messages[message])
                     prevLives = lives
                     await self.last_visited_galaxy()
                     await self.smg_location_checker()
