@@ -1,41 +1,27 @@
 from __future__ import annotations
 import asyncio
-from enum import Enum, StrEnum
+import time
+from enum import Enum
 import struct
 import sys
+from typing import NamedTuple, Optional
+import copy
+import random
 
 import Utils
-
-from typing import Callable, NamedTuple, Optional
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
 from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
+from .Constants.constants import *
 from .Constants.ram_constants import *
-from .items import SMGItemData, item_table
 
-import os
-import copy
 import dolphin_memory_engine as dme
-clientname: str = "SMG Client"
-# All the dolphin connection messages used in the client
-CONNECTION_REFUSED_STATUS: str = "Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in 5 seconds..."
-CONNECTION_LOST_STATUS: str = "Dolphin connection was lost. Please restart your emulator and make sure SMG is running."
-NO_SLOT_NAME_STATUS: str = "No slot name was detected. Ensure a randomized ROM is loaded. Retrying in 5 seconds..."
-CONNECTION_VERIFY_SERVER: str = "Dolphin was confirmed to be opened and ready, Connect to the server when ready..."
-CONNECTION_INITIAL_STATUS: str = "Dolphin emulator was not detected to be running. Retrying in 5 seconds..."
-DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY: str = "Dolphin did not load the ROM correctly. Close only the game / dolphin launcher and try again..."
-CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready to play SMG!"
-AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
-EXPECTED_GAME_ID: str = "RMGE01"
-WAIT_TIMER_LONG_TIMEOUT: int = 5
-WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
-
+lives = 0
 class TypeTuple(NamedTuple):
     format: str
     size: int
-
 class ValueType(Enum):
     BOOL = TypeTuple(">B", 1)
     u8 = TypeTuple(">B", 1)
@@ -66,7 +52,10 @@ class Pointer:
             raise ValueError("Address of pointer is not initialised")
 
         value = dme.read_bytes(self.address, self.value_type.value.size)
-        return struct.unpack(self.value_type.value.format, value)[0]
+        unpack_val = struct.unpack(self.value_type.value.format, value)[0]
+        if self.value_type.name == ValueType.string32.name:
+            unpack_val = unpack_val.decode("ascii").split("\x00")[0]
+        return unpack_val
     
     def write_value(self, value) -> None:
         """Write a value at the addresss of the pointer."""
@@ -79,26 +68,24 @@ class GalaxyCommand(ClientCommandProcessor):
         """Prints the current Dolphin status to the client."""
         if isinstance(self.ctx, GalaxyContext):
             logger.info(f"Dolphin Status: {self.ctx.dolphin_status}")
-        
-    # command to print deathlink status
-    # commented out till we implement deathlink
-#    def _cmd_deathlink(self):
-#        """Toggle deathlink from client. Overrides default setting."""
-#        if isinstance(self.ctx, GalaxyContext):
-#            Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
+
+    def _cmd_deathlink(self):
+        """Toggle deathlink from client. Overrides default setting."""
+        if isinstance(self.ctx, GalaxyContext):
+            Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
 class GalaxyContext(CommonContext):
     password_required: bool = False
     rom_loaded: bool = False
     command_processor = GalaxyCommand
-    game: str = "Super Mario Galaxy"
+    game: str = GAME_NAME
     items_handling = 0b111
     runloop: Optional[asyncio.Task[None]] = None
     dolphin_status: str = CONNECTION_INITIAL_STATUS
     last_galaxy: str = ""
     needs_recalculating: bool = True
     pointers: dict[str, Pointer] = {}
-
+    highest_processed_item_index: int
     def make_gui(self) -> type["kvui.GameManager"]:
         """
         Initialize the GUI for SMG Client.
@@ -106,7 +93,7 @@ class GalaxyContext(CommonContext):
         :return: The client's GUI.
         """
         ui = super().make_gui()
-        ui.base_title = f"Archipelago | {clientname}"
+        ui.base_title = f"Archipelago | {CLIENT_NAME}"
         return ui
     
     def __init__(self, server_address, password):
@@ -119,18 +106,17 @@ class GalaxyContext(CommonContext):
         super().__init__(server_address, password)
 
         # Create pointer dictionary for all the galaxy star flags
-        star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST + [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if value.region_offset is not None}
+        star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
+            [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
+            value.region_offset is not None}
         star_colour_pointers = {value.in_game_name + "Colours": [Pointer(STAR_COLOUR_LIST_OFFSET + value.region_offset + index, ValueType.u8) for index in range(8)] for value in region_list.values() if value.region_offset is not None}
-
+        
         self.pointers = {**star_count_flag_pointers,
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL)}
-
-    async def wait_for_next_loop(self, time_to_wait: float):
-        await asyncio.sleep(time_to_wait)
 
     async def check_ingame(self) -> bool:
         """Checks to see if Mario/Luigi is in game and not at file select."""
@@ -148,7 +134,6 @@ class GalaxyContext(CommonContext):
         """Updates the last Galaxy Mario/Luigi was on."""
         if not await self.check_ingame():
             return
-
         curr_galaxy: str = await self.current_galaxy()
 
         if curr_galaxy != self.last_galaxy:
@@ -164,7 +149,7 @@ class GalaxyContext(CommonContext):
         if not await self.check_ingame():
             return
         
-        local_missing_locs = copy.deepcopy(self.missing_locations)
+        local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
         star_bit_flag: int | None = None
 
         for loc_id in local_missing_locs:
@@ -178,11 +163,10 @@ class GalaxyContext(CommonContext):
                 continue
 
             if star_bit_flag is None:
-                star_bit_flag: int = self.pointers[region_data.in_game_name].get_value()
+                star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
 
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
-                logger.info(loc_id)
 
         await self.check_locations(self.locations_checked)
     
@@ -192,45 +176,40 @@ class GalaxyContext(CommonContext):
             return
         
         #note will resend items upon reconnection
-        for item_id in self.items_received[self.highest_processed_item_index :]:
+        for item_id in self.items_received[self.highest_processed_item_index: ]:
             self.highest_processed_item_index += 1
-            logger.info(item_id.item)
-
             match item_id.item:
                 case 170000007:
-                    logger.info("1up Received")
-                    lives = self.pointers["Lives"].get_value()
+                    lives = await self.pointers["Lives"].get_value()
                     self.pointers["Lives"].write_value(lives + 1)
 
-            #note currently adding these in breaks lives adding(might fix once changing that value does something?)
-            #   case 170000004:
-            #     logger.debug("Power Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                case 170000004:
+                  logger.info("Power Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
 
-            #   case 170000005:
-            #     logger.debug("Grand Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
+                case 170000005:
+                  # TODO: FIGURE OUT HOW TO GIVE GRAND STARS IN GAME
+                  logger.debug("Grand Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
 
-            #   case 170000006:
-            #     logger.debug("Green Star Received")
-            #     stars = int.from_bytes(dme.read_bytes(0x80001880, 4))
-            #     dme.write_bytes(0x80F63CF0, (stars + 1).to_bytes(4))
-
-            self.items_received.remove(item_id)
-    
+                case 170000006:
+                  # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
+                  logger.debug("Green Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
     async def recalculate_pointers(self):
         if self.needs_recalculating:
             for pointer in self.pointers.values():
                 await pointer.recalculate()
         
         self.needs_recalculating = False
-
     async def dolphinloop(self):
+        i = 0
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         try:
-            while(not self.exit_event.is_set()):
+            while not self.exit_event.is_set():
                 try:
                     # If DME is not already hooked or connected in any way
                     if not dme.is_hooked():
@@ -241,19 +220,18 @@ class GalaxyContext(CommonContext):
                             self.dolphin_status = CONNECTION_INITIAL_STATUS
                             logger.info(self.dolphin_status)
 
-                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
-
                     if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                         #checks the id of the game as a string
-                        romgameid: str = dme.read_bytes(0x80000000,6)
+                        romgameid: bytes = dme.read_bytes(0x80000000,6)
                         if romgameid.decode() != EXPECTED_GAME_ID:
                             dme.un_hook()
 
                             self.dolphin_status = DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY
                             logger.info(self.dolphin_status)
 
-                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
 
                         if not self.auth:
@@ -268,21 +246,30 @@ class GalaxyContext(CommonContext):
                             await self.server_auth(self.password_required)
 
                         if not self.slot:
-                            await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
 
                     await self.recalculate_pointers()
 
                     # Currently verified connected to AP and dolphin is properly loaded
+                    lives = await self.pointers["Lives"].get_value()
+                    messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"]
+                    if i == 0:
+                        prevLives = 0
+                    if lives < prevLives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)) and self.check_ingame() and "DeathLink" in self.ctx.tags:
+                        message = random.nextInt(0, messages.Count)
+                        await self.send_death(self.player_names[self.slot] + messages[message])
+                    prevLives = lives
                     await self.last_visited_galaxy()
                     await self.smg_location_checker()
                     await self.writeitems()
-                    await self.wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+                    i += 1
+                    await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
                 except Exception as dmeEx:
                     await self.disconnect()
 
-                    logger.error("Something went wrong when connection to Dolphin Memory Engine details: " + str(dmeEx))
+                    logger.error("Unable to connect to SMG. Details: " + str(dmeEx))
 
                     dme.un_hook()
 
@@ -292,40 +279,43 @@ class GalaxyContext(CommonContext):
                     self.rom_loaded = False
                     self.needs_recalculating = True
                     
-                    await self.wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                     continue
 
         except Exception as dolphinEx:
-            logger.error("Something went wrong when connection to dolphin details:" + str(dolphinEx))
-
+            logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
     def on_package(self, cmd, args):
-        super().on_package(cmd, args)
-        
         match cmd:
             case "RoomInfo":
                 self.password_required = bool(args["password"])
             
             case "Connected":
                 self.highest_processed_item_index = 0
-                #TODO: UNCOMMENT WHEN STAR RECEIVING WORKS PROPERLY
-                # dme.write_bytes(0x80F63CF0, 0.to_bytes(4))
-                pass
+            case "Bounced":
+                # This currently produces a client error so commenting out for now. (Deathlink should work without it)
+                #if args["source"] == self.player_names[self.slot]:
+                return # Don't process our own deathlink
 
-            case "Connection Refused":
-                pass
+            case "ConnectionRefused":
+                self.dolphin_status = AP_REFUSED_STATUS
+                logger.error(self.dolphin_status)
 
-    def on_deathlink(self, data: dict[str, Any]):
+        super().on_package(cmd, args)
+
+    def on_deathlink(self, data: dict):
         """
         Handle a DeathLink event.
 
         :param data: The data associated with the DeathLink event.
         """
         super().on_deathlink(data)
-
-        self.is_dead = True
-        
-        dme.write_byte(0x80001af0, 1)
+        Utils.async_start(self.kill_player(), "SMG - Kill Player")
         return
+
+    async def kill_player(self):
+        if not await self.check_ingame():
+            return
+        dme.write_byte(0x80001af0, 1)
 
     async def server_auth(self, password_requested: bool = False):
         """
@@ -347,8 +337,8 @@ class GalaxyContext(CommonContext):
 # launches/starts everything we need
 def launch(*launch_args: str):
     import colorama
-    Utils.init_logging(clientname)
-    logger.info("Starting SMG Client")
+    Utils.init_logging(CLIENT_NAME)
+    logger.info(f"Starting {CLIENT_NAME}")
     
     parser = get_base_parser()
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
@@ -365,7 +355,7 @@ def launch(*launch_args: str):
             if gui_enabled:
                 ctx.run_gui()
             ctx.run_cli()
-            await ctx.wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
             ctx.runloop = asyncio.create_task(ctx.dolphinloop(), name="SMG - DolphinSync")
 
@@ -376,15 +366,18 @@ def launch(*launch_args: str):
                 await ctx.runloop
 
         except Exception as clientEx:
-            client_msg: str = (f"An unknown error occurred while running {clientname}.\n" +
+            client_msg: str = (f"An unknown error occurred while running {CLIENT_NAME}.\n" +
                 f"Additional details:\n{str(clientEx)}")
             logger.error(client_msg)
-            Utils.messagebox(f"Main Client Issue {clientname}", client_msg, True)
+            Utils.messagebox(f"Main Client Issue {CLIENT_NAME}", client_msg, True)
             raise clientEx
         
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
     colorama.deinit()
+
+async def wait_for_next_loop(time_to_wait: float):
+    await asyncio.sleep(time_to_wait)
 
 if __name__ == "__main__":
     launch(*sys.argv[1:])

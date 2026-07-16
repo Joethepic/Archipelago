@@ -104,6 +104,7 @@ class WiiISO:
         file_name = options["smgalaxy.world_options"]["iso_file"]
         if not os.path.exists(file_name):
             file_name = Utils.user_path(file_name)
+            options["smgalaxy.world_options"]["iso_file"] = file_name
         return file_name
     
     def extract(self):
@@ -136,10 +137,11 @@ class WiiISO:
         """Takes an extracted ISO directory and re-compiles it into a playable Wii ISO."""
         output_path = Path(self.dest_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        print("Initiating repacking ISO")
+
+        iso_path = os.path.join(self.dest_path, self.iso_name + '.iso')
+        print("Initiating repacking ISO to output: " + iso_path)
         self.calling_function = 'repack_iso'
-        rebuild_from_directory(self.temp_dir, self.dest_path + self.iso_name + '.iso', callback=self.progress_callback)
+        rebuild_from_directory(self.temp_dir, iso_path, callback=self.progress_callback)
         
         print("Repacking ISO complete")
 

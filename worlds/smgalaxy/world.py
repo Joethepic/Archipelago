@@ -1,20 +1,20 @@
-import json
 import os
 from dataclasses import fields
 from typing import ClassVar
-from BaseClasses import Item
 from Utils import visualize_regions
 from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, SuffixIdentifier, Type, components, launch_subprocess
+import typing
+import logging
 
 from . import items, regions, Rules, web_world, Options
 from .Constants.Names import region_names as regname
-from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION
+from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
-from .regions import disconnect_from_option, region_list, SMGRegionData
+from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.Patch import SMGPlayerContainer
 
@@ -31,8 +31,8 @@ class SMGWorld(World):
     center of the universe in order to save Princess Peach from Bowser's clutches.
     """
 
-    game = "Super Mario Galaxy"
-    topology_present = False
+    game = GAME_NAME
+    topology_present = True
     
     web = web_world.SMGWebWorld()
     
@@ -54,7 +54,7 @@ class SMGWorld(World):
         super(SMGWorld, self).__init__(*args, **kwargs)
         self.origin_region_name: str = regname.SHIP
         self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
-        self.starting_galaxy: str = "Good Egg Galaxy"
+        self.starting_galaxy: str = regname.GOODEGG
         self.galaxy_counts: dict[str, int] = {}
 
     def generate_early(self) -> None:
@@ -127,7 +127,10 @@ class SMGWorld(World):
         leftover_locations = min([109, (len(list(self.multiworld.get_unfilled_locations(self.player))) - len(local_pool))])
 
         # Add a random number of extra stars. Later, this can be made into an option.
-        extra_stars: int = self.random.randint(0, leftover_locations)
+        if leftover_locations >= 1:
+            extra_stars: int = self.random.randint(0, leftover_locations)
+        else:
+            extra_stars: int = 0
         local_pool += [self.create_item("Power Star") for i in range(extra_stars)]
         n_filler_items = n_locations - len(local_pool)
 
@@ -148,7 +151,6 @@ class SMGWorld(World):
 
     def pre_fill(self) -> None:
         visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml",show_entrance_names=True)
-
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         self.galaxy_counts.update({"D1G1": 0})
@@ -158,8 +160,7 @@ class SMGWorld(World):
             "Seed": str(self.multiworld.seed_name)[:16],
             "Slot": self.player,
             "Name": self.player_name,
-            "Options": {
-            },
+            "Options": {},
             "Locations": {},
             "Galaxies": self.shuffled_levels,
             "Galaxy Counts": self.galaxy_counts,
@@ -205,19 +206,25 @@ class SMGWorld(World):
             else:
                 item_info = {"name": "Nothing", "game": self.game, "classification": "filler"}
             output_data["Locations"][location.name] = item_info
-        # # Outputs the plando details to our expected output file
-        # # Create the output path based on the current player + expected patch file ending.
-        # patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
-        #                                             f"{SMGPlayerContainer.patch_file_ending}")
-        # # Create a zip (container) that will contain all the necessary output files for us to use during patching.
-        # smg_container = SMGPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player],
-        #                                  self.player)
-        # # Write the expected output zip container to the Generated Seed folder.
-        # smg_container.write()
 
+        # Create the patch file output in patch_file_ending format.
         patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
                     f"{SMGPlayerContainer.patch_file_ending}")
 
         player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
         player_container.write()
+    def extend_hint_information(self, hint_data: typing.Dict[int, typing.Dict[int, str]]):
+        if self.topology_present:
+            er_hint_data = {}
+            for galaxy in galaxies_list:
+                slot = [key for key, val in self.shuffled_levels.items() if val == galaxy]
+                logging.info(slot)
+                for region in region_list:
+                    if region == galaxy:
+                        for location in location_table.values():
+                            if location.region == galaxy:
+                                er_hint_data.update({location.code: slot[0]})
+            hint_data[self.player] = er_hint_data
+
+                                
 
