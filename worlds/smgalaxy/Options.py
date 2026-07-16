@@ -70,7 +70,7 @@ class Dome1Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
-    will be capped to ensure generation if necessary, and will never be allowed to go above 9 total stars.
+    will be capped to ensure generation if necessary.
     The first orbit in Dome 1 will always have no star requirement.
 
     These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
