@@ -114,7 +114,7 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
         
         self.pointers = {**star_count_flag_pointers,
                          **star_colour_pointers,
