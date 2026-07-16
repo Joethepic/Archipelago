@@ -119,7 +119,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.multiworld.completion_condition[player] = lambda state: state.has("Peach", player)
 
 def rules_from_er_placements(world: "SMGWorld"):
-    available_locations = 4
+    available_locations: int = 4
     dome_orbits: list[str] = ["First Orbit", "Second Orbit", "Third Orbit", "Fourth Orbit", "Fifth Orbit"]
     for dome_num in [1, 2, 3, 4, 5, 6]:
         dome_galaxy_dict: dict = dict(sorted(dict([(d_key, d_val) for d_key, d_val in world.galaxy_counts.items()
