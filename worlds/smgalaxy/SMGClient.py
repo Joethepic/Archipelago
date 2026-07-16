@@ -49,7 +49,7 @@ class Pointer:
         if self.offsets is not None:
             self.address = dme.follow_pointers(self.base, self.offsets)
         else:
-            self.address = base
+            self.address = self.base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address."""
