@@ -68,7 +68,7 @@ class SMGWorld(World):
         stupid_word_dict: dict[str, int] = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
         galaxy_counts: dict[str, int] = {}
         previous_dome_count: int = 0
-
+        previous_orbit_count: int = 0
         for dome_name, dome_num in stupid_word_dict.items():
             # Get each set of dome offsets for each dome
             dome_dict: dict = dict(sorted(dict(getattr(self.options, f"dome_{dome_name}_counts").value).items(),
@@ -97,7 +97,12 @@ class SMGWorld(World):
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
                     continue
-                galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
+                if dome_orb_name == "First Orbit":
+                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
+                    previous_orbit_count = previous_dome_count + int(dome_dict[dome_orb_name])
+                else:
+                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_orbit_count + int(dome_dict[dome_orb_name])
+                    previous_orbit_count = previous_orbit_count + int(dome_dict[dome_orb_name])
 
         return galaxy_counts
 
