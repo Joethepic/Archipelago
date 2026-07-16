@@ -36,15 +36,17 @@ class Pointer:
     address: int
     offsets: list[int]
     value_type: ValueType
+    base: int
 
-    def __init__(self, offsets: list[int], value_type: ValueType):
+    def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
         self.address = -1
         self.offsets = offsets
         self.value_type = value_type
+        self.base = base
 
     async def recalculate(self):
         """Recalculates the address of the offset chain."""
-        self.address = dme.follow_pointers(GAMESYSTEM, self.offsets)
+        self.address = dme.follow_pointers(self.base, self.offsets)
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address."""
@@ -56,7 +58,7 @@ class Pointer:
         if self.value_type.name == ValueType.string32.name:
             unpack_val = unpack_val.decode("ascii").split("\x00")[0]
         return unpack_val
-    
+
     def write_value(self, value) -> None:
         """Write a value at the addresss of the pointer."""
         value = struct.pack(self.value_type.value.format, value)
