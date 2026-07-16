@@ -121,7 +121,7 @@ class GalaxyContext(CommonContext):
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL)}
+                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
     async def check_ingame(self) -> bool:
         """Checks to see if Mario/Luigi is in game and not at file select."""
@@ -206,9 +206,8 @@ class GalaxyContext(CommonContext):
                   dme.write_byte(0x80001880, (stars + 1))
     async def recalculate_pointers(self):
         if self.needs_recalculating:
-            for pointer in self.pointers.values():
+            for key, pointer in self.pointers.items():
                 await pointer.recalculate()
-        
         self.needs_recalculating = False
     async def dolphinloop(self):
         i = 0
@@ -253,7 +252,6 @@ class GalaxyContext(CommonContext):
                         if not self.slot:
                             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                             continue
-
                     await self.recalculate_pointers()
 
                     # Currently verified connected to AP and dolphin is properly loaded
