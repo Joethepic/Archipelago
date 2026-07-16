@@ -46,7 +46,10 @@ class Pointer:
 
     async def recalculate(self):
         """Recalculates the address of the offset chain."""
-        self.address = dme.follow_pointers(self.base, self.offsets)
+        if self.offsets is not None:
+            self.address = dme.follow_pointers(self.base, self.offsets)
+        else:
+            self.address = base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address."""
@@ -111,7 +114,7 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([0], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset + index) for index in range(8) for value in region_list.values() if value.region_offset is not None}
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
         
         self.pointers = {**star_count_flag_pointers,
                          **star_colour_pointers,
