@@ -120,8 +120,10 @@ class GalaxyContext(CommonContext):
 
         # Create pointer dictionary for all the galaxy star flags
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST + [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if value.region_offset is not None}
+        star_colour_pointers = {value.in_game_name + "Colours": [Pointer(STAR_COLOUR_LIST_OFFSET + value.region_offset + index, ValueType.u8) for index in range(8)] for value in region_list.values() if value.region_offset is not None}
 
         self.pointers = {**star_count_flag_pointers,
+                         **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
