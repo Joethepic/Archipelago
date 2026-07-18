@@ -1,18 +1,26 @@
 from gclib import texture_utils
+from gclib.gx_enums import ImageFormat
 from gclib.j3d import BDL
 from enum import StrEnum
-from PIL import Image
+from PIL.Image import Image
 
 from ...Options import MarioColors
 from ..extensions import RARCExtended
 
 MARIO_RELATIVE_PATH = "/DATA/files/ObjectData/Mario.arc"
 
-class MarioParts(StrEnum):
-    HATandSHIRT: str = "Hat & Shirt"
-    OVERALLS: str = "Overalls"
-    SHOES: str = "Shoes"
-    GLOVES: str = "Gloves"
+WHITE = (255, 255, 255)
+OLD_CAP_COLOUR = (181, 0, 0)
+OLD_GLOVES_COLOUR = (153, 153, 153)
+
+def lerp1(x: int | float, begin: int, end: int) -> int:
+    return int(begin + (end - begin) * x)
+
+def lerp(x: int | float, begin: tuple, end: tuple) -> tuple:
+    return (lerp1(x, y, z) for y, z in zip(begin, end))
+
+def distance(x: tuple, y: tuple) -> int:
+    return sum([(i - j) ** 2 for i, j in zip(x, y)])
 
 class MarioColours:
     """
@@ -22,22 +30,23 @@ class MarioColours:
     with BDL (Binary Display List) files. It uses pixel threshold detection to identify
     and replace specific colored regions in texture images.
     """
-    HAT_THRESHOLD: tuple = (255,50,50)
-    OVERALLS_THRESHOLD: tuple = (50,55,255)
-    GLOVES_THRESHOLD: tuple = (0,0,0)
-    SHOES_THRESHOLD: tuple = (0,0,0)
+    colour_map: dict[str, tuple[int, int, int]] = {"Red"   : (255,  0,  0),
+                                                   "Orange": (255,165,  0),
+                                                   "Yellow": (255,255,  0),
+                                                   "Green" : (  0,128,  0),
+                                                   "Blue"  : (  0,  0,255),
+                                                   "Purple": (128,  0,128),
+                                                   "Black" : (  0,  0,  0),
+                                                   "Brown" : (165, 42, 42),
+                                                   "White" : (255,255,255),
+                                                   "Pink"  : (255,192,203),
+                                                   "Gray"  : (128,128,128)}
 
-    colour_map: dict[str, tuple] = {"Red"   : (255,  0,  0),
-                                    "Orange": (255,165,  0),
-                                    "Yellow": (255,255,  0),
-                                    "Green" : (  0,128,  0),
-                                    "Blue"  : (  0,  0,255),
-                                    "Purple": (128,  0,128),
-                                    "Black" : (  0,  0,  0),
-                                    "Brown" : (165, 42, 42),
-                                    "White" : (255,255,255),
-                                    "Pink"  : (255,192,203),
-                                    "Gray"  : (128,128,128)}
+    class Parts(StrEnum):
+        HAT: str = "Hat"
+        OVERALLS: str = "Overalls"
+        SHOES: str = "Shoes"
+        GLOVES: str = "Gloves"
 
     def __init__(self, mario: RARCExtended):
         self.mario = mario
@@ -47,61 +56,88 @@ class MarioColours:
         
         self.bdl = self.mario.get_file("mario.bdl", BDL)
         
-    def get_img(self, texture_name: str) -> Image:    
-        if texture_name not in self.bdl.tex1.textures_by_name:
-            raise ValueError(f"Texture not found in bdl file: {texture_name}")
+    def paint_hat(self, old_colour: tuple[int, int, int], new_colour: tuple[int, int, int], *args) -> tuple[int, int, int]:
+        distance_to_old = distance(old_colour, OLD_CAP_COLOUR)
+        max_distance = distance(OLD_CAP_COLOUR, WHITE)
 
-        bti = self.bdl.tex1.textures_by_name[texture_name][0]
-        img = texture_utils.decode_image(bti.image_data, bti.palette_data,
-                                         bti.image_format, bti.palette_format,
-                                         bti.num_colors, bti.width, bti.height)
-        self.img = img
+        return lerp(1 - distance_to_old / max_distance, old_colour, new_colour)
 
-    def set_img(self, texture_name: str) -> None:
-        if texture_name not in self.bdl.tex1.textures_by_name:
-            raise ValueError(f"Texture not found in bdl file: {texture_name}")
+    def paint_overalls(self, old_colour: tuple[int, int, int], new_colour: tuple[int, int, int], x, y, *args) -> tuple[int, int, int]:
+        if x >= 128 and y >= 44:
+            return old_colour
+        
+        return new_colour
+    
+    def paint_shoes(self, old_colour: tuple[int, int, int], new_colour: tuple[int, int, int], x, y, *args) -> tuple[int, int, int]:
+        if x < 192 or y < 108:
+            return old_colour
+        
+        return new_colour
 
-        bti = self.bdl.tex1.textures_by_name[texture_name][0]
-        bti.replace_image(self.img)
-        self.bdl.tex1.textures_by_name[texture_name][0] = bti
+    def paint_gloves(self, old_colour: tuple[int, int, int], new_colour: tuple[int, int, int], *args) -> tuple[int, int, int]:
+        distance_to_old = distance(old_colour, OLD_GLOVES_COLOUR)
+        max_distance = distance(OLD_GLOVES_COLOUR, WHITE)
 
-    def replace_pixels(self, threshold_values: tuple, new_colour: tuple) -> None:
-        img = self.img
+        return lerp(distance_to_old / max_distance, old_colour, new_colour)
+
+    def paint_pixels(self, img: Image, colour: tuple[int, int, int], paint_callback) -> Image:
         pixels = img.load()
-        width = img.size[0]
-        height = img.size[1]
+        width, height = img.size
 
         for x in range(width):
             for y in range(height):
-                if False not in [pixels[x,y][i] <= threshold_values[i] for i in [0,1,2]]:
-                    pixels[x, y] = (*new_colour, 255)
+                old_colour = (pixels[x, y][0], pixels[x, y][1], pixels[x, y][2])
+                pixels[x, y] = (*paint_callback(old_colour, colour, x, y), 255)
+
+        return img
     
+    def paint_texture(self, texture_name: str, paint_callback, colour, texture_count = 1) -> None:
+        for texture_index in range(texture_count):
+            bti = self.bdl.tex1.textures_by_name[texture_name][texture_index]
+            img = texture_utils.decode_image(bti.image_data, bti.palette_data,
+                                            bti.image_format, bti.palette_format,
+                                            bti.num_colors, bti.width, bti.height)
+            
+            bti.image_format = ImageFormat.CMPR
+            bti.replace_image(self.paint_pixels(img, colour, paint_callback))
+            self.bdl.tex1.textures_by_name[texture_name][texture_index] = bti
+
     def update_part(self, mario_part: str, colour: str) -> None:
         if mario_part not in MarioColors.valid_keys:
             raise ValueError(f"Mario part is not an accepted part: {mario_part}")
 
+        if colour is MarioColors.default[mario_part]:
+            return
+        
         print(f"Updating {mario_part.lower()} to {colour.lower()}")
 
-        colour = self.colour_map[colour]
+        texture_count = 1
 
-        if mario_part == MarioParts.HATandSHIRT:
-            texture_name = "MarioCap.0"
-            threshold = self.HAT_THRESHOLD
-        elif mario_part == MarioParts.OVERALLS:
-            texture_name = "MarioBody.0"
-            threshold = self.OVERALLS_THRESHOLD
-        elif mario_part == MarioParts.SHOES:
-            texture_name = "MarioBody.0"
-            threshold = self.SHOES_THRESHOLD
-        elif mario_part == MarioParts.GLOVES:
-            texture_name = "MarioBody.0"
-            threshold = self.GLOVES_THRESHOLD
-        else:
-            raise ValueError(f"Cannot find mario part: {mario_part}")
+        match mario_part:
+            case self.Parts.HAT:
+                texture_name = "MarioCap.0"
+                callback = self.paint_hat
 
-        self.get_img(texture_name)
-        self.replace_pixels(threshold, colour)
-        self.set_img(texture_name)
+            case self.Parts.OVERALLS:
+                texture_name = "MarioBody.0"
+                callback = self.paint_overalls
+
+            case self.Parts.SHOES:
+                texture_name = "MarioBody.0"
+                callback = self.paint_shoes
+
+            case self.Parts.GLOVES:
+                texture_name = "MarioHand"
+                callback = self.paint_gloves
+                texture_count = 2
+
+            case _:
+                raise ValueError(f"Cannot find mario part: {mario_part}")
+
+        if texture_name not in self.bdl.tex1.textures_by_name:
+            raise ValueError(f"Texture not found in bdl file: {texture_name}")
+
+        self.paint_texture(texture_name, callback, self.colour_map[colour], texture_count)
 
         self.bdl.save()
         for ch in self.bdl.chunks:

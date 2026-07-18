@@ -194,7 +194,7 @@ class Dome6Offsets(OptionCounter):
     }
 
 
-class  MarioColors(OptionDict):
+class MarioColors(OptionDict):
     """
     Choose new colors for part of Mario's Outfit! (These will also be applied to Luigi)
     4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
@@ -204,10 +204,10 @@ class  MarioColors(OptionDict):
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
-    valid_keys = ["Hat & Shirt", "Overalls", "Shoes", "Gloves"]
+    valid_keys = ["Hat", "Overalls", "Shoes", "Gloves"]
     valid_values = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"]
     default = {
-        "Hat & Shirt": "Red",
+        "Hat": "Red",
         "Overalls": "Blue",
         "Shoes": "Brown",
         "Gloves": "White"
