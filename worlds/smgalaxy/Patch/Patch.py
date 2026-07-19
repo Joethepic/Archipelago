@@ -427,6 +427,13 @@ class Patch:
         new_instruction = b'\x7c\x7f\x1b\x78\x48\x1e\x68\x45\x7c\x64\x1b\x78\x48\x1a\x12\xc9\x80\x63\x00\x0c\x48\x1a\x21\x0d\x3c\x80\x80\x00\x60\x84\x18\xff\x1c\x63\x00\x08\x7c\x63\x22\x14\x7c\x63\xf8\xae'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+        ##################################
+        # Custom grandstar count loading #
+        ##################################
+        address = 0x803b1d10
+        new_instruction = b'\x3c\x60\x80\x00\x88\x63\x18\x82\x38\x63\x00\x01\x7c\x03\x20\x00\x41\x80\x00\x0c\x38\x60\x00\x01\x42\x80\x00\x08\x38\x60\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00'
+        #self.dol.write_data(fs.write_bytes, address, new_instruction)
+
         #########################
         # Skip wii strap screen #
         #########################
@@ -478,7 +485,7 @@ class Patch:
         self.astrodomeentrances.save()
         self.dol.save()
 
-        #self.save_copies()
+        self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
