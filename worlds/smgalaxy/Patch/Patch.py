@@ -31,7 +31,7 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, patch_name: str):
+    def __init__(self, patch_patch: str):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
             patch_name (str): Name of the patch file
@@ -41,15 +41,11 @@ class WiiISO:
             temp_dir (str): Temporary extraction directory.
             iso_name (str): Name of the new ISO file.
         """
-        clean_iso_path: str = self.get_base_rom_path()
-        dest_path: str = os.path.split(clean_iso_path)[0]
-        temp_dir = os.path.join(dest_path, "temp")
-
-        self.clean_iso_path = clean_iso_path
-        self.dest_path = dest_path
-        self.temp_dir = temp_dir
-        self.iso_name = patch_name
-
+        self.clean_iso_path = self.get_base_rom_path()
+        self.dest_path = os.path.dirname(patch_path)
+        self.temp_dir = os.path.join(self.dest_path, "temp")
+        self.iso_name = os.path.basename(patch_path).split('.')[:-1]
+        
         self.progress = None
         self.calling_function = None
 
@@ -226,8 +222,8 @@ class GalaxyShuffle:
             self.galaxy_destinations.append(new_galaxy)
 
 class Patch:
-    def __init__(self, patch_name: str, output: dict):
-        self.iso: WiiISO = WiiISO(patch_name)
+    def __init__(self, patch_path: str, output: dict):
+        self.iso: WiiISO = WiiISO(patch_patch)
 
         RARCExtended.iso_base_path = self.iso.temp_dir
         DOLExtended.iso_base_path = self.iso.temp_dir
@@ -510,8 +506,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         with zipfile.ZipFile(patch_path, "r") as zf:
             output = json.loads(zf.read("patch.json").decode('shift-jis'))
 
-        patch_name: str = os.path.split(patch_path)[1].split('.')[0]
-        patch = Patch(patch_name, output)
+        patch = Patch(patch_path, output)
 
         galaxies: dict[str, str] = patch.galaxies
         galaxy_counts: dict[str, int] = patch.counts
