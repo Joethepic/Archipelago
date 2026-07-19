@@ -37,13 +37,12 @@ class Pointer:
     offsets: list[int]
     value_type: ValueType
     base: int
-    loc_id: Optional[int]
+
     def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
         self.address = -1
         self.offsets = offsets
         self.value_type = value_type
         self.base = base
-        self.loc_id = 0
 
     async def recalculate(self):
         """Recalculates the address of the offset chain."""
@@ -115,7 +114,6 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        # 0 for yellow, 1 for blue, 2 for green, 3 is red
         star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
         
         self.pointers = {**star_count_flag_pointers,
@@ -148,26 +146,17 @@ class GalaxyContext(CommonContext):
 
         if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
             return
-    async def putLocIdsIntoStarColor(self):
-        for region in region_list.values():
-            if region.star_location_ids != [0]:
-                i = 0
-                try:
-                    while i <= 7:
-                        star = region.in_game_name + "Colours" + str(i)
-                        self.pointers[star].loc_id = region.star_location_ids[i]
-                        i += 1
-                except(IndexError):
-                    i = 0
-                    continue
+
+        self.last_galaxy = curr_galaxy
+    
     async def smg_location_checker(self):
         """Checks the various location within SMG to see if the player has completed any appropriate actions"""
         if not await self.check_ingame():
             return
+        
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
         star_bit_flag: int | None = None
-        curr_galaxy = await self.current_galaxy()
-        await self.putLocIdsIntoStarColor()
+
         for loc_id in local_missing_locs:
             local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
             region_data: SMGRegionData = region_list[local_loc.region]
@@ -177,19 +166,13 @@ class GalaxyContext(CommonContext):
 
             if local_loc.game_address is None:
                 continue
+
             if star_bit_flag is None:
                 star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
+
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
-        for location_id in self.checked_locations:
-            times = 0
-            while times <= 7:
-                star = curr_galaxy + "Colours" + str(times)
-                if curr_galaxy != "AstroDome" and curr_galaxy != "AstroGalaxy": 
-                    colorId = self.pointers[star].loc_id
-                    if location_id == colorId:
-                        self.pointers[star].write_value(1)
-                    times += 1
+
         await self.check_locations(self.locations_checked)
     
     async def writeitems(self):
@@ -225,6 +208,7 @@ class GalaxyContext(CommonContext):
         if self.needs_recalculating:
             for key, pointer in self.pointers.items():
                 await pointer.recalculate()
+                logger.info(f"{key}: {hex(pointer.address)}")
         self.needs_recalculating = False
     async def dolphinloop(self):
         i = 0
@@ -237,6 +221,7 @@ class GalaxyContext(CommonContext):
                         dme.hook()
                         if dme.get_status() == dme.get_status().noEmu or dme.get_status() == dme.get_status().notRunning:
                             dme.un_hook()
+
                             self.dolphin_status = CONNECTION_INITIAL_STATUS
                             logger.info(self.dolphin_status)
 
@@ -277,10 +262,10 @@ class GalaxyContext(CommonContext):
                         prevLives = 0
                     if lives < prevLives and time.time() >= float(int(self.last_death_link) + (WAIT_TIMER_LONG_TIMEOUT * 3)) and await self.check_ingame() and "DeathLink" in self.tags:
                         logger.info("Deathlink being sent")
+                        logger.info(len(messages))
                         message = random.randint(0, len(messages))
                         await self.send_death(self.player_names[self.slot] + " " + messages[message])
                     prevLives = lives
-                   #add in once we have pointer for item index self.highest_processed_item_index = await self.pointers["item_index"].get_value()
                     await self.last_visited_galaxy()
                     await self.smg_location_checker()
                     await self.writeitems()
