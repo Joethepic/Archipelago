@@ -38,9 +38,11 @@ class Pointer:
     offsets: list[int]
     value_type: ValueType
     base: int
-
     def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
-        self.address = -1
+        if offsets is not None:
+            self.address = -1
+        else:
+            self.address = base
         self.offsets = offsets
         self.value_type = value_type
         self.base = base
@@ -50,7 +52,7 @@ class Pointer:
         if self.offsets is not None:
             self.address = dme.follow_pointers(self.base, self.offsets)
         else:
-            self.address = base
+            self.address = self.base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address. Raises a ValueError if not properly initialised.
@@ -87,7 +89,38 @@ class GalaxyCommand(ClientCommandProcessor):
         """Toggle deathlink from client. Overrides default setting."""
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
-
+class StarColor(NamedTuple):
+    name: str
+    pointer: Pointer
+    location_id: int
+class StarColorHandler:
+    pointers: dict[str, Pointer]
+    star_colors: list[StarColor] = []
+    async def setstar_colors(self, loc_id: int):
+        try:
+            for star in self.star_colors:
+                if star.location_id == loc_id:
+                    star.pointer.write_value(1)
+        except Exception as e:
+            logger.info(f"Error {e}")
+    async def setAllStar_Colors(self):
+        self.star_colors = []
+        try:
+            for region in region_list.values():
+                if region.star_location_ids != [0]:
+                    for index, item in enumerate(region.star_location_ids):
+                        starname = region.in_game_name + "Colours" + str(index)
+                        star_color = StarColor(starname, self.pointers[starname], region.star_location_ids[index])
+                        self.star_colors.append(star_color)
+        except Exception as e: 
+            logger.info(f"Error:  {e}")
+    def __init__(self):
+        self.star_colors = []
+        # 0 for yellow, 1 for blue, 2 for green, 3 is red
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer(None, ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
+        self.pointers = {**star_colour_pointers}
+        for pointer in self.pointers.values():
+            pointer.recalculate()
 class GalaxyContext(CommonContext):
     password_required: bool = False
     rom_loaded: bool = False
@@ -104,7 +137,7 @@ class GalaxyContext(CommonContext):
     pointers: dict[str, Pointer] = {}
 
     highest_processed_item_index: int
-
+    starcolorhandler: StarColorHandler
     lives: int
 
     def make_gui(self) -> type["kvui.GameManager"]:
@@ -132,14 +165,12 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
-        
         self.pointers = {**star_count_flag_pointers,
-                         **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+        self.starcolorhandler = StarColorHandler()
 
     async def disconnect(self, msg: str = '') -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
@@ -197,7 +228,6 @@ class GalaxyContext(CommonContext):
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         if not await self.check_ingame():
             return
-        
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
@@ -211,7 +241,8 @@ class GalaxyContext(CommonContext):
 
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
-
+        for location_id in self.checked_locations:
+                await self.starcolorhandler.setstar_colors(location_id)
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
@@ -253,7 +284,7 @@ class GalaxyContext(CommonContext):
         
         for key, pointer in self.pointers.items():
             await pointer.recalculate()
-            logger.info(f"{key}: {hex(pointer.address)}")
+            await self.starcolorhandler.setAllStar_Colors()
 
         self.needs_recalculating = False
     
@@ -304,58 +335,51 @@ class GalaxyContext(CommonContext):
 
     async def dme_loop(self) -> None:
         """Main loop that checks in game values using Dolphin Memory Engine."""
-        try:
-            # If DME is not already hooked or connected in any way
-            if not dme.is_hooked() and not await self.try_hook():
-                return
-                
-            if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
-                #checks the id of the game as a string
-                romgameid: bytes = dme.read_bytes(0x80000000,6)
-                if romgameid.decode() != EXPECTED_GAME_ID:
-                    dme.un_hook()
-
-                    self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
-
-                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                    return
-
-                if not self.auth:
-                    await self.get_username()
-                    
-                # Inform the player we are ready and waiting for them to connect.
-                if not self.rom_loaded:
-                    self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
-                    self.rom_loaded = True
-
-                    await self.server_auth(self.password_required)
-
-                if not self.slot:
-                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                    return
-
-            await self.recalculate_pointers()
-
-            # Currently verified connected to AP and dolphin is properly loaded
-            await self.last_visited_galaxy()
-            await self.smg_locs_checker()
-            await self.smg_recv_items()
-            await self.check_death()
+        #try:
+        # If DME is not already hooked or connected in any way
+        if not dme.is_hooked() and not await self.try_hook():
+            return
             
-        except Exception as dmeEx:
-            await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
-            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+        if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
+            #checks the id of the game as a string
+            romgameid: bytes = dme.read_bytes(0x80000000,6)
+            if romgameid.decode() != EXPECTED_GAME_ID:
+                dme.un_hook()
+                self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
+                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                return
+            if not self.auth:
+                await self.get_username()
+                
+            # Inform the player we are ready and waiting for them to connect.
+            if not self.rom_loaded:
+                self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
+                self.rom_loaded = True
+                await self.server_auth(self.password_required)
+            if not self.slot:
+                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                return
+        await self.recalculate_pointers()
+        # Currently verified connected to AP and dolphin is properly loaded
+        await self.last_visited_galaxy()
+        await self.smg_locs_checker()
+        await self.smg_recv_items()
+        await self.check_death()
+            
+        #except Exception as dmeEx:
+        #    await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
+        #    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
     async def dolphin_loop(self) -> None:
         """Continuously check and communicate with Dolphin until the user disconnects."""
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         while not self.exit_event.is_set():
-            try:
-                await self.dme_loop()
-                await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            #try:
+            await self.dme_loop()
+            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
-            except Exception as dolphinEx:
-                logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
+            #except Exception as dolphinEx:
+                #logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
     
     def on_package(self, cmd, args) -> None:
         """Processes and handles packets from the server."""
@@ -368,9 +392,9 @@ class GalaxyContext(CommonContext):
             case "Connected":
                 self.highest_processed_item_index = 0
                 
-            case "Bounced":
-                if args["source"] != self.player_names[self.slot]:
-                    pass # handle (death) links
+            #case "Bounced":
+                #if args["source"] != self.player_names[self.slot]:
+                #    pass # handle (death) links
 
             case "ConnectionRefused":
                 self.set_dolphin_status(AP_REFUSED_STATUS)
