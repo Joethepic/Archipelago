@@ -38,13 +38,12 @@ class Pointer:
     offsets: list[int]
     value_type: ValueType
     base: int
-    loc_id: Optional[int]
+
     def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
         self.address = -1
         self.offsets = offsets
         self.value_type = value_type
         self.base = base
-        self.loc_id = 0
 
     async def recalculate(self) -> None:
         """Recalculates the address of the offset chain."""
@@ -133,7 +132,6 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        # 0 for yellow, 1 for blue, 2 for green, 3 is red
         star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
         
         self.pointers = {**star_count_flag_pointers,
@@ -199,6 +197,7 @@ class GalaxyContext(CommonContext):
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         if not await self.check_ingame():
             return
+        
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
@@ -212,15 +211,7 @@ class GalaxyContext(CommonContext):
 
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
-        for location_id in self.checked_locations:
-            times = 0
-            while times <= 7:
-                star = curr_galaxy + "Colours" + str(times)
-                if curr_galaxy != "AstroDome" and curr_galaxy != "AstroGalaxy": 
-                    colorId = self.pointers[star].loc_id
-                    if location_id == colorId:
-                        self.pointers[star].write_value(1)
-                    times += 1
+
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
