@@ -97,23 +97,17 @@ class StarColorHandler:
     pointers: dict[str, Pointer]
     star_colors: list[StarColor] = []
     async def setstar_colors(self, loc_id: int):
-        try:
-            for star in self.star_colors:
-                if star.location_id == loc_id:
-                    star.pointer.write_value(1)
-        except Exception as e:
-            logger.info(f"Error {e}")
+        for star in self.star_colors:
+            if star.location_id == loc_id:
+                star.pointer.write_value(1)
     async def setAllStar_Colors(self):
         self.star_colors = []
-        try:
-            for region in region_list.values():
-                if region.star_location_ids != [0]:
-                    for index, item in enumerate(region.star_location_ids):
-                        starname = region.in_game_name + "Colours" + str(index)
-                        star_color = StarColor(starname, self.pointers[starname], region.star_location_ids[index])
-                        self.star_colors.append(star_color)
-        except Exception as e: 
-            logger.info(f"Error:  {e}")
+        for region in region_list.values():
+            if region.star_location_ids != [0]:
+                for index, item in enumerate(region.star_location_ids):
+                    starname = region.in_game_name + "Colours" + str(index)
+                    star_color = StarColor(starname, self.pointers[starname], region.star_location_ids[index])
+                    self.star_colors.append(star_color)
     def __init__(self):
         self.star_colors = []
         # 0 for yellow, 1 for blue, 2 for green, 3 is red
@@ -335,51 +329,50 @@ class GalaxyContext(CommonContext):
 
     async def dme_loop(self) -> None:
         """Main loop that checks in game values using Dolphin Memory Engine."""
-        #try:
-        # If DME is not already hooked or connected in any way
-        if not dme.is_hooked() and not await self.try_hook():
-            return
-            
-        if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
-            #checks the id of the game as a string
-            romgameid: bytes = dme.read_bytes(0x80000000,6)
-            if romgameid.decode() != EXPECTED_GAME_ID:
-                dme.un_hook()
-                self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
-                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+        try:
+            # If DME is not already hooked or connected in any way
+            if not dme.is_hooked() and not await self.try_hook():
                 return
-            if not self.auth:
-                await self.get_username()
-                
-            # Inform the player we are ready and waiting for them to connect.
-            if not self.rom_loaded:
-                self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
-                self.rom_loaded = True
-                await self.server_auth(self.password_required)
-            if not self.slot:
-                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                return
-        await self.recalculate_pointers()
-        # Currently verified connected to AP and dolphin is properly loaded
-        await self.last_visited_galaxy()
-        await self.smg_locs_checker()
-        await self.smg_recv_items()
-        await self.check_death()
+
+            if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
+                #checks the id of the game as a string
+                romgameid: bytes = dme.read_bytes(0x80000000,6)
+                if romgameid.decode() != EXPECTED_GAME_ID:
+                    dme.un_hook()
+                    self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
+                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                    return
+                if not self.auth:
+                    await self.get_username()
+
+                # Inform the player we are ready and waiting for them to connect.
+                if not self.rom_loaded:
+                    self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
+                    self.rom_loaded = True
+                    await self.server_auth(self.password_required)
+                if not self.slot:
+                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                    return
+            await self.recalculate_pointers()
+            # Currently verified connected to AP and dolphin is properly loaded
+            await self.last_visited_galaxy()
+            await self.smg_locs_checker()
+            await self.smg_recv_items()
+            await self.check_death()
             
-        #except Exception as dmeEx:
-        #    await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
-        #    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+        except Exception as dmeEx:
+            await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
+            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
     async def dolphin_loop(self) -> None:
         """Continuously check and communicate with Dolphin until the user disconnects."""
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         while not self.exit_event.is_set():
-            #try:
-            await self.dme_loop()
-            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
-
-            #except Exception as dolphinEx:
-                #logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
+            try:
+                await self.dme_loop()
+                await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            except Exception as dolphinEx:
+                logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
     
     def on_package(self, cmd, args) -> None:
         """Processes and handles packets from the server."""
