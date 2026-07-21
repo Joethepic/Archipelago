@@ -6,7 +6,7 @@ from PIL.Image import Image
 
 from ...Options import MarioColors
 from ..extensions import RARCExtended
-
+from ...Constants.constants import *
 MARIO_RELATIVE_PATH = "/DATA/files/ObjectData/Mario.arc"
 
 WHITE = (255, 255, 255)
@@ -30,17 +30,6 @@ class MarioColours:
     with BDL (Binary Display List) files. It uses pixel threshold detection to identify
     and replace specific colored regions in texture images.
     """
-    colour_map: dict[str, tuple[int, int, int]] = {"Red"   : (255,  0,  0),
-                                                   "Orange": (255,165,  0),
-                                                   "Yellow": (255,255,  0),
-                                                   "Green" : (  0,128,  0),
-                                                   "Blue"  : (  0,  0,255),
-                                                   "Purple": (128,  0,128),
-                                                   "Black" : (  0,  0,  0),
-                                                   "Brown" : (165, 42, 42),
-                                                   "White" : (255,255,255),
-                                                   "Pink"  : (255,192,203),
-                                                   "Gray"  : (128,128,128)}
 
     class Parts(StrEnum):
         HAT: str = "Hat"
@@ -137,7 +126,7 @@ class MarioColours:
         if texture_name not in self.bdl.tex1.textures_by_name:
             raise ValueError(f"Texture not found in bdl file: {texture_name}")
 
-        self.paint_texture(texture_name, callback, self.colour_map[colour], texture_count)
+        self.paint_texture(texture_name, callback, colors[colour], texture_count)
 
         self.bdl.save()
         for ch in self.bdl.chunks:
