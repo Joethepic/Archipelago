@@ -31,7 +31,7 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, patch_patch: str):
+    def __init__(self, patch_path: str):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
             patch_name (str): Name of the patch file
@@ -42,9 +42,9 @@ class WiiISO:
             iso_name (str): Name of the new ISO file.
         """
         self.clean_iso_path = self.get_base_rom_path()
-        self.dest_path = os.path.dirname(patch_patch)
+        self.dest_path = os.path.dirname(patch_path)
         self.temp_dir = os.path.join(self.dest_path, "temp")
-        self.iso_name = os.path.basename(patch_patch).split('.')[:-1]
+        self.iso_name = ''.join(os.path.basename(patch_path).split('.')[:-1])
         
         self.progress = None
         self.calling_function = None
@@ -134,7 +134,7 @@ class WiiISO:
         output_path = Path(self.dest_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        iso_path = os.path.join(self.dest_path, self.iso_name[0] + '.iso')
+        iso_path = os.path.join(self.dest_path, self.iso_name + '.iso')
         print("Initiating repacking ISO to output: " + iso_path)
         self.calling_function = 'repack_iso'
         rebuild_from_directory(self.temp_dir, iso_path, callback=self.progress_callback)
