@@ -197,7 +197,7 @@ class Dome6Offsets(OptionCounter):
 class MarioColors(OptionDict):
     """
     Choose new colors for part of Mario's Outfit! (These will also be applied to Luigi)
-    4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
+    4 pieces are changeable: 'Hat' , 'Overalls', 'Shoes', 'Gloves'
 
     The following predetermined colors are available:
     "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
