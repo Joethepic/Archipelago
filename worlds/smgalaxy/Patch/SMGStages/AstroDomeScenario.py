@@ -1,23 +1,22 @@
+from wiithon import WiiIsoPatcher
+from wiithon.file_helper.bcsv import BCSV
+
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended
+from ..extensions import RARCExtended, SMGObject
 
-class AstroDomeScenario(RARCExtended):
-    def __init__(self):
-        self.relative_path = ASTRO_DOME_SCENARIO_RELATIVE_PATH
-        super().__init__()
+class AstroDomeScenario(SMGObject):
+    def __init__(self, patcher: WiiIsoPatcher):
+        super().__init__(patcher, ASTRO_DOME_SCENARIO_PATH)
 
-        # Get the scenariodata bcsv
-        self.scenariodata = self.get_bcsv_file('', SCENARIO_DATA_FILE_NAME)
-        
-        # Get the indices of the fields
-        self.scenariono_index = self.scenariodata.get_field_index(ScenarioDataFieldName.SCENARIO_NUMBER)
-        self.astrodome_index = self.scenariodata.get_field_index(ScenarioDataFieldName.ASTRO_DOME)
+    def update(self, shuffle: dict[int, int]) -> None:
+        self.shuffle_loading_zones(shuffle)
 
     def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
         """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
         for index in range(1,7):
             if index not in dome_shuffle.keys() or index not in dome_shuffle.values():
                 return False
+            
         return True
 
     def shuffle_loading_zones(self, shuffle: dict[int, int]) -> None:
@@ -35,13 +34,12 @@ class AstroDomeScenario(RARCExtended):
             raise ValueError(f"Invalid shuffle: {shuffle}")
 
         print("Updating dome loading zones...")
-        
-        for entry_index in range(self.scenariodata.entry_count):
-            scenariono = self.scenariodata.get_value_by_index(entry_index, self.scenariono_index)
-            new_value = 1 << (shuffle[scenariono] - 1)
 
-            print(f"Loading zone dome {scenariono} -> dome {shuffle[scenariono]}")
+        bcsv: BCSV
+        with self.edit_bcsv(SCENARIO_DATA_FILE_NAME) as bcsv:
+            for entry in bcsv.entries:
+                scenariono = entry["ScenarioNo"]
 
-            self.scenariodata.set_value_by_index(entry_index, self.astrodome_index, new_value)
+                print(f"Loading zone dome {scenariono} -> dome {shuffle[scenariono]}")
 
-        self.scenariodata.save_changes()
+                entry["ScenarioNo"] = 1 << (shuffle[scenariono] - 1)

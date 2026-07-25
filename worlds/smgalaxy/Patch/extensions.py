@@ -1,12 +1,36 @@
+import abc
+from contextlib import contextmanager
+from typing import ContextManager, T
+
 from gclib.dol import DOL, DOLSection
 from gclib.rarc import RARC
 from gclib.yaz0_yay0 import Yaz0
 import gclib.fs_helpers as fs
 from io import BytesIO
 
+from wiithon import WiiIsoPatcher
+
+from worlds.smgalaxy.Patch import hashtable
+
 from .bcsv import BCSV
 
 NOP = b'\x60\x00\x00\x00'
+
+class SMGObject(abc):
+    patcher: WiiIsoPatcher
+    path: str
+
+    def __init__(self, patcher: WiiIsoPatcher, path: str):
+        self.patcher = patcher
+        self.path = path
+
+    @abc.abstractmethod
+    def update(self) -> None:
+        raise NotImplementedError(f"Unimplemented update method for object: {type(self)}")
+
+    @contextmanager
+    def edit_bcsv(self, path: str) -> ContextManager[T]:
+        return self.patcher.edit_as(self.path + '/' + path, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis")
 
 class CustomDOLSection(DOLSection):
     pointer: int
@@ -116,10 +140,7 @@ class RARCExtended(RARC):
     Set relative_path before initialising inheriting class instance
     """
     # Path to be set before calling classes that inherit from this class
-    iso_base_path = ''
-
-    # Path to be set in each class that inherits this class
-    relative_path = ''
+    patcher: WiiIsoPatcher
 
     def __init__(self):
         if self.iso_base_path == '' or self.relative_path == '':

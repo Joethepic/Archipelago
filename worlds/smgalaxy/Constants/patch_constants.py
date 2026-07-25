@@ -5,16 +5,16 @@ from .Names.region_names import GATEWAY
 from ..regions import region_list
 
 # PATHS
-ASTRO_DOME_ENTRANCE_RELATIVE_PATH = "/DATA/files/ObjectData/AstroDomeEntrance{0}.arc"
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-GATEWAY_RELATIVE_PATH: str = "/DATA/files/ObjectData/AstroChildRoom.arc"
-MARIO_RELATIVE_PATH = "/DATA/files/ObjectData/Mario.arc"
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-SURPRISED_GALAXY_RELATIVE_PATH = "/DATA/files/ObjectData/MiniSurprisedGalaxy.arc"
-ASTRODOME_RELATIVE_PATH = "/DATA/files/StageData/AstroDome.arc"
-ASTRO_DOME_SCENARIO_RELATIVE_PATH = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
-ASTRO_GALAXY_RELATIVE_PATH: str = "/DATA/files/StageData/AstroGalaxy.arc"
-DOL_RELATIVE_PATH: str = "/DATA/sys/main.dol"
+ASTRO_DOME_ENTRANCE_PATH = "ObjectData/AstroDomeEntrance{0}.arc"
+OBJECT_DATA_PATH = "ObjectData/"
+GATEWAY_PATH: str = "ObjectData/AstroChildRoom.arc"
+MARIO_PATH = "ObjectData/Mario.arc"
+OBJECT_DATA_PATH = "ObjectData/"
+SURPRISED_GALAXY_PATH = "ObjectData/MiniSurprisedGalaxy.arc"
+ASTRODOME_PATH = "StageData/AstroDome.arc"
+ASTRO_DOME_SCENARIO_PATH = "StageData/AstroDome/AstroDomeScenario.arc"
+ASTRO_GALAXY_PATH: str = "StageData/AstroGalaxy.arc"
+DOL_PATH: str = "/DATA/sys/main.dol"
 
 # ASTRODOMEENTRANCES
 DOMES: dict[int, str] = {1: "Observatory",
@@ -41,7 +41,7 @@ OLD_CAP_COLOUR = (181, 0, 0)
 OLD_GLOVES_COLOUR = (153, 153, 153)
 
 # ASTRODOME
-PLACEMENT_PATH = "jmp/placement/"
+PLACEMENT_PATH = "Stage/jmp/placement/"
 FILE_NAME = "objinfo"
 
 class ObjInfoFieldNames(StrEnum):
@@ -95,7 +95,7 @@ index_to_layer = {1: 'layera',
                   6: 'layerf'}
 
 # ASTRODOMESCENARIO
-SCENARIO_DATA_FILE_NAME = "scenariodata.bcsv"
+SCENARIO_DATA_FILE_NAME = "AstroDomeScenario/ScenarioData.bcsv"
 
 class ScenarioDataFieldName(StrEnum):
     SCENARIO_NUMBER: str = "ScenarioNo"
@@ -111,9 +111,9 @@ class ScenarioDataFieldName(StrEnum):
 # ASTROGALAXY
 ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 
-COMMON_PATH: str = "jmp/placement/common"
-LAYERA_PATH: str = "jmp/placement/layera"
-LAYERB_PATH: str = "jmp/placement/layerb"
+COMMON_PATH: str = "Stage/jmp/placement/common/"
+LAYERA_PATH: str = "Stage/jmp/placement/layera/"
+LAYERB_PATH: str = "Stage/jmp/placement/layerb/"
 FILE_NAME: str = "objinfo"
 
 # SMGDOL

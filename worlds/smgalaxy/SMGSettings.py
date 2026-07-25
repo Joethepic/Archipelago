@@ -1,3 +1,4 @@
+import os
 import settings
 
 class EmulatorExecutable(settings.UserFilePath):
@@ -32,3 +33,16 @@ class SuperMarioGalaxy(settings.Group):
     iso_file: ISOFile = ISOFile(ISOFile.copy_to)
     dolphin_settings: EmulatorSettings = EmulatorSettings()
     dolphin_process_name: DolphinProcessName = DolphinProcessName("")
+
+def get_base_rom_path() -> str:
+    import Utils
+
+    """Gets the base rom path from the host.yml settings."""
+    options: settings.Settings = settings.get_settings()
+    file_name = options["smgalaxy.world_options"]["iso_file"]
+    
+    if not os.path.exists(file_name):
+        file_name = Utils.user_path(file_name)
+        options["smgalaxy.world_options"]["iso_file"] = file_name
+
+    return file_name

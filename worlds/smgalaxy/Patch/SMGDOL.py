@@ -2,7 +2,8 @@ from typing import Self
 from io import BytesIO
 from enum import StrEnum
 import gclib.fs_helpers as fs
-from gclib.dol import DOL
+from wiithon import WiiIsoPatcher
+from wiithon.file_helper.dol import DOL
 
 from ..Constants.patch_constants import *
 from .extensions import DOLExtended, CustomDOLSection
@@ -360,19 +361,20 @@ class AstroDomeModels:
         self.shuffle_list(self.astro_dome_entrance, shuffle)
         #self.shuffle_list(self.astro_dome, shuffle)
 
-class SMGDOL(DOLExtended):
+class SMGDOL:
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
     name_object_factory: NameObjFactory
     galaxy_unlock_table: GalaxyUnlockTable
     custom_section: CustomDOLSection
+    data: BytesIO
 
-    def __init__(self):
-        self.relative_path = DOL_RELATIVE_PATH
-        super().__init__()
-        
-        self.name_object_factory = NameObjFactory(self)
-        self.galaxy_unlock_table = GalaxyUnlockTable(self)
-        self.astro_dome_models = AstroDomeModels(self)
+    def __init__(self, patcher: WiiIsoPatcher):
+        self.dol: DOL = patcher.read_dol()
+        self.data = self.dol.to_bytes()
+
+        self.name_object_factory = NameObjFactory(self.dol)
+        self.galaxy_unlock_table = GalaxyUnlockTable(self.dol)
+        self.astro_dome_models = AstroDomeModels(self.dol)
 
         self.custom_section = self.add_section(0x806ADF90, 0x1000)
 

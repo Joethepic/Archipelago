@@ -3,10 +3,11 @@ from gclib.gx_enums import ImageFormat
 from gclib.j3d import BDL
 from enum import StrEnum
 from PIL.Image import Image
+from wiithon import WiiIsoPatcher
 
 from ...Constants.patch_constants import *
 from ...Options import MarioColors
-from ..extensions import RARCExtended
+from ..extensions import RARCExtended, SMGObject
 from ...Constants.constants import *
 
 def lerp1(x: int | float, begin: int, end: int) -> int:
@@ -33,7 +34,7 @@ class MarioColours:
         SHOES: str = "Shoes"
         GLOVES: str = "Gloves"
 
-    def __init__(self, mario: RARCExtended):
+    def __init__(self, mario: SMGObject):
         self.mario = mario
 
         if "mario.bdl" not in [file.name for file in self.mario.file_entries]:
@@ -77,15 +78,17 @@ class MarioColours:
         return img
     
     def paint_texture(self, texture_name: str, paint_callback, colour, texture_count = 1) -> None:
-        for texture_index in range(texture_count):
-            bti = self.bdl.tex1.textures_by_name[texture_name][texture_index]
-            img = texture_utils.decode_image(bti.image_data, bti.palette_data,
-                                            bti.image_format, bti.palette_format,
-                                            bti.num_colors, bti.width, bti.height)
-            
-            bti.image_format = ImageFormat.CMPR
-            bti.replace_image(self.paint_pixels(img, colour, paint_callback))
-            self.bdl.tex1.textures_by_name[texture_name][texture_index] = bti
+        bdl: BDL
+        with self.mario.patcher.edit_as(self.mario.path + "/mario.bdl", BDL) as bdl:
+            for texture_index in range(texture_count):
+                bti = bdl.tex1.textures_by_name[texture_name][texture_index]
+                img = texture_utils.decode_image(bti.image_data, bti.palette_data,
+                                                bti.image_format, bti.palette_format,
+                                                bti.num_colors, bti.width, bti.height)
+                
+                bti.image_format = ImageFormat.CMPR
+                bti.replace_image(self.paint_pixels(img, colour, paint_callback))
+                bdl.tex1.textures_by_name[texture_name][texture_index] = bti
 
     def update_part(self, mario_part: str, colour: str) -> None:
         if mario_part not in MarioColors.valid_keys:
@@ -124,16 +127,14 @@ class MarioColours:
 
         self.paint_texture(texture_name, callback, colors[colour], texture_count)
 
-        self.bdl.save()
-        for ch in self.bdl.chunks:
-            ch.save()
-
-class Mario(RARCExtended):
-    def __init__(self):
-        self.relative_path = MARIO_RELATIVE_PATH
-        super().__init__()
+class Mario(SMGObject):
+    def __init__(self, patcher: WiiIsoPatcher):
+        super().__init__(patcher, MARIO_PATH)
 
         self.colours = MarioColours(self)
+
+    def update(self, items: dict[str, str]):
+        self.update_colours(items)
     
     def update_colours(self, items: dict[str, str]) -> None:
         for mario_part, colour in items.items():
