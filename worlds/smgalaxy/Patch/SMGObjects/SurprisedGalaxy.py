@@ -1,8 +1,7 @@
 from ..extensions import RARCExtended
 from gclib.j3d import BDL
 
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-SURPRISED_GALAXY_RELATIVE_PATH = "/DATA/files/ObjectData/MiniSurprisedGalaxy.arc"
+from ...Constants.patch_constants import *
 
 class SurprisedGalaxy(RARCExtended):
     bdl_base_name: str = "minisurprisedgalaxy.bdl"

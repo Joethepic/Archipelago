@@ -1,23 +1,5 @@
-from enum import IntEnum
-
+from ...Constants.patch_constants import *
 from ..extensions import RARCExtended
-
-ASTRO_DOME_ENTRANCE_RELATIVE_PATH = "/DATA/files/ObjectData/AstroDomeEntrance{0}.arc"
-
-DOMES: dict[int, str] = {1: "Observatory",
-                         2: "Well",
-                         3: "Kitchen",
-                         4: "BedRoom",
-                         5: "Machine",
-                         6: "Tower"}
-
-class Domes(IntEnum):
-    TERRACE = 1
-    FOUNTAIN = 2
-    KITCHEN = 3
-    BEDROOM = 4
-    ENGINE = 5
-    GARDEN = 6
 
 class AstroDomeEntrance(RARCExtended):
     name: str

@@ -4,14 +4,10 @@ from gclib.j3d import BDL
 from enum import StrEnum
 from PIL.Image import Image
 
+from ...Constants.patch_constants import *
 from ...Options import MarioColors
 from ..extensions import RARCExtended
 from ...Constants.constants import *
-MARIO_RELATIVE_PATH = "/DATA/files/ObjectData/Mario.arc"
-
-WHITE = (255, 255, 255)
-OLD_CAP_COLOUR = (181, 0, 0)
-OLD_GLOVES_COLOUR = (153, 153, 153)
 
 def lerp1(x: int | float, begin: int, end: int) -> int:
     return int(begin + (end - begin) * x)
