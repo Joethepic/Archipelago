@@ -8,15 +8,18 @@ class AstroDomeEntrance(SMGObject):
     file_data: bytes
 
     def __init__(self, patcher: WiiIsoPatcher, dome_name: str):
-        super().__init__(patcher, ASTRO_DOME_ENTRANCE_PATH.format(dome_name) + ".arc")
+        super().__init__(patcher, ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
 
         self.file_data = self.patcher.read_file(self.path)
         self.name = dome_name
 
+    def update(self) -> None:
+        pass
+
     def rename(self, new_dome_name: str):
         print(f"Renaming dome: {self.name}")
 
-        self.patcher.add_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name) + ".arc", self.file_data)
+        self.patcher.add_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.file_data)
 
 class AstroDomeEntrances:
     entrances: list[AstroDomeEntrance]
