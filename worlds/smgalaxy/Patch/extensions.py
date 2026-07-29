@@ -3,10 +3,9 @@ from contextlib import contextmanager
 from typing import ContextManager, T
 
 from wiithon import WiiIsoPatcher
+from wiithon.file_helper.bcsv import BCSV
 
-from worlds.smgalaxy.Patch import hashtable
-
-from .bcsv import BCSV
+from . import hashtable
 
 NOP = b'\x60\x00\x00\x00'
 

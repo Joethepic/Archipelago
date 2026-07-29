@@ -1,11 +1,13 @@
 from typing import Self
 from io import BytesIO
+
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.dol import DOL
+from wiithon.file_helper.bcsv import BCSV
 from wiithon.helpers.Utils import read_string_until_null, write_string as wr_str
 
+from .hashtable import hash_to_name
 from ..Constants.patch_constants import *
-from .bcsv import BCSV
 
 class Pointer:
     base_address: int
@@ -275,15 +277,9 @@ class GalaxyUnlockTable:
         self.entries = []
 
         table_bytes: bytes = dol.read_at(self.start_address, self.size)
-        self.table = BCSV(BytesIO(table_bytes))
-
-        self.name_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.NAME)
-        self.open_condition0_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.OPEN_CONDITION0)
-        self.open_condition1_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.OPEN_CONDITION1)
-        self.power_star_requirement_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT)
-        self.return_dome_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.RETURN_DOME)
+        self.table = BCSV.import_bcsv(BytesIO(table_bytes), field_names=hash_to_name, str_fmt="shift-jis")
         
-        for entry_index in range(self.table.entry_count):
+        for entry_index in range(len(self.table.entries)):
             entry = self.get_entry(entry_index)
 
             # Set empty by default, to be overridden later
@@ -296,25 +292,25 @@ class GalaxyUnlockTable:
             self.entries.append(entry)
 
     def get_entry(self, entry_index: int) -> GalaxyUnlockTableEntry:
-        name = self.table.get_value_by_index(entry_index, self.name_index)
-        open_condition0 = self.table.get_value_by_index(entry_index, self.open_condition0_index)
-        open_condition1 = self.table.get_value_by_index(entry_index, self.open_condition1_index)
-        power_star_requirement = self.table.get_value_by_index(entry_index, self.power_star_requirement_index)
-        return_dome = self.table.get_value_by_index(entry_index, self.return_dome_index)
+        name = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.NAME]
+        open_condition0 = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0]
+        open_condition1 = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1]
+        power_star_requirement = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT]
+        return_dome = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME]
 
         return GalaxyUnlockTableEntry(entry_index, name, open_condition0, open_condition1,
                                       power_star_requirement, return_dome)
     
     def set_entry(self, entry: GalaxyUnlockTableEntry) -> None:
-        self.table.set_value_by_index(entry.entry_index, self.name_index, entry.name)
-        self.table.set_value_by_index(entry.entry_index, self.open_condition0_index, entry.open_condition0)
-        self.table.set_value_by_index(entry.entry_index, self.open_condition1_index, entry.open_condition1)
-        self.table.set_value_by_index(entry.entry_index, self.power_star_requirement_index, entry.power_star_requirement)
-        self.table.set_value_by_index(entry.entry_index, self.return_dome_index, entry.return_dome)
+        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.NAME] = entry.name
+        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0] = entry.open_condition0
+        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1] = entry.open_condition1
+        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
+        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME] = entry.return_dome
 
     def save_to_dol(self, dol: DOL, address: int) -> None:
-        self.table.save_changes()
-        dol.write_at(address, self.table.data.getvalue())
+        bcsv_bytes = self.table.export_bcsv(str_fmt="shift-jis")
+        dol.write_at(address, bcsv_bytes.getvalue())
 
 class AstroDomeModels:
     astro_dome: list[CharPointer]
