@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from gclib.j3d import BDL
+from gclib.yaz0_yay0 import Yaz0
 
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.rarc import Rarc
@@ -22,7 +23,7 @@ class SurprisedGalaxy:
         super().__init__()
         self.patcher = patcher
 
-        self.arc_file = Rarc.read(BytesIO(patcher.read_file(SURPRISED_GALAXY_PATH)))
+        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(patcher.read_file(SURPRISED_GALAXY_PATH))))
         self.bdl_entry = BytesIO(self.arc_file.get_file(self.bdl_base_name))
         self.btk_entry = BytesIO(self.arc_file.get_file(self.btk_base_name))
     
@@ -64,4 +65,4 @@ class SurprisedGalaxy:
         print(f"Creating {luma_galaxy_name}.arc")
         arc_data = BytesIO()
         self.arc_file.write(arc_data)
-        self.patcher.add_file(new_file_path, arc_data.getvalue())
+        self.patcher.add_file(new_file_path, Yaz0.compress(arc_data).getvalue())

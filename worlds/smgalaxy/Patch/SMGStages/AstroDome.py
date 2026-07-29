@@ -12,7 +12,7 @@ class AstroDome(SMGObject):
     def __init__(self, patcher: WiiIsoPatcher, dol: SMGDOL):
         super().__init__(patcher, ASTRODOME_PATH)
 
-        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy()
+        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(patcher)
         self.gateway_galaxy: Gateway = Gateway(patcher, dol)
 
         # Get the in-game names from the region list
