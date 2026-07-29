@@ -3,19 +3,15 @@ import asyncio
 import os
 from pathlib import Path
 import time
-from enum import Enum
 import struct
 import sys
 from typing import NamedTuple, Optional
 import copy
 import random
 
-from wiithon import WiiIsoPatcher
-
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
 from worlds.smgalaxy.Patch.Patch_new import SuperMarioGalaxyRandomiser
-from worlds.smgalaxy.SMGSettings import get_base_rom_path
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
@@ -55,7 +51,7 @@ class Pointer:
         if self.offsets is not None:
             self.address = dme.follow_pointers(self.base, self.offsets)
         else:
-            self.address = base
+            self.address = self.base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address. Raises a ValueError if not properly initialised.
@@ -453,15 +449,12 @@ def launch(*launch_args: str):
     args = parser.parse_args(launch_args)
 
     if args.apsmg_file:
-        with WiiIsoPatcher(get_base_rom_path()) as patcher:
-            SuperMarioGalaxyRandomiser().patch(patcher, args.apsmg_file)
+        output_directory = Path(args.apsmg_file).parent
+        iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
+        iso_path = os.path.join(output_directory, iso_name + '.iso')
 
-            output_directory = Path(args.apsmg_file).parent
-            iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
-            iso_path = os.path.join(output_directory, iso_name + '.iso')
+        SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
 
-            patcher.build(iso_path)
-        
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
     colorama.deinit()

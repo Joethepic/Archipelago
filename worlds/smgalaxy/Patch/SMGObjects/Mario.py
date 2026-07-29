@@ -1,13 +1,12 @@
 from gclib import texture_utils
 from gclib.gx_enums import ImageFormat
 from gclib.j3d import BDL
-from enum import StrEnum
 from PIL.Image import Image
 from wiithon import WiiIsoPatcher
 
 from ...Constants.patch_constants import *
 from ...Options import MarioColors
-from ..extensions import RARCExtended, SMGObject
+from ..extensions import SMGObject
 from ...Constants.constants import *
 
 def lerp1(x: int | float, begin: int, end: int) -> int:
@@ -19,6 +18,12 @@ def lerp(x: int | float, begin: tuple, end: tuple) -> tuple:
 def distance(x: tuple, y: tuple) -> int:
     return sum([(i - j) ** 2 for i, j in zip(x, y)])
 
+class Parts(StrEnum):
+    HAT = "Hat"
+    OVERALLS = "Overalls"
+    SHOES = "Shoes"
+    GLOVES = "Gloves"
+
 class MarioColours:
     """
     A utility class for modifying Mario's colours in Super Mario Galaxy.
@@ -27,12 +32,6 @@ class MarioColours:
     with BDL (Binary Display List) files. It uses pixel threshold detection to identify
     and replace specific colored regions in texture images.
     """
-
-    class Parts(StrEnum):
-        HAT: str = "Hat"
-        OVERALLS: str = "Overalls"
-        SHOES: str = "Shoes"
-        GLOVES: str = "Gloves"
 
     def __init__(self, mario: SMGObject):
         self.mario = mario
@@ -101,20 +100,21 @@ class MarioColours:
 
         texture_count = 1
 
+        texture_name: str = ""
         match mario_part:
-            case self.Parts.HAT:
+            case Parts.HAT:
                 texture_name = "MarioCap.0"
                 callback = self.paint_hat
 
-            case self.Parts.OVERALLS:
+            case Parts.OVERALLS:
                 texture_name = "MarioBody.0"
                 callback = self.paint_overalls
 
-            case self.Parts.SHOES:
+            case Parts.SHOES:
                 texture_name = "MarioBody.0"
                 callback = self.paint_shoes
 
-            case self.Parts.GLOVES:
+            case Parts.GLOVES:
                 texture_name = "MarioHand"
                 callback = self.paint_gloves
                 texture_count = 2

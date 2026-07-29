@@ -1,7 +1,7 @@
 from wiithon import WiiIsoPatcher
 
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended, SMGObject
+from ..extensions import SMGObject
 
 class AstroDomeEntrance(SMGObject):
     name: str

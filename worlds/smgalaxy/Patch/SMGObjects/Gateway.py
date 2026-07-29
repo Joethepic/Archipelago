@@ -1,20 +1,25 @@
+from io import BytesIO
+
 from gclib.rarc import RARC
 from gclib.j3d import BDL
-from gclib import fs_helpers as fs
+
+from wiithon import WiiIsoPatcher
+from wiithon.file_helper.rarc import *
 
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended
 from ..SMGDOL import SMGDOL
 
-class Gateway(RARCExtended):
-    bdl_base_name = "astrochildroom.bdl"
+class Gateway:
+    arc_file: Rarc
+    bdl_entry: BytesIO
+    patcher: WiiIsoPatcher
+    dol: SMGDOL
 
-    def __init__(self):
-        self.object_data_absolute_path = self.iso_base_path +  OBJECT_DATA_RELATIVE_PATH
-        self.relative_path = GATEWAY_RELATIVE_PATH
-        super().__init__()
-
-        self.bdl_entry = self.get_file_entry(self.bdl_base_name)
+    def __init__(self, patcher: WiiIsoPatcher, dol: SMGDOL):
+        self.patcher = patcher
+        self.dol = dol
+        self.arc_file = Rarc.read(BytesIO(patcher.read_file(GATEWAY_PATH)))
+        self.bdl_entry = BytesIO(self.arc_file.get_file(GATEWAY_BDL_NAME))
 
     def create_miniature(self):
         # Scale the BDL to the desired size
@@ -37,7 +42,7 @@ class Gateway(RARCExtended):
         for chunk in bdl.chunks:
             chunk.save()
         bdl.save()
-        self.bdl_entry.save_changes()
+        self.arc_file.replace_file(GATEWAY_BDL_NAME, bdl.data.getvalue())
 
         # Instantiate an empty ARC file and populate it with they BDL entry
         name: str = MINIATURE_GATEWAY_NAME.lower()
@@ -48,45 +53,37 @@ class Gateway(RARCExtended):
         root_node = empty_arc.get_node_by_path('')
         root_node.name = "minisurprisedgalaxy"
 
-        empty_arc.add_new_file(name + ".bdl", self.bdl_entry.data, root_node)
+        empty_arc.add_new_file(name + ".bdl", self.bdl_entry, root_node)
         empty_arc.save_changes()
-        
-        self.data = empty_arc.data
-        self.read()
 
-        new_file_path = self.object_data_absolute_path + MINIATURE_GATEWAY_NAME + ".arc"
+        new_file_path = GATEWAY_PATH + MINIATURE_GATEWAY_NAME + ".arc"
 
         print(f"Creating {MINIATURE_GATEWAY_NAME}.arc")
+        self.patcher.add_file(new_file_path, empty_arc.data.getvalue())
 
-        self.save_to_new_file(new_file_path)
-
-    def replace_loading(self, dol: SMGDOL, name_address: int) -> None:
+    def replace_loading(self, name_address: int) -> None:
         """
         Replaces typical loading of gateway galaxy of the gateway island. Replaces both the entrance and exit.
         """
-        self.replace_entrance(dol, name_address)
-        self.replace_exit(dol, name_address)
+        self.replace_entrance(name_address)
+        self.replace_exit(name_address)
 
-    def replace_entrance(self, dol: SMGDOL, name_address: int) -> None:
+    def replace_entrance(self, name_address: int) -> None:
         upper_bytes: int = name_address >> 16
         lower_bytes: int = name_address & 0xFFFF
 
-        address = 0x8001f024
         new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_ONE, new_instruction)
 
-        address = 0x8001f028
         new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_TWO, new_instruction)
 
-    def replace_exit(self, dol: SMGDOL, name_address: int) -> None:
+    def replace_exit(self, name_address: int) -> None:
         upper_bytes: int = name_address >> 16
         lower_bytes: int = name_address & 0xFFFF
 
-        address = 0x803bb2fc
         new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_ONE, new_instruction)
 
-        address = 0x803bb300
         new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        dol.write_data(fs.write_bytes, address, new_instruction)
+        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_TWO, new_instruction)

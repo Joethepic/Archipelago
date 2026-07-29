@@ -1,19 +1,17 @@
 from typing import Self
 from io import BytesIO
-from enum import StrEnum
-import gclib.fs_helpers as fs
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.dol import DOL
+from wiithon.helpers.Utils import read_string_until_null, write_string as wr_str
 
 from ..Constants.patch_constants import *
-from .extensions import DOLExtended, CustomDOLSection
 from .bcsv import BCSV
 
 class Pointer:
     base_address: int
     pointing_address: int
     
-    def __init__(self, dol: DOL, base_address: int):
+    def __init__(self, dol: "SMGDOL", base_address: int):
         self.dol = dol
         
         self.base_address = base_address
@@ -21,10 +19,10 @@ class Pointer:
         self.read_pointer()
 
     def read_pointer(self):
-        self.pointing_address = self.dol.read_data(fs.read_u32, self.base_address)
+        self.pointing_address = int.from_bytes(self.dol.dol.read_at(self.base_address, 4))
     
     def write_pointer(self):
-        self.dol.write_data(fs.write_u32, self.base_address, self.pointing_address)
+        self.dol.dol.write_at(self.base_address, int.to_bytes(self.pointing_address, 4, "big"))
 
     def swap_with_pointer(self, other: Self):
         self.pointing_address, other.pointing_address = other.pointing_address, self.pointing_address
@@ -33,18 +31,19 @@ class Pointer:
         other.write_pointer()
 
 class CharPointer(Pointer):
-    string: str
+    string: str | None
 
     def read_pointer(self):
         super().read_pointer()
 
         if self.pointing_address != 0:
-            self.string = self.dol.read_data(fs.read_str_until_null_character, self.pointing_address)
+            self.string = read_string_until_null(self.dol.data, self.pointing_address, "utf-8")
         else:
             self.string = None
     
     def write_string(self) -> None:
-        self.dol.write_data(fs.write_str_with_null_byte, self.pointing_address, self.string)
+        wr_str(self.dol.data, self.string, len(self.string.encode("utf-8")),
+            offset=self.pointing_address, str_fmt="utf-8", add_null_byte=True)
 
     def replace_prefix(self, new_prefix: str) -> None:
         self.string = new_prefix + self.string[len(new_prefix):]
@@ -87,7 +86,7 @@ class NameObjFactory:
     name_to_archive_elements: list[Name2ArchiveElement]
     name_to_make_archive_list_function_elements: list[Name2MakeArchiveListFuncElement]
 
-    def __init__(self, dol: DOL):
+    def __init__(self, dol: "SMGDOL"):
         self.dol = dol
 
         self.miniature_function_address = CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS
@@ -233,13 +232,13 @@ class NameObjFactory:
         pointer1.swap_with_pointer(pointer2)
 
 class GalaxyUnlockTableFieldNames(StrEnum):
-    NAME: str = "name"
-    MAP_PANE_NAME: str = "MapPaneName"
-    OPEN_CONDITION0: str = "OpenCondition0"
-    OPEN_CONDITION1: str = "OpenCondition1"
-    OPEN_CONDITION2: str = "OpenCondition2"
-    POWER_STAR_REQUIREMENT: str = "PowerStarNum"
-    RETURN_DOME: str = "GrandGalaxyNo"
+    NAME = "name"
+    MAP_PANE_NAME = "MapPaneName"
+    OPEN_CONDITION0 = "OpenCondition0"
+    OPEN_CONDITION1 = "OpenCondition1"
+    OPEN_CONDITION2 = "OpenCondition2"
+    POWER_STAR_REQUIREMENT = "PowerStarNum"
+    RETURN_DOME = "GrandGalaxyNo"
 
 class GalaxyUnlockTableEntry:
     def __init__(self, entry_index: int, name: str, open_condition0: str, open_condition1: str,
@@ -275,7 +274,7 @@ class GalaxyUnlockTable:
 
         self.entries = []
 
-        table_bytes: bytes = dol.read_data(fs.read_bytes, self.start_address, self.size)
+        table_bytes: bytes = dol.read_at(self.start_address, self.size)
         self.table = BCSV(BytesIO(table_bytes))
 
         self.name_index = self.table.get_field_index(GalaxyUnlockTableFieldNames.NAME)
@@ -315,7 +314,7 @@ class GalaxyUnlockTable:
 
     def save_to_dol(self, dol: DOL, address: int) -> None:
         self.table.save_changes()
-        dol.write_data(fs.write_bytes, address, self.table.data.getvalue())
+        dol.write_at(address, self.table.data.getvalue())
 
 class AstroDomeModels:
     astro_dome: list[CharPointer]
@@ -323,7 +322,7 @@ class AstroDomeModels:
     astro_dome_entrance: list[CharPointer]
     astro_star_plate: list[CharPointer]
 
-    def __init__(self, dol: DOL):
+    def __init__(self, dol: "SMGDOL"):
         self.astro_dome_address: int = ASTRO_DOME_ARRAY_ADDRESS
         self.astro_dome_sky_address: int = ASTRO_DOME_SKY_ARRAY_ADDRESS
         self.astro_dome_entrance_address: int = ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS
@@ -365,31 +364,55 @@ class SMGDOL:
     """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
     name_object_factory: NameObjFactory
     galaxy_unlock_table: GalaxyUnlockTable
-    custom_section: CustomDOLSection
     data: BytesIO
+    custom_section_size: int = 0x1000
 
     def __init__(self, patcher: WiiIsoPatcher):
         self.dol: DOL = patcher.read_dol()
-        self.data = self.dol.to_bytes()
+        self.data = BytesIO(self.dol.to_bytes())
 
-        self.name_object_factory = NameObjFactory(self.dol)
+        self.name_object_factory = NameObjFactory(self)
         self.galaxy_unlock_table = GalaxyUnlockTable(self.dol)
-        self.astro_dome_models = AstroDomeModels(self.dol)
+        self.astro_dome_models = AstroDomeModels(self)
 
-        self.custom_section = self.add_section(0x806ADF90, 0x1000)
+        self.dol.add_text_section(CUSTOM_SECTION_START, b"" * self.custom_section_size)
 
     def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
         self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
 
-    def get_galaxy_unlock_table_entry_by_name(self, name: str) -> GalaxyUnlockTableEntry:
+    def get_galaxy_unlock_table_entry_by_name(self, name: str) -> GalaxyUnlockTableEntry | None:
         for entry in self.galaxy_unlock_table.entries:
             if entry.name == name:
                 return entry
 
-    def save(self):
-        self.save_changes()
-        self.write_data(fs.write_bytes, self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
-        self.galaxy_unlock_table.save_to_dol(self, self.galaxy_unlock_table.start_address)
+        print(f"Entry was not found in Unlock table: {name}")
+        return None
 
-        with open(self.absolute_file_path, 'wb') as f:
-            f.write(self.data.getvalue())
+    def add_deathlink(self):
+        self.dol.write_at(0x804A16C0, b'\x38\x63\xef\x90')
+        self.dol.write_at(0x804AAC98, b'\x38\xa5\xef\x90')
+
+        # Return
+        instructions = b'\x39\x61\x01\x00\x4b\xe6\x85\xcd\x80\x01\x01\x04\x7c\x08\x03\xa6\x38\x21\x01\x00\x4e\x80\x00\x20'
+        address: int = (CUSTOM_SECTION_START + self.custom_section_size) - len(instructions)
+        self.dol.write_at(address, instructions)
+
+        # Setup
+        instructions = b'\x94\x21\xff\x00\x7c\x08\x02\xa6\x90\x01\x01\x04\x39\x61\x01\x00\x4b\xe6\x95\x5d\x4b\xce\xbb\x4d'
+        self.dol.write_at(CUSTOM_SECTION_START, instructions)
+
+        # Set 0x8000 into higher bits of r3
+        # Load byte from 0x80001af0 into r3
+        # Compare 0x80001af0 with 0
+        # Jump over if its not 0
+        # Jump to forceKillPlayerByAbyss
+        # Set 0 into r3
+        # Store byte from r3 (0) into 0x80001af0 and reset it
+        address = CUSTOM_SECTION_START + len(instructions) # Previous Instructions first
+        instructions = b'\x3f\xe0\x80\x00\x88\x7f\x1a\xf0\x2c\x03\x00\x00\x41\x82\x00\x10\x4b\xd4\x3e\xbd\x38\x60\x00\x00\x98\x7f\x1a\xf0'
+        self.dol.write_at(address, instructions)
+
+    def save(self):
+        self.add_deathlink()
+        self.dol.write_at(self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
+        self.galaxy_unlock_table.save_to_dol(self.dol, self.galaxy_unlock_table.start_address)

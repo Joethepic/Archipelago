@@ -2,7 +2,7 @@ from wiithon import WiiIsoPatcher
 from wiithon.file_helper.bcsv import BCSV
 
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended, SMGObject
+from ..extensions import SMGObject
 
 class AstroDomeScenario(SMGObject):
     def __init__(self, patcher: WiiIsoPatcher):
