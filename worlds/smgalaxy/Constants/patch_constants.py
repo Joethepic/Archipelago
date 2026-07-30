@@ -41,7 +41,7 @@ OLD_CAP_COLOUR = (181, 0, 0)
 OLD_GLOVES_COLOUR = (153, 153, 153)
 
 # ASTRODOME
-PLACEMENT_PATH = "Stage/jmp/placement/"
+PLACEMENT_PATH = "/jmp/placement/"
 FILE_NAME = "objinfo"
 
 class ObjInfoFieldNames(StrEnum):
@@ -95,7 +95,7 @@ index_to_layer = {1: 'layera',
                   6: 'layerf'}
 
 # ASTRODOMESCENARIO
-SCENARIO_DATA_FILE_NAME = "AstroDomeScenario/ScenarioData.bcsv"
+SCENARIO_DATA_FILE_NAME = "/scenariodata.bcsv"
 
 class ScenarioDataFieldName(StrEnum):
     SCENARIO_NUMBER = "ScenarioNo"
