@@ -15,59 +15,6 @@ from .SMGStages.AstroGalaxy import AstroGalaxy
 from ..regions import region_list
 from ..SMGSettings import get_base_rom_path
 
-class InvalidCleanISOError(Exception): pass
-
-# Name of the game, which is used in various error messaging.
-RANDOMIZER_NAME: str = "Super Mario Galaxy"
-
-# Can pull this from dolphin or a cmd command / bash command
-CLEAN_MD5: int = 0xf99a97f9ae4dccd1db45e9aaab9cebd8
-
-# Expected Game ID of the GC/Wii game we expect here.
-EXPECTED_GAME_ID: str = "RMGE01"
-
-
-def verify_base_rom(clean_iso_path: str):
-    """Verifies that the base Vanilla ROM against a few rules. First, the file is of type ISO, second, the MD5
-    of the file matches against the one we expect, and third, we had a game id in the file that matches the games
-    official one"""
-    # Verifies we have a valid installation of Super Mario Galaxy USA. There are some regional file differences.
-    print(f"Verifying if the provided ISO is a valid copy of {RANDOMIZER_NAME}...")
-
-    # Reads the file in chunks, as its too big as a file on its own and could lead to the python process slowing
-    # down to process and read each byte. After reading each chunk, it updates and calculates the MD5
-    base_md5 = hashlib.md5()
-    with open(clean_iso_path, "rb") as f:
-        while chunk := f.read(1024 * 1024):  # Read the file in chunks.
-            base_md5.update(chunk)
-
-        # Grab the Magic Code and Game_ID with the file still open
-        f.seek(0)
-        game_id = f.read(6).decode("shift_jis")
-        magic = game_id[:4]
-        print(f"Magic Code: {magic}; Game ID: {game_id}")
-
-    # Verify that the file has the right has format first, as the wrong file could have been loaded.
-    md5_conv = int(base_md5.hexdigest(), 16)
-    if md5_conv != CLEAN_MD5:
-        raise InvalidCleanISOError(f"Invalid vanilla {RANDOMIZER_NAME} ISO.\nYour ISO may be corrupted or your " +
-                                   f"MD5 hashes do not match.\nCorrect ISO MD5 hash: {CLEAN_MD5:x}\nYour ISO's MD5 hash: {md5_conv}")
-
-    # Verify if the provided ISO file is a valid file extension and contains a valid Game ID.
-    # Based on some similar code from (MIT License): https://github.com/LagoLunatic/wwrando
-    if magic == "CISO":
-        raise InvalidCleanISOError(f"The provided ISO is in CISO format. The {RANDOMIZER_NAME} randomizer " +
-                                   "only supports ISOs in ISO format.")
-    if game_id != EXPECTED_GAME_ID:
-        # Checks this starts with "RMG" at least, otherwise user provided an entirely different game.
-        if game_id and game_id.startswith(EXPECTED_GAME_ID[:3]):
-            raise InvalidCleanISOError(f"Invalid version of {RANDOMIZER_NAME}. " +
-                                       "Currently, only the North American / English version is supported by this randomizer.")
-        else:
-            raise InvalidCleanISOError(f"Non-{RANDOMIZER_NAME} game detected. Please re-select the vanilla " +
-                                       f"{RANDOMIZER_NAME}'s ISO (North American version).")
-    return
-
 class GalaxyDestination(NamedTuple):
     name: str
     type: str
