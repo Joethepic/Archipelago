@@ -1,4 +1,4 @@
-import hashlib, zipfile, json
+import zipfile, json
 from typing import NamedTuple
 
 from wiithon import WiiIsoPatcher
@@ -14,6 +14,7 @@ from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
 from ..regions import region_list
 from ..SMGSettings import get_base_rom_path
+from ..Constants.constants import GAME_NAME
 
 class GalaxyDestination(NamedTuple):
     name: str
@@ -274,7 +275,7 @@ class Patch:
         
 
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
-    game = RANDOMIZER_NAME
+    game = GAME_NAME
     patch_file_ending = ".apsmg"
     result_file_ending = ".iso"
     input_path: str
@@ -285,7 +286,6 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
     def patch(self, target: str) -> None:
         vanilla_rom_path = get_base_rom_path()
-        verify_base_rom(vanilla_rom_path)
 
         with WiiIsoPatcher(vanilla_rom_path) as patcher:
             # Get the data from the generated output to use for patching
@@ -316,7 +316,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         
 
 class SMGPlayerContainer(APPlayerContainer):
-    game = RANDOMIZER_NAME
+    game = GAME_NAME
     compression_method = zipfile.ZIP_DEFLATED
     patch_file_ending = ".apsmg"
 
