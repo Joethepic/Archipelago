@@ -363,6 +363,7 @@ class SMGDOL:
     galaxy_unlock_table: GalaxyUnlockTable
     data: BytesIO
     custom_section_size: int = 0x1000
+    custom_section_address: int
 
     def __init__(self, patcher: WiiIsoPatcher):
         self.dol: DOL = patcher.read_dol()
@@ -372,7 +373,8 @@ class SMGDOL:
         self.galaxy_unlock_table = GalaxyUnlockTable(self.dol)
         self.astro_dome_models = AstroDomeModels(self)
 
-        self.dol.add_text_section(CUSTOM_SECTION_START, b"\x00" * self.custom_section_size)
+        diff, addrs = self.dol.inject_above_arena([b'\0' * self.custom_section_size])
+        self.custom_section_address = addrs[0]
 
     def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
         self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
@@ -391,12 +393,12 @@ class SMGDOL:
 
         # Return
         instructions = b'\x39\x61\x01\x00\x4b\xe6\x85\xcd\x80\x01\x01\x04\x7c\x08\x03\xa6\x38\x21\x01\x00\x4e\x80\x00\x20'
-        address: int = (CUSTOM_SECTION_START + self.custom_section_size) - len(instructions)
+        address: int = (self.custom_section_address + self.custom_section_size) - len(instructions)
         self.dol.write_at(address, instructions)
 
         # Setup
         instructions = b'\x94\x21\xff\x00\x7c\x08\x02\xa6\x90\x01\x01\x04\x39\x61\x01\x00\x4b\xe6\x95\x5d\x4b\xce\xbb\x4d'
-        self.dol.write_at(CUSTOM_SECTION_START, instructions)
+        self.dol.write_at(self.custom_section_address, instructions)
 
         # Set 0x8000 into higher bits of r3
         # Load byte from 0x80001af0 into r3
@@ -405,7 +407,7 @@ class SMGDOL:
         # Jump to forceKillPlayerByAbyss
         # Set 0 into r3
         # Store byte from r3 (0) into 0x80001af0 and reset it
-        address = CUSTOM_SECTION_START + len(instructions) # Previous Instructions first
+        address = self.custom_section_address + len(instructions) # Previous Instructions first
         instructions = b'\x3f\xe0\x80\x00\x88\x7f\x1a\xf0\x2c\x03\x00\x00\x41\x82\x00\x10\x4b\xd4\x3e\xbd\x38\x60\x00\x00\x98\x7f\x1a\xf0'
         self.dol.write_at(address, instructions)
 
