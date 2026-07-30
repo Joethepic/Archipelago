@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 import os
+from enum import Enum
 from pathlib import Path
 import time
 import struct
