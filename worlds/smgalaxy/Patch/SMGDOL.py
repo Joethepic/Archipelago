@@ -39,13 +39,14 @@ class CharPointer(Pointer):
         super().read_pointer()
 
         if self.pointing_address != 0:
-            self.string = read_string_until_null(self.dol.data, self.pointing_address, "utf-8")
+            stype, i, offset = self.dol.dol._virtual_to_section(self.pointing_address)
+            section = self.dol.dol.text_sections[i] if stype == 'text' else self.dol.dol.data_sections[i]
+            self.string = read_string_until_null(BytesIO(section), offset, "shift-jis")
         else:
             self.string = None
     
     def write_string(self) -> None:
-        wr_str(self.dol.data, self.string, len(self.string.encode("utf-8")),
-            offset=self.pointing_address, str_fmt="utf-8", add_null_byte=True)
+        self.dol.dol.write_at(self.pointing_address, self.string.encode("shift-jis") + b'\0')
 
     def replace_prefix(self, new_prefix: str) -> None:
         self.string = new_prefix + self.string[len(new_prefix):]
