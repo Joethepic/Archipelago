@@ -372,7 +372,7 @@ class SMGDOL:
         self.galaxy_unlock_table = GalaxyUnlockTable(self.dol)
         self.astro_dome_models = AstroDomeModels(self)
 
-        self.dol.add_text_section(CUSTOM_SECTION_START, b"" * self.custom_section_size)
+        self.dol.add_text_section(CUSTOM_SECTION_START, b"\x00" * self.custom_section_size)
 
     def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
         self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
