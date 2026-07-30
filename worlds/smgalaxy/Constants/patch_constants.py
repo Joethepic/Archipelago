@@ -111,9 +111,9 @@ class ScenarioDataFieldName(StrEnum):
 # ASTROGALAXY
 ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 
-COMMON_PATH: str = "Stage/jmp/placement/common/"
-LAYERA_PATH: str = "Stage/jmp/placement/layera/"
-LAYERB_PATH: str = "Stage/jmp/placement/layerb/"
+COMMON_PATH: str = "/jmp/placement/common/" #TODO add stage name root folder once wiithon fixes it.
+LAYERA_PATH: str = "/jmp/placement/layera/"
+LAYERB_PATH: str = "/jmp/placement/layerb/"
 
 # SMGDOL
 GATEWAY_IN_GAME: str = region_list[GATEWAY].in_game_name
