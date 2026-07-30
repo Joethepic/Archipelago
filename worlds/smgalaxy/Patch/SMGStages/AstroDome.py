@@ -1,4 +1,7 @@
 from wiithon import WiiIsoPatcher
+from wiithon.file_helper.bcsv import BCSV
+
+from worlds.smgalaxy.Patch import hashtable
 
 from ..SMGDOL import SMGDOL
 from ...Constants.patch_constants import *
@@ -41,7 +44,7 @@ class AstroDome(SMGObject):
         OBJINFO_PATH = PLACEMENT_PATH + index_to_layer[dome_index]
 
         galaxy_index = 0
-        with self.edit_bcsv(OBJINFO_PATH) as bcsv:
+        with self.patcher.edit_as(self.path + '/' + OBJINFO_PATH, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
             for entry in bcsv.entries:
                 if entry["name"].startwith("Mini"):
                     galaxy: GalaxyDestination = new_galaxies[galaxy_index]

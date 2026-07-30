@@ -1,6 +1,8 @@
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.bcsv import BCSV
 
+from worlds.smgalaxy.Patch import hashtable
+
 from ...Constants.patch_constants import *
 from ..extensions import SMGObject
 
@@ -36,7 +38,7 @@ class AstroDomeScenario(SMGObject):
         print("Updating dome loading zones...")
 
         bcsv: BCSV
-        with self.edit_bcsv(SCENARIO_DATA_FILE_NAME) as bcsv:
+        with self.patcher.edit_as(self.path + '/' + SCENARIO_DATA_FILE_NAME, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
             for entry in bcsv.entries:
                 scenariono = entry["ScenarioNo"]
 
