@@ -4,7 +4,9 @@ from gclib import texture_utils
 from gclib.yaz0_yay0 import Yaz0
 from gclib.gx_enums import ImageFormat
 from gclib.j3d import BDL
+
 from PIL.Image import Image
+
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.rarc import Rarc
 
@@ -34,8 +36,6 @@ class MarioColours:
 
         #if "mario.bdl" not in [file.name for file in self.mario.file_entries]:
         #    raise ValueError("Arc file is not expected arc file: Mario.arc")
-
-        #self.bdl = BDL(BytesIO(self.mario.arc_file.get_file("mario.bdl")))
 
     def paint_hat(self, old_colour: tuple[int, int, int], new_colour: tuple[int, int, int], *args) -> tuple[int, int, int]:
         distance_to_old = distance(old_colour, OLD_CAP_COLOUR)
@@ -73,20 +73,18 @@ class MarioColours:
         return img
 
     def paint_texture(self, texture_name: str, paint_callback, colour, texture_count = 1) -> None:
-        bdl: BDL
-        with self.mario.patcher.edit_as(self.mario.path + "/mario.bdl", BDL) as bdl:
-            if texture_name not in bdl.tex1.textures_by_name:
-                raise ValueError(f"Texture not found in bdl file: {texture_name}")
+        if texture_name not in self.mario.bdl.tex1.textures_by_name:
+            raise ValueError(f"Texture not found in bdl file: {texture_name}")
 
-            for texture_index in range(texture_count):
-                bti = bdl.tex1.textures_by_name[texture_name][texture_index]
-                img = texture_utils.decode_image(bti.image_data, bti.palette_data,
-                                                bti.image_format, bti.palette_format,
-                                                bti.num_colors, bti.width, bti.height)
+        for texture_index in range(texture_count):
+            bti = self.mario.bdl.tex1.textures_by_name[texture_name][texture_index]
+            img = texture_utils.decode_image(bti.image_data, bti.palette_data,
+                                            bti.image_format, bti.palette_format,
+                                            bti.num_colors, bti.width, bti.height)
 
-                bti.image_format = ImageFormat.CMPR
-                bti.replace_image(self.paint_pixels(img, colour, paint_callback))
-                bdl.tex1.textures_by_name[texture_name][texture_index] = bti
+            bti.image_format = ImageFormat.CMPR
+            bti.replace_image(self.paint_pixels(img, colour, paint_callback))
+            self.mario.bdl.tex1.textures_by_name[texture_name][texture_index] = bti
 
     def update_part(self, mario_part: str, colour: str) -> None:
         if mario_part not in MarioColors.valid_keys:
@@ -136,16 +134,24 @@ class Mario(SMGObject):
 
     def __init__(self, patcher: WiiIsoPatcher):
         super().__init__(patcher, MARIO_PATH)
-        #compressed_bytes: BytesIO = BytesIO(self.patcher.read_file(self.path))
-        #self.arc_file: Rarc = Rarc.read(Yaz0.decompress(compressed_bytes))
+        compressed_bytes: BytesIO = BytesIO(self.patcher.read_file(self.path))
+        self.arc_file: Rarc = Rarc.read(Yaz0.decompress(compressed_bytes))
+        self.bdl = BDL(BytesIO(self.arc_file.get_file("mario.bdl")))
 
         self.colours = MarioColours(self)
 
     def update(self, items: dict[str, str]):
         self.update_colours(items)
-        #compressed_bytes = Yaz0.compress(self.)
-        #self.patcher.replace_file(self.path)
+        mario_bytes: BytesIO = BytesIO()
+        self.arc_file.write(mario_bytes)
+        self.patcher.replace_file(self.path, Yaz0.compress(mario_bytes).getvalue())
     
     def update_colours(self, items: dict[str, str]) -> None:
         for mario_part, colour in items.items():
             self.colours.update_part(mario_part, colour)
+
+        self.bdl.save()
+        for ch in self.bdl.chunks:
+            ch.save()
+
+        self.arc_file.replace_file("mario.bdl", self.bdl.data.getvalue())
