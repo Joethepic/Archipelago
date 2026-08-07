@@ -92,22 +92,19 @@ class GalaxyCommand(ClientCommandProcessor):
 class StarColor(NamedTuple):
     name: str
     pointer: Pointer
-    location_id: int
 class StarColorHandler:
     pointers: dict[str, Pointer]
     star_colors: list[StarColor] = []
-    async def setstar_colors(self, loc_id: int):
+    async def setstar_colors(self, galaxyName: str, starNum: int):
         for star in self.star_colors:
-            if star.location_id == loc_id:
+            if star.name == galaxyName + "Colours" + str(starNum):
                 star.pointer.write_value(1)
     async def setAllStar_Colors(self):
         self.star_colors = []
-        for region in region_list.values():
-            if region.star_location_ids != [0]:
-                for index, item in enumerate(region.star_location_ids):
-                    starname = region.in_game_name + "Colours" + str(index)
-                    star_color = StarColor(starname, self.pointers[starname], region.star_location_ids[index])
-                    self.star_colors.append(star_color)
+        for location in location_table.values():
+            starname = location.in_game_galaxy_name + "Colours" + str(location.game_address)
+            star_color = StarColor(starname, self.pointers[starname])
+            self.star_colors.append(star_color)
     def __init__(self):
         self.star_colors = []
         # 0 for yellow, 1 for blue, 2 for green, 3 is red
@@ -115,6 +112,7 @@ class StarColorHandler:
         self.pointers = {**star_colour_pointers}
         for pointer in self.pointers.values():
             pointer.recalculate()
+        
 class GalaxyContext(CommonContext):
     password_required: bool = False
     rom_loaded: bool = False
@@ -236,7 +234,11 @@ class GalaxyContext(CommonContext):
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
         for location_id in self.checked_locations:
-                await self.starcolorhandler.setstar_colors(location_id)
+            for key, location in location_table.items():
+                if key == self.location_names.lookup_in_game(location_id):
+                    await self.starcolorhandler.setstar_colors(location.in_game_galaxy_name, location.game_address)
+                else: 
+                    continue
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
