@@ -61,3 +61,7 @@ BUOY = "Buoy Base Galaxy"
 HONEYCLIMB = "Honeyclimb Galaxy"
 BONEFIN = "Bonefin Galaxy"
 MATTER = "Matter Splatter Galaxy"
+
+# Planetoid Subregions
+## Terrace Galaxies
+### Good Egg
