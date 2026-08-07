@@ -31,7 +31,7 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, patch_patch: str):
+    def __init__(self, patch_path: str):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
             patch_name (str): Name of the patch file
@@ -44,7 +44,7 @@ class WiiISO:
         self.clean_iso_path = self.get_base_rom_path()
         self.dest_path = os.path.dirname(patch_path)
         self.temp_dir = os.path.join(self.dest_path, "temp")
-        self.iso_name = os.path.basename(patch_path).split('.')[:-1]
+        self.iso_name = ''.join(os.path.basename(patch_path).split('.')[:-1])
         
         self.progress = None
         self.calling_function = None
@@ -223,7 +223,7 @@ class GalaxyShuffle:
 
 class Patch:
     def __init__(self, patch_path: str, output: dict):
-        self.iso: WiiISO = WiiISO(patch_patch)
+        self.iso: WiiISO = WiiISO(patch_path)
 
         RARCExtended.iso_base_path = self.iso.temp_dir
         DOLExtended.iso_base_path = self.iso.temp_dir

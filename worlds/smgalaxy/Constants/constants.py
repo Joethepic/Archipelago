@@ -1,3 +1,4 @@
+from enum import Enum
 # Client Constants
 AP_WORLD_VERSION_NAME: str = "APWorldVersion"
 CLIENT_VERSION: str = "V0.0.1"
@@ -17,3 +18,26 @@ AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see abo
 EXPECTED_GAME_ID: str = "RMGE01"
 WAIT_TIMER_LONG_TIMEOUT: int = 5
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
+# Colors
+WHITE = (255,  255,  255)
+RED = (255,  0,  0)
+PINK = (240, 67, 205)
+ORANGE = (247, 161, 2)
+GREEN = (0,128,  0)
+YELLOW = (255, 247, 0)
+BLUE = (0,  0,255)
+PURPLE = (128,  0,128)
+BLACK = (0, 0, 0)
+BROWN = (165, 42, 42)
+GRAY = (128,128,128)
+colors: dict[str, tuple[int, int, int]] = {"red": RED,
+                                           "Orange": ORANGE,
+                                           "Yellow": YELLOW,
+                                           "Green" : GREEN,
+                                           "Blue"  : BLUE,
+                                           "Purple": PURPLE,
+                                           "Black" : BLACK,
+                                           "Brown" : BROWN,
+                                           "White" : WHITE,
+                                           "Pink"  : PINK,
+                                           "Gray"  : GRAY}
