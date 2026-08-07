@@ -14,6 +14,8 @@ class SMGLocationData(NamedTuple):
     location_groups: list[str] # type of randomization option table and group []
     region: str
     code: Optional[int]  # used to create ap_id, None for events
+    galaxy_name: str
+    star_number: int
     game_address: Optional[int] = 0  #
     default_access: Optional[dict[str, int]] = {}
 
