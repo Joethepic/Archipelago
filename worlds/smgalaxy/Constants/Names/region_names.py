@@ -63,5 +63,12 @@ BONEFIN = "Bonefin Galaxy"
 MATTER = "Matter Splatter Galaxy"
 
 # Planetoid Subregions
+## Gateway Galaxy
+GATEWAY1HOMEP = "Grand Star Rescue: Home Planet"
+GATEWAY1HOLEY = "Grand Star Rescue: Holey Planet"
+GATEWAY1SMLTU = "Grand Star Rescue: Small Tuning Shard Planet"
+GATEWAY1LRGTU = "Grand Star Rescue: Large Tuning Shard Planet"
+GATEWAY1LRGTI = "Grand Star Rescue: Large tuning Planet Inside"
+
 ## Terrace Galaxies
 ### Good Egg

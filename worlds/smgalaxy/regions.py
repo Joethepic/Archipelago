@@ -98,6 +98,11 @@ region_list: dict[str, SMGRegionData] = {
     regname.BONEFIN: SMGRegionData("Minor", 0x70, "SkullSharkGalaxy"),
     regname.MATTER: SMGRegionData("Minor", 0x88, "DarkRoomGalaxy"),
     regname.TRIALS: SMGRegionData("Hub"),
+    regname.GATEWAY1HOMEP: SMGRegionData("Planetoid"),
+    regname.GATEWAY1HOLEY: SMGRegionData("Planetoid"),
+    regname.GATEWAY1SMLTU: SMGRegionData("Planetoid"),
+    regname.GATEWAY1LRGTU: SMGRegionData("Planetoid"),
+    regname.GATEWAY1LRGTI: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

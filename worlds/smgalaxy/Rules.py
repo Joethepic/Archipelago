@@ -104,6 +104,11 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 5))
     connect_regions(world, player, regname.SHIP, regname.GATEWAY, "Gateway Dome",
                     Has("Grand Star", 5))
+    connect_regions(world, player, regname.GATEWAY, regname.GATEWAY1HOMEP, "Gateway: Grand Star Rescue")
+    connect_regions(world, player, regname.GATEWAY1HOMEP, regname.GATEWAY1HOLEY, "Gateway: Home Planet Launch Star")
+    connect_regions(world, player, regname.GATEWAY1HOLEY, regname.GATEWAY1SMLTU, "Gateway: Holey Planet Launch Star")
+    connect_regions(world, player, regname.GATEWAY1SMLTU, regname.GATEWAY1LRGTU, "Gateway: Small Tuning Planet Launch Star")
+    connect_regions(world, player, regname.GATEWAY1LRGTU, regname.GATEWAY1LRGTI, "Gateway: Large Tuning Planet Pipe")
     connect_regions(world, player, regname.SHIP, regname.BOOBONE, "Boo's Boneyard Hungry Luma",
                     Has("Grand Star", 5))
     connect_regions(world, player, regname.SHIP, regname.TRIALS, "Planet of Trials Launch Star",
