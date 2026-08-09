@@ -16,80 +16,80 @@ def set_rules(world: "SMGWorld", player: int):
     connect_regions(world, player, regname.SHIP, regname.TERRACE, "Dome 1 Entry")
     connect_regions(world, player, regname.TERRACE, regname.GOODEGG, "Dome 1 First Orbit Galaxy")
     connect_regions(world, player, regname.TERRACE, regname.HONEYHIVE, "Dome 1 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_one_counts["Second Orbit"], 4)))
+                    HasGroup("Power Stars", count=min(world.options.dome_one_counts["Second Orbit"], 4)))
     connect_regions(world, player, regname.TERRACE, regname.LOOPDEELOOP, "Dome 1 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
+                    HasGroup("Power Stars", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
     connect_regions(world, player, regname.TERRACE, regname.FLIPSWITCH, "Dome 1 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_one_counts["Fourth Orbit"], 6)))
+                    HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fourth Orbit"], 6)))
     connect_regions(world, player, regname.TERRACE, regname.BOWJR1, "Dome 1 Fifth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_one_counts["Fifth Orbit"], 7)))
+                    HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fifth Orbit"], 7)))
     # Dome 2
     connect_regions(world, player, regname.SHIP, regname.FOUNTAIN, "Dome 2 Entry",
                     Has("Grand Star"))
     connect_regions(world, player, regname.FOUNTAIN, regname.SPACEJUNK, "Dome 2 First Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_two_counts["First Orbit"], 8)))
+                    HasGroup("Power Stars", count=min(world.options.dome_two_counts["First Orbit"], 8)))
     connect_regions(world, player, regname.FOUNTAIN, regname.ROLLINGGREEN, "Dome 2 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
+                    HasGroup("Power Stars", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
     connect_regions(world, player, regname.FOUNTAIN, regname.BATTLEROCK, "Dome 2 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_two_counts["Third Orbit"], 10)))
+                    HasGroup("Power Stars", count=min(world.options.dome_two_counts["Third Orbit"], 10)))
     connect_regions(world, player, regname.FOUNTAIN, regname.HURRYSCUR, "Dome 2 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_two_counts["Fourth Orbit"], 11)))
+                    HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fourth Orbit"], 11)))
     connect_regions(world, player, regname.FOUNTAIN, regname.BOWSER1, "Dome 2 Fifth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_two_counts["Fifth Orbit"], 12)))
+                    HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fifth Orbit"], 12)))
     # Dome 3
     connect_regions(world, player, regname.SHIP, regname.KITCHEN, "Dome 3 Entry",
                     Has("Grand Star", 2))
     connect_regions(world, player, regname.KITCHEN, regname.BEACHBOWL, "Dome 3 First Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_three_counts["First Orbit"], 13)))
+                    HasGroup("Power Stars", count=min(world.options.dome_three_counts["First Orbit"], 13)))
     connect_regions(world, player, regname.KITCHEN, regname.BUBBLEBREEZE, "Dome 3 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
+                    HasGroup("Power Stars", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
     connect_regions(world, player, regname.KITCHEN, regname.GHOSTLY, "Dome 3 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_three_counts["Third Orbit"], 15)))
+                    HasGroup("Power Stars", count=min(world.options.dome_three_counts["Third Orbit"], 15)))
     connect_regions(world, player, regname.KITCHEN, regname.BUOY, "Dome 3 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_three_counts["Fourth Orbit"], 16)))
+                    HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fourth Orbit"], 16)))
     connect_regions(world, player, regname.KITCHEN, regname.BOWJR2, "Dome 3 Fifth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_three_counts["Fifth Orbit"], 17)))
+                    HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fifth Orbit"], 17)))
     # Dome 4
     connect_regions(world, player, regname.SHIP, regname.BEDROOM, "Dome 4 Entry",
                     Has("Grand Star", 3))
     connect_regions(world, player, regname.BEDROOM, regname.GUSTY, "Dome 4 First Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_four_counts["First Orbit"], 18)))
+                    HasGroup("Power Stars", count=min(world.options.dome_four_counts["First Orbit"], 18)))
     connect_regions(world, player, regname.BEDROOM, regname.FREEZEFLAME, "Dome 4 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
+                    HasGroup("Power Stars", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
     connect_regions(world, player, regname.BEDROOM, regname.DUSTY, "Dome 4 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
+                    HasGroup("Power Stars", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
     connect_regions(world, player, regname.BEDROOM, regname.HONEYCLIMB, "Dome 4 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_four_counts["Fourth Orbit"], 21)))
+                    HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fourth Orbit"], 21)))
     connect_regions(world, player, regname.BEDROOM, regname.BOWSER2, "Dome 4 Fifth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_four_counts["Fifth Orbit"], 22)))
+                    HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fifth Orbit"], 22)))
     # Dome 5
     connect_regions(world, player, regname.SHIP, regname.ENGINE, "Dome 5 Entry",
                     Has("Grand Star", 4))
     connect_regions(world, player, regname.ENGINE, regname.GOLDLEAF, "Dome 5 First Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_five_counts["First Orbit"], 23)))
+                    HasGroup("Power Stars", count=min(world.options.dome_five_counts["First Orbit"], 23)))
     connect_regions(world, player, regname.ENGINE, regname.SEASLIDE, "Dome 5 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_five_counts["Second Orbit"], 24)))
+                    HasGroup("Power Stars", count=min(world.options.dome_five_counts["Second Orbit"], 24)))
     connect_regions(world, player, regname.ENGINE, regname.TOYTIME, "Dome 5 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
+                    HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
     connect_regions(world, player, regname.ENGINE, regname.BONEFIN, "Dome 5 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
+                    HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
     connect_regions(world, player, regname.ENGINE, regname.BOWJR3, "Dome 5 Fifth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_five_counts["Fifth Orbit"], 27)))
+                    HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fifth Orbit"], 27)))
     # Dome 6
     connect_regions(world, player, regname.SHIP, regname.GARDEN, "Dome 6 Entry",
                     Has("Grand Star", 5))
     connect_regions(world, player, regname.GARDEN, regname.DEEPDARK, "Dome 6 First Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_six_counts["First Orbit"], 28)))
+                    HasGroup("Power Stars", count=min(world.options.dome_six_counts["First Orbit"], 28)))
     connect_regions(world, player, regname.GARDEN, regname.DREADNOUGHT, "Dome 6 Second Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_six_counts["Second Orbit"], 29)))
+                    HasGroup("Power Stars", count=min(world.options.dome_six_counts["Second Orbit"], 29)))
     connect_regions(world, player, regname.GARDEN, regname.MATTER, "Dome 6 Third Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
+                    HasGroup("Power Stars", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
     connect_regions(world, player, regname.GARDEN, regname.MELTY, "Dome 6 Fourth Orbit Galaxy",
-                    HasGroup("Power Star", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
+                    HasGroup("Power Stars", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
     #Remaining Ship Connections
     connect_regions(world, player, regname.SHIP, regname.LIBRARY, "Library Entrance")
     connect_regions(world, player, regname.SHIP, regname.COTU, "Center Of the Universe Entry",
-                    Has("Grand Star", 5) and HasGroup("Power Star", count=world.options.stars_to_finish.value))
+                    Has("Grand Star", 5) and HasGroup("Power Stars", count=world.options.stars_to_finish.value))
     connect_regions(world, player, regname.COTU, regname.BOWSER3, "Galaxy's Center")
     connect_regions(world, player, regname.SHIP, regname.SWEETSWEET, "Sweet Sweet Hungry Luma")
     connect_regions(world, player, regname.SHIP, regname.SLINGPOD, "Sling Pod Hungry Luma",
@@ -129,9 +129,9 @@ def rules_from_er_placements(world: "SMGWorld"):
             galaxy_type: str = region_list[galaxy_entr.connected_region.name].type
 
             if star_count <= available_locations:
-                world.set_rule(galaxy_entr, Has("Power Star", count=star_count))
+                world.set_rule(galaxy_entr, HasGroup("Power Stars", count=star_count))
             else:
-                world.set_rule(galaxy_entr, Has("Power Star", count=available_locations))
+                world.set_rule(galaxy_entr, HasGroup("Power Stars", count=available_locations))
                 world.galaxy_counts[galaxy] = available_locations
 
             available_locations += 4 if galaxy_type == "Major" else 1
