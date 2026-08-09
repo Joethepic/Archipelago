@@ -103,6 +103,7 @@ region_list: dict[str, SMGRegionData] = {
     regname.GATEWAY1SMLTU: SMGRegionData("Planetoid"),
     regname.GATEWAY1LRGTU: SMGRegionData("Planetoid"),
     regname.GATEWAY1LRGTI: SMGRegionData("Planetoid"),
+    regname.GATEWAY2HOMEP: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

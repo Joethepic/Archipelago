@@ -64,11 +64,12 @@ MATTER = "Matter Splatter Galaxy"
 
 # Planetoid Subregions
 ## Gateway Galaxy
-GATEWAY1HOMEP = "Grand Star Rescue: Home Planet"
-GATEWAY1HOLEY = "Grand Star Rescue: Holey Planet"
-GATEWAY1SMLTU = "Grand Star Rescue: Small Tuning Shard Planet"
-GATEWAY1LRGTU = "Grand Star Rescue: Large Tuning Shard Planet"
-GATEWAY1LRGTI = "Grand Star Rescue: Large tuning Planet Inside"
+GATEWAY1HOMEP = "Gateway: Home Planet"
+GATEWAY1HOLEY = "Gateway: Holey Planet"
+GATEWAY1SMLTU = "Gateway: Small Tuning Shard Planet"
+GATEWAY1LRGTU = "Gateway: Large Tuning Shard Planet"
+GATEWAY1LRGTI = "Gateway: Large Tuning Planet Inside"
+GATEWAY2HOMEP = "Gateway Comet: Home Planet"
 
 ## Terrace Galaxies
 ### Good Egg
