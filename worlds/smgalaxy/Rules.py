@@ -88,7 +88,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.GOODEGG3SHIPS).connect(world.get_region(regname.GOODEGG3KBOSS),
                                                     "Good Egg 3: Ship Launch Star")
     world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG4HOTOW),
-                                              "Good Egg 4: Dino Piranha Speed Run")
+                                              "Good Egg Comet: Dino Piranha Speed Run")
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4HOTOP))
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4TONOT),
                                                     "Good Egg Comet: Tower Orange Pipe")
@@ -125,6 +125,54 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.TERRACE).connect(world.get_region(regname.HONEYHIVE), "Dome 1 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Second Orbit"], 4)))
+    world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI1LANDI),
+                                                    "Honeyhive 1: Bee Mario Takes Flight")
+    world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1SIDEP))
+    world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1WATRP))
+    world.get_region(regname.HONEYHI1POUND).connect(world.get_region(regname.HONEYHI1FOUNC))
+    world.get_region(regname.HONEYHI1WATRP).connect(world.get_region(regname.HONEYHI1WATRT))
+    world.get_region(regname.HONEYHI1WATRT).connect(world.get_region(regname.HONEYHI1POUND))
+    world.get_region(regname.HONEYHI1POUND).connect(world.get_region(regname.HONEYHI6LUIGI))
+    world.get_region(regname.HONEYHI1POUND).connect(world.get_region(regname.HONEYHI1BIGTR))
+    world.get_region(regname.HONEYHI1WATRT).connect(world.get_region(regname.HONEYHI1UNDER))
+    world.get_region(regname.HONEYHI1UNDER).connect(world.get_region(regname.HONEYHI1GARDN),
+                                                    "Honeyhive 1: Undercliff Launch Star")
+    world.get_region(regname.HONEYHI1GARDN).connect(world.get_region(regname.HONEYHI1HONYC),
+                                                    "Honeyhive 1: Garden Launch Star")
+    world.get_region(regname.HONEYHI1HONYC).connect(world.get_region(regname.HONEYHI1PONDT))
+    world.get_region(regname.HONEYHI1PONDT).connect(world.get_region(regname.HONEYHI1TREET),
+                                                    "Honeyhive 1: Queen Bee Launch Star")
+    world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI2LANDI),
+                                                    "Honeyhive 2: Trouble on the Tower")
+    world.get_region(regname.HONEYHI2LANDI).connect(world.get_region(regname.HONEYHI2SIDEP))
+    world.get_region(regname.HONEYHI2LANDI).connect(world.get_region(regname.HONEYHI2WATRP))
+    world.get_region(regname.HONEYHI2LANDI).connect(world.get_region(regname.HONEYHI2BIGTR),
+                                                    "Honeyhive 2: Landing Ground Pound Vine")
+    world.get_region(regname.HONEYHI2BIGTR).connect(world.get_region(regname.HONEYHI2POUND),
+                                                    "Honeyhive 2: Big Tree Sling Star")
+    world.get_region(regname.HONEYHI2POUND).connect(world.get_region(regname.HONEYHI6LUIGI))
+    world.get_region(regname.HONEYHI2POUND).connect(world.get_region(regname.HONEYHI2CLIFF))
+    world.get_region(regname.HONEYHI2CLIFF).connect(world.get_region(regname.HONEYHI2FOUNC))
+    world.get_region(regname.HONEYHI2CLIFF).connect(world.get_region(regname.HONEYHI2WATRT))
+    world.get_region(regname.HONEYHI2CLIFF).connect(world.get_region(regname.HONEYHI2HATS2),
+                                                    "Honeyhive 2: Clifftop Launch Star")
+    world.get_region(regname.HONEYHI2HATS2).connect(world.get_region(regname.HONEYHI2DROPL),
+                                                    "Honeyhive 2: Hat Planets Sling Star")
+    world.get_region(regname.HONEYHI2DROPL).connect(world.get_region(regname.HONEYHI2TOWRB))
+    world.get_region(regname.HONEYHI2TOWRB).connect(world.get_region(regname.HONEYHI2TOWRM))
+    world.get_region(regname.HONEYHI2TOWRM).connect(world.get_region(regname.HONEYHI2TOWRT))
+    world.get_region(regname.HONEYHI2WATRT).connect(world.get_region(regname.HONEYHI2UNDER))
+    world.get_region(regname.HONEYHI2UNDER).connect(world.get_region(regname.HONEYHI2SMLHI),
+                                                    "Honeyhive 2: Undercliff Return Pipe")
+    world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI3LANDI),
+                                                    "Honeyhive 3: Big Bad Bugaboom")
+
+    world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI4LANDI),
+                                                    "Honeyhive Comet: Honeyhive Cosmic Mario Race")
+
+    world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI5LANDI),
+                                                    "Honeyhive Purple Coins: The Honeyhive's Purple Coins")
+
     world.get_region(regname.TERRACE).connect(world.get_region(regname.LOOPDEELOOP), "Dome 1 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
     world.get_region(regname.TERRACE).connect(world.get_region(regname.FLIPSWITCH), "Dome 1 Fourth Orbit Galaxy",
