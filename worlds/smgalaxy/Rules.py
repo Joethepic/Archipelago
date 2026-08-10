@@ -13,112 +13,154 @@ if TYPE_CHECKING:
 # main stage logic
 def set_rules(world: "SMGWorld", player: int):
     # Dome 1
-    connect_regions(world, player, regname.SHIP, regname.TERRACE, "Dome 1 Entry")
-    connect_regions(world, player, regname.TERRACE, regname.GOODEGG, "Dome 1 First Orbit Galaxy")
-    connect_regions(world, player, regname.TERRACE, regname.HONEYHIVE, "Dome 1 Second Orbit Galaxy",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.TERRACE), "Dome 1 Entry")
+    world.get_region(regname.TERRACE).connect(world.get_region(regname.GOODEGG), "Dome 1 First Orbit Galaxy")
+    world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG1HOTOW), "Good Egg 1: Dino Piranha")
+    world.get_region(regname.GOODEGG1HOTOW).connect(world.get_region(regname.GOODEGG1HOTOP))
+    world.get_region(regname.GOODEGG1HOTOW).connect(world.get_region(regname.GOODEGG1TONOT),
+                                                    "Good Egg 1: Tower Orange Pipe")
+    world.get_region(regname.GOODEGG1TONOT).connect(world.get_region(regname.GOODEGG1HOTOP),
+                                                    "Good Egg 1: Note Room Orange Pipe")
+    world.get_region(regname.GOODEGG1HOTOW).connect(world.get_region(regname.GOODEGG1DUMBB),
+                                                    "Good Egg 1: Towertop Sling & Launch Star")
+    world.get_region(regname.GOODEGG1DUMBB).connect(world.get_region(regname.GOODEGG1SMLGR),
+                                                    "Good Egg 1: Dumbbell Boulder Launch Star")
+    world.get_region(regname.GOODEGG1SMLGR).connect(world.get_region(regname.GOODEGG1BOULD),
+                                                    "Good Egg 1: Small Grass Planet Vine")
+    world.get_region(regname.GOODEGG1BOULD).connect(world.get_region(regname.GOODEGG1PANEL),
+                                                    "Good Egg 1: Boulder Black Hole Green Pipe")
+    world.get_region(regname.GOODEGG1BOULD).connect(world.get_region(regname.GOODEGG1GRASS),
+                                                    "Good Egg 1: Boulder Black Hole Vine")
+    world.get_region(regname.GOODEGG1PANEL).connect(world.get_region(regname.GOODEGG1GRASS),
+                                                    "Good Egg 1: Flipswitch Launch Star")
+    world.get_region(regname.GOODEGG1GRASS).connect(world.get_region(regname.GOODEGG1DINOP),
+                                                    "Good Egg 1: Grass Climb Launch Star")
+
+    world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG4HOTOW),
+                                              "Good Egg 4: Dino Piranha Speed Run")
+    world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4HOTOP))
+    world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4TONOT),
+                                                    "Good Egg 4: Tower Orange Pipe")
+    world.get_region(regname.GOODEGG4TONOT).connect(world.get_region(regname.GOODEGG4HOTOP),
+                                                    "Good Egg 4: Note Room Orange Pipe")
+    world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4DUMBB),
+                                                    "Good Egg 4: Towertop Sling & Launch Star")
+    world.get_region(regname.GOODEGG4DUMBB).connect(world.get_region(regname.GOODEGG4SMLGR),
+                                                    "Good Egg 4: Dumbbell Boulder Launch Star")
+    world.get_region(regname.GOODEGG4SMLGR).connect(world.get_region(regname.GOODEGG4BOULD),
+                                                    "Good Egg 4: Small Grass Planet Vine")
+    world.get_region(regname.GOODEGG4BOULD).connect(world.get_region(regname.GOODEGG4PANEL),
+                                                    "Good Egg 4: Boulder Black Hole Green Pipe")
+    world.get_region(regname.GOODEGG4BOULD).connect(world.get_region(regname.GOODEGG4GRASS),
+                                                    "Good Egg 4: Boulder Black Hole Vine")
+    world.get_region(regname.GOODEGG4PANEL).connect(world.get_region(regname.GOODEGG4GRASS),
+                                                    "Good Egg 4: Flipswitch Launch Star")
+    world.get_region(regname.GOODEGG4GRASS).connect(world.get_region(regname.GOODEGG4DINOP),
+                                                    "Good Egg 4: Grass Climb Launch Star")
+    world.get_region(regname.TERRACE).connect(world.get_region(regname.HONEYHIVE), "Dome 1 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Second Orbit"], 4)))
-    connect_regions(world, player, regname.TERRACE, regname.LOOPDEELOOP, "Dome 1 Third Orbit Galaxy",
+    world.get_region(regname.TERRACE).connect(world.get_region(regname.LOOPDEELOOP), "Dome 1 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
-    connect_regions(world, player, regname.TERRACE, regname.FLIPSWITCH, "Dome 1 Fourth Orbit Galaxy",
+    world.get_region(regname.TERRACE).connect(world.get_region(regname.FLIPSWITCH), "Dome 1 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fourth Orbit"], 6)))
-    connect_regions(world, player, regname.TERRACE, regname.BOWJR1, "Dome 1 Fifth Orbit Galaxy",
+    world.get_region(regname.TERRACE).connect(world.get_region(regname.BOWJR1), "Dome 1 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fifth Orbit"], 7)))
     # Dome 2
-    connect_regions(world, player, regname.SHIP, regname.FOUNTAIN, "Dome 2 Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.FOUNTAIN), "Dome 2 Entry",
                     Has("Grand Star"))
-    connect_regions(world, player, regname.FOUNTAIN, regname.SPACEJUNK, "Dome 2 First Orbit Galaxy",
+    world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.SPACEJUNK), "Dome 2 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["First Orbit"], 8)))
-    connect_regions(world, player, regname.FOUNTAIN, regname.ROLLINGGREEN, "Dome 2 Second Orbit Galaxy",
+    world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.ROLLINGGREEN), "Dome 2 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
-    connect_regions(world, player, regname.FOUNTAIN, regname.BATTLEROCK, "Dome 2 Third Orbit Galaxy",
+    world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BATTLEROCK), "Dome 2 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Third Orbit"], 10)))
-    connect_regions(world, player, regname.FOUNTAIN, regname.HURRYSCUR, "Dome 2 Fourth Orbit Galaxy",
+    world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.HURRYSCUR), "Dome 2 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fourth Orbit"], 11)))
-    connect_regions(world, player, regname.FOUNTAIN, regname.BOWSER1, "Dome 2 Fifth Orbit Galaxy",
+    world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BOWSER1), "Dome 2 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fifth Orbit"], 12)))
     # Dome 3
-    connect_regions(world, player, regname.SHIP, regname.KITCHEN, "Dome 3 Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.KITCHEN), "Dome 3 Entry",
                     Has("Grand Star", 2))
-    connect_regions(world, player, regname.KITCHEN, regname.BEACHBOWL, "Dome 3 First Orbit Galaxy",
+    world.get_region(regname.KITCHEN).connect(world.get_region(regname.BEACHBOWL), "Dome 3 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["First Orbit"], 13)))
-    connect_regions(world, player, regname.KITCHEN, regname.BUBBLEBREEZE, "Dome 3 Second Orbit Galaxy",
+    world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUBBLEBREEZE), "Dome 3 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
-    connect_regions(world, player, regname.KITCHEN, regname.GHOSTLY, "Dome 3 Third Orbit Galaxy",
+    world.get_region(regname.KITCHEN).connect(world.get_region(regname.GHOSTLY), "Dome 3 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Third Orbit"], 15)))
-    connect_regions(world, player, regname.KITCHEN, regname.BUOY, "Dome 3 Fourth Orbit Galaxy",
+    world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUOY), "Dome 3 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fourth Orbit"], 16)))
-    connect_regions(world, player, regname.KITCHEN, regname.BOWJR2, "Dome 3 Fifth Orbit Galaxy",
+    world.get_region(regname.KITCHEN).connect(world.get_region(regname.BOWJR2), "Dome 3 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fifth Orbit"], 17)))
     # Dome 4
-    connect_regions(world, player, regname.SHIP, regname.BEDROOM, "Dome 4 Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.BEDROOM), "Dome 4 Entry",
                     Has("Grand Star", 3))
-    connect_regions(world, player, regname.BEDROOM, regname.GUSTY, "Dome 4 First Orbit Galaxy",
+    world.get_region(regname.BEDROOM).connect(world.get_region(regname.GUSTY), "Dome 4 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["First Orbit"], 18)))
-    connect_regions(world, player, regname.BEDROOM, regname.FREEZEFLAME, "Dome 4 Second Orbit Galaxy",
+    world.get_region(regname.BEDROOM).connect(world.get_region(regname.FREEZEFLAME), "Dome 4 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
-    connect_regions(world, player, regname.BEDROOM, regname.DUSTY, "Dome 4 Third Orbit Galaxy",
+    world.get_region(regname.BEDROOM).connect(world.get_region(regname.DUSTY), "Dome 4 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
-    connect_regions(world, player, regname.BEDROOM, regname.HONEYCLIMB, "Dome 4 Fourth Orbit Galaxy",
+    world.get_region(regname.BEDROOM).connect(world.get_region(regname.HONEYCLIMB), "Dome 4 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fourth Orbit"], 21)))
-    connect_regions(world, player, regname.BEDROOM, regname.BOWSER2, "Dome 4 Fifth Orbit Galaxy",
+    world.get_region(regname.BEDROOM).connect(world.get_region(regname.BOWSER2), "Dome 4 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fifth Orbit"], 22)))
     # Dome 5
-    connect_regions(world, player, regname.SHIP, regname.ENGINE, "Dome 5 Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.ENGINE), "Dome 5 Entry",
                     Has("Grand Star", 4))
-    connect_regions(world, player, regname.ENGINE, regname.GOLDLEAF, "Dome 5 First Orbit Galaxy",
+    world.get_region(regname.ENGINE).connect(world.get_region(regname.GOLDLEAF), "Dome 5 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["First Orbit"], 23)))
-    connect_regions(world, player, regname.ENGINE, regname.SEASLIDE, "Dome 5 Second Orbit Galaxy",
+    world.get_region(regname.ENGINE).connect(world.get_region(regname.SEASLIDE), "Dome 5 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Second Orbit"], 24)))
-    connect_regions(world, player, regname.ENGINE, regname.TOYTIME, "Dome 5 Third Orbit Galaxy",
+    world.get_region(regname.ENGINE).connect(world.get_region(regname.TOYTIME), "Dome 5 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
-    connect_regions(world, player, regname.ENGINE, regname.BONEFIN, "Dome 5 Fourth Orbit Galaxy",
+    world.get_region(regname.ENGINE).connect(world.get_region(regname.BONEFIN), "Dome 5 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
-    connect_regions(world, player, regname.ENGINE, regname.BOWJR3, "Dome 5 Fifth Orbit Galaxy",
+    world.get_region(regname.ENGINE).connect(world.get_region(regname.BOWJR3), "Dome 5 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fifth Orbit"], 27)))
     # Dome 6
-    connect_regions(world, player, regname.SHIP, regname.GARDEN, "Dome 6 Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.GARDEN), "Dome 6 Entry",
                     Has("Grand Star", 5))
-    connect_regions(world, player, regname.GARDEN, regname.DEEPDARK, "Dome 6 First Orbit Galaxy",
+    world.get_region(regname.GARDEN).connect(world.get_region(regname.DEEPDARK), "Dome 6 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["First Orbit"], 28)))
-    connect_regions(world, player, regname.GARDEN, regname.DREADNOUGHT, "Dome 6 Second Orbit Galaxy",
+    world.get_region(regname.GARDEN).connect(world.get_region(regname.DREADNOUGHT), "Dome 6 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Second Orbit"], 29)))
-    connect_regions(world, player, regname.GARDEN, regname.MATTER, "Dome 6 Third Orbit Galaxy",
+    world.get_region(regname.GARDEN).connect(world.get_region(regname.MATTER), "Dome 6 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
-    connect_regions(world, player, regname.GARDEN, regname.MELTY, "Dome 6 Fourth Orbit Galaxy",
+    world.get_region(regname.GARDEN).connect(world.get_region(regname.MELTY), "Dome 6 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
     #Remaining Ship Connections
-    connect_regions(world, player, regname.SHIP, regname.LIBRARY, "Library Entrance")
-    connect_regions(world, player, regname.SHIP, regname.COTU, "Center Of the Universe Entry",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.LIBRARY), "Library Entrance")
+    world.get_region(regname.SHIP).connect(world.get_region(regname.COTU), "Center Of the Universe Entry",
                     Has("Grand Star", 5) and HasGroup("Power Stars", count=world.options.stars_to_finish.value))
-    connect_regions(world, player, regname.COTU, regname.BOWSER3, "Galaxy's Center")
-    connect_regions(world, player, regname.SHIP, regname.SWEETSWEET, "Sweet Sweet Hungry Luma")
-    connect_regions(world, player, regname.SHIP, regname.SLINGPOD, "Sling Pod Hungry Luma",
+    world.get_region(regname.COTU).connect(world.get_region(regname.BOWSER3), "Galaxy's Center")
+    world.get_region(regname.SHIP).connect(world.get_region(regname.SWEETSWEET), "Sweet Sweet Hungry Luma")
+    world.get_region(regname.SHIP).connect(world.get_region(regname.SLINGPOD), "Sling Pod Hungry Luma",
                     Has("Grand Star"))
-    connect_regions(world, player, regname.SHIP, regname.DRIPDROP, "Drip Drop Hungry Luma",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.DRIPDROP), "Drip Drop Hungry Luma",
                     Has("Grand Star", 2))
-    connect_regions(world, player, regname.SHIP, regname.BIGMOUTH, "Bigmouth Hungry Luma",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.BIGMOUTH), "Bigmouth Hungry Luma",
                     Has("Grand Star", 3))
-    connect_regions(world, player, regname.SHIP, regname.SANDSPIRAL, "Sand Spiral Hungry Luma",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.SANDSPIRAL), "Sand Spiral Hungry Luma",
                     Has("Grand Star", 4))
-    connect_regions(world, player, regname.SHIP, regname.SNOWCAP, "Snow Cap Hungry Luma",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.SNOWCAP), "Snow Cap Hungry Luma",
                     Has("Grand Star", 5))
-    connect_regions(world, player, regname.SHIP, regname.GATEWAY, "Gateway Dome",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.GATEWAY), "Gateway Dome",
                     Has("Grand Star", 5))
-    connect_regions(world, player, regname.GATEWAY, regname.GATEWAY1HOMEP, "Gateway: Grand Star Rescue")
-    connect_regions(world, player, regname.GATEWAY, regname.GATEWAY2HOMEP, "Gateway Comet: Gateway's Purple Coins")
-    connect_regions(world, player, regname.GATEWAY1HOMEP, regname.GATEWAY1HOLEY, "Gateway: Home Planet Launch Star")
-    connect_regions(world, player, regname.GATEWAY1HOLEY, regname.GATEWAY1SMLTU, "Gateway: Holey Planet Launch Star")
-    connect_regions(world, player, regname.GATEWAY1SMLTU, regname.GATEWAY1LRGTU, "Gateway: Small Tuning Planet Launch Star")
-    connect_regions(world, player, regname.GATEWAY1LRGTU, regname.GATEWAY1LRGTI, "Gateway: Large Tuning Planet Pipe")
-    connect_regions(world, player, regname.GATEWAY, regname.GATEWAY2HOMEP, "Gateway Comet: Gateway's Purple Coins")
-    connect_regions(world, player, regname.SHIP, regname.BOOBONE, "Boo's Boneyard Hungry Luma",
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY1HOMEP), "Gateway: Grand Star Rescue")
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP), "Gateway Comet: Gateway's Purple Coins")
+    world.get_region(regname.GATEWAY1HOMEP).connect(world.get_region(regname.GATEWAY1HOLEY), "Gateway: Home Planet Launch Star")
+    world.get_region(regname.GATEWAY1HOLEY).connect(world.get_region(regname.GATEWAY1SMLTU), "Gateway: Holey Planet Launch Star")
+    world.get_region(regname.GATEWAY1SMLTU).connect(world.get_region(regname.GATEWAY1LRGTU), "Gateway: Small Tuning Planet Launch Star")
+    world.get_region(regname.GATEWAY1LRGTU).connect(world.get_region(regname.GATEWAY1LRGTI), "Gateway: Large Tuning Planet Pipe")
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP), "Gateway Comet: Gateway's Purple Coins")
+    world.get_region(regname.SHIP).connect(world.get_region(regname.BOOBONE), "Boo's Boneyard Hungry Luma",
                     Has("Grand Star", 5))
-    connect_regions(world, player, regname.SHIP, regname.TRIALS, "Planet of Trials Launch Star",
+    world.get_region(regname.SHIP).connect(world.get_region(regname.TRIALS), "Planet of Trials Launch Star",
                     Has("Green Star"))
-    connect_regions(world, player, regname.TRIALS, regname.ROLLINGGIZ, "Rolling Gizmo Launch Star")
-    connect_regions(world, player, regname.TRIALS, regname.LOOPDEESWOOP, "Loopdeeswoop Launch Star")
-    connect_regions(world, player, regname.TRIALS, regname.BUBBLEBLAST, "Bubble Blast Launch Star")
-    # connect_regions(world, player, regname.SHIP, regname.FINALE, "Grand Finale Launch Star",
+    world.get_region(regname.TRIALS).connect(world.get_region(regname.ROLLINGGIZ), "Rolling Gizmo Launch Star")
+    world.get_region(regname.TRIALS).connect(world.get_region(regname.LOOPDEESWOOP), "Loopdeeswoop Launch Star")
+    world.get_region(regname.TRIALS).connect(world.get_region(regname.BUBBLEBLAST), "Bubble Blast Launch Star")
+    # world.get_region(regname.SHIP).connect(world.get_region(regname.FINALE), "Grand Finale Launch Star",
     #                 Has("Green Star") and Has("Power Star", 120))
     world.set_completion_rule(Has("Peach"))
 

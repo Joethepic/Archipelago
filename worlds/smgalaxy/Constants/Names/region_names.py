@@ -73,3 +73,23 @@ GATEWAY2HOMEP = "Gateway Comet: Home Planet"
 
 ## Terrace Galaxies
 ### Good Egg
+GOODEGG1HOTOW = "Good Egg 1: House-Tower Planet"
+GOODEGG1HOTOP = "Good Egg 1: Top of House"
+GOODEGG1TONOT = "Good Egg 1: Tower Note Room"
+GOODEGG1DUMBB = "Good Egg 1: Dumbbell Boulder Planet"
+GOODEGG1SMLGR = "Good Egg 1: Small Grass Planet"
+GOODEGG1BOULD = "Good Egg 1: Boulder Black Hole Planet"
+GOODEGG1PANEL = "Good Egg 1: Flipswitch Platform"
+GOODEGG1GRASS = "Good Egg 1: Grass Climb Planet"
+GOODEGG1DINOP = "Good Egg 1: Dino Piranha Planet"
+
+
+GOODEGG4HOTOW = "Good Egg Comet: House-Tower Planet"
+GOODEGG4HOTOP = "Good Egg Comet: Top of House"
+GOODEGG4TONOT = "Good Egg Comet: Tower Note Room"
+GOODEGG4DUMBB = "Good Egg Comet: Dumbbell Boulder Planet"
+GOODEGG4SMLGR = "Good Egg Comet: Small Grass Planet"
+GOODEGG4BOULD = "Good Egg Comet: Boulder Black Hole Planet"
+GOODEGG4PANEL = "Good Egg Comet: Flipswitch Platform"
+GOODEGG4GRASS = "Good Egg Comet: Grass Climb Planet"
+GOODEGG4DINOP = "Good Egg Comet: Dino Piranha Planet"
