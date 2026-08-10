@@ -98,6 +98,7 @@ region_list: dict[str, SMGRegionData] = {
     regname.BONEFIN: SMGRegionData("Minor", 0x70, "SkullSharkGalaxy"),
     regname.MATTER: SMGRegionData("Minor", 0x88, "DarkRoomGalaxy"),
     regname.TRIALS: SMGRegionData("Hub"),
+
     regname.GATEWAY1HOMEP: SMGRegionData("Planetoid"),
     regname.GATEWAY1HOLEY: SMGRegionData("Planetoid"),
     regname.GATEWAY1SMLTU: SMGRegionData("Planetoid"),
@@ -113,6 +114,16 @@ region_list: dict[str, SMGRegionData] = {
     regname.GOODEGG1PANEL: SMGRegionData("Planetoid"),
     regname.GOODEGG1GRASS: SMGRegionData("Planetoid"),
     regname.GOODEGG1DINOP: SMGRegionData("Planetoid"),
+    regname.GOODEGG3HOTOW: SMGRegionData("Planetoid"),
+    regname.GOODEGG3HOTOP: SMGRegionData("Planetoid"),
+    regname.GOODEGG3TONOT: SMGRegionData("Planetoid"),
+    regname.GOODEGG3PALMT: SMGRegionData("Planetoid"),
+    regname.GOODEGG3SANDY: SMGRegionData("Planetoid"),
+    regname.GOODEGG3CHOMP: SMGRegionData("Planetoid"),
+    regname.GOODEGG3CHOMI: SMGRegionData("Planetoid"),
+    regname.GOODEGG3GRASS: SMGRegionData("Planetoid"),
+    regname.GOODEGG3SHIPS: SMGRegionData("Planetoid"),
+    regname.GOODEGG3KBOSS: SMGRegionData("Planetoid"),
     regname.GOODEGG4HOTOW: SMGRegionData("Planetoid"),
     regname.GOODEGG4HOTOP: SMGRegionData("Planetoid"),
     regname.GOODEGG4TONOT: SMGRegionData("Planetoid"),
@@ -135,6 +146,7 @@ region_list: dict[str, SMGRegionData] = {
     regname.GOODEGG5PEARP: SMGRegionData("Planetoid"),
     regname.GOODEGG5ROCKY: SMGRegionData("Planetoid"),
     regname.GOODEGG5YOSHI: SMGRegionData("Planetoid"),
+    regname.GOODEGG6LUIGI: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

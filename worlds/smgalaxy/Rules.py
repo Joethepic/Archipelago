@@ -73,7 +73,20 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Good Egg 3: Tower Orange Pipe")
     world.get_region(regname.GOODEGG3TONOT).connect(world.get_region(regname.GOODEGG3HOTOP),
                                                     "Good Egg 3: Note Room Orange Pipe")
-
+    world.get_region(regname.GOODEGG3HOTOP).connect(world.get_region(regname.GOODEGG3PALMT),
+                                                    "Good Egg 3: Housetop Launch Star")
+    world.get_region(regname.GOODEGG3PALMT).connect(world.get_region(regname.GOODEGG3SANDY),
+                                                    "Good Egg 3: Palm Tree Sling Star")
+    world.get_region(regname.GOODEGG3SANDY).connect(world.get_region(regname.GOODEGG3CHOMP),
+                                                    "Good Egg 3: Sandy Launch Star")
+    world.get_region(regname.GOODEGG3CHOMP).connect(world.get_region(regname.GOODEGG3CHOMI),
+                                                    "Good Egg 3: Meteor Pipe")
+    world.get_region(regname.GOODEGG3CHOMP).connect(world.get_region(regname.GOODEGG3GRASS),
+                                                    "Good Egg 3: Meteor Sling Star")
+    world.get_region(regname.GOODEGG3GRASS).connect(world.get_region(regname.GOODEGG3SHIPS),
+                                                    "Good Egg 3: UFO Grass Launch Star")
+    world.get_region(regname.GOODEGG3SHIPS).connect(world.get_region(regname.GOODEGG3KBOSS),
+                                                    "Good Egg 3: Ship Launch Star")
     world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG4HOTOW),
                                               "Good Egg 4: Dino Piranha Speed Run")
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4HOTOP))
