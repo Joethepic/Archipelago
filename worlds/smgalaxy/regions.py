@@ -122,6 +122,19 @@ region_list: dict[str, SMGRegionData] = {
     regname.GOODEGG4PANEL: SMGRegionData("Planetoid"),
     regname.GOODEGG4GRASS: SMGRegionData("Planetoid"),
     regname.GOODEGG4DINOP: SMGRegionData("Planetoid"),
+    regname.GOODEGG2HOTOW: SMGRegionData("Planetoid"),
+    regname.GOODEGG2HOTOP: SMGRegionData("Planetoid"),
+    regname.GOODEGG2TONOT: SMGRegionData("Planetoid"),
+    regname.GOODEGG2PEARP: SMGRegionData("Planetoid"),
+    regname.GOODEGG2ROCKY: SMGRegionData("Planetoid"),
+    regname.GOODEGG2YOSHI: SMGRegionData("Planetoid"),
+    regname.GOODEGG2TOWER: SMGRegionData("Planetoid"),
+    regname.GOODEGG2CAPSU: SMGRegionData("Planetoid"),
+    regname.GOODEGG2CAPSI: SMGRegionData("Planetoid"),
+    regname.GOODEGG2STARP: SMGRegionData("Planetoid"),
+    regname.GOODEGG5PEARP: SMGRegionData("Planetoid"),
+    regname.GOODEGG5ROCKY: SMGRegionData("Planetoid"),
+    regname.GOODEGG5YOSHI: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

@@ -17,6 +17,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.TERRACE).connect(world.get_region(regname.GOODEGG), "Dome 1 First Orbit Galaxy")
     world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG1HOTOW), "Good Egg 1: Dino Piranha")
     world.get_region(regname.GOODEGG1HOTOW).connect(world.get_region(regname.GOODEGG1HOTOP))
+    world.get_region(regname.GOODEGG1HOTOP).connect(world.get_region(regname.GOODEGG6LUIGI))
     world.get_region(regname.GOODEGG1HOTOW).connect(world.get_region(regname.GOODEGG1TONOT),
                                                     "Good Egg 1: Tower Orange Pipe")
     world.get_region(regname.GOODEGG1TONOT).connect(world.get_region(regname.GOODEGG1HOTOP),
@@ -35,28 +36,80 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Good Egg 1: Flipswitch Launch Star")
     world.get_region(regname.GOODEGG1GRASS).connect(world.get_region(regname.GOODEGG1DINOP),
                                                     "Good Egg 1: Grass Climb Launch Star")
+    world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG2HOTOW),
+                                              "Good Egg 2: A Snack of Cosmic Proportions")
+    world.get_region(regname.GOODEGG2HOTOW).connect(world.get_region(regname.GOODEGG2HOTOP))
+    world.get_region(regname.GOODEGG2HOTOP).connect(world.get_region(regname.GOODEGG6LUIGI))
+    world.get_region(regname.GOODEGG2HOTOW).connect(world.get_region(regname.GOODEGG2TONOT),
+                                                    "Good Egg 2: Tower Orange Pipe")
+    world.get_region(regname.GOODEGG2TONOT).connect(world.get_region(regname.GOODEGG2HOTOP),
+                                                    "Good Egg 2: Note Room Orange Pipe")
+    world.get_region(regname.GOODEGG2HOTOW).connect(world.get_region(regname.GOODEGG2PEARP),
+                                                    "Good Egg 2: Tower Pull to Launch Star")
+    world.get_region(regname.GOODEGG2PEARP).connect(world.get_region(regname.GOODEGG2ROCKY),
+                                                    "Good Egg 2: Pear Launch Star")
+    world.get_region(regname.GOODEGG2PEARP).connect(world.get_region(regname.GOODEGG2YOSHI),
+                                                    "Good Egg 2: Pear Mid-Flight Launch Star")
+    world.get_region(regname.GOODEGG2ROCKY).connect(world.get_region(regname.GOODEGG2YOSHI),
+                                                    "Good Egg 2: Rocky Launch Star")
+    world.get_region(regname.GOODEGG2ROCKY).connect(world.get_region(regname.GOODEGG2PEARP),
+                                                    "Good Egg 2: Rocky Mid-Flight Launch Star")
+    world.get_region(regname.GOODEGG2YOSHI).connect(world.get_region(regname.GOODEGG2PEARP),
+                                                    "Good Egg 2: Yoshi Egg Launch Star")
+    world.get_region(regname.GOODEGG2YOSHI).connect(world.get_region(regname.GOODEGG2ROCKY),
+                                                    "Good Egg 2: Yoshi Egg Mid-Flight Launch Star")
+    world.get_region(regname.GOODEGG2YOSHI).connect(world.get_region(regname.GOODEGG2TOWER),
+                                                    "Good Egg 2: Yoshi Egg Hungry Luma Launch Star")
+    world.get_region(regname.GOODEGG2TOWER).connect(world.get_region(regname.GOODEGG2CAPSU),
+                                                    "Good Egg 2: Tower Climb Launch Star")
+    world.get_region(regname.GOODEGG2CAPSU).connect(world.get_region(regname.GOODEGG2CAPSI))
+    world.get_region(regname.GOODEGG2CAPSI).connect(world.get_region(regname.GOODEGG2STARP),
+                                                    "Good Egg 2: Inside Capsule Launch Star")
+    world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG3HOTOW),
+                                              "Good Egg 3: King Kaliente's Battle Fleet")
+    world.get_region(regname.GOODEGG3HOTOW).connect(world.get_region(regname.GOODEGG3HOTOP))
+    world.get_region(regname.GOODEGG3HOTOP).connect(world.get_region(regname.GOODEGG6LUIGI))
+    world.get_region(regname.GOODEGG3HOTOW).connect(world.get_region(regname.GOODEGG3TONOT),
+                                                    "Good Egg 3: Tower Orange Pipe")
+    world.get_region(regname.GOODEGG3TONOT).connect(world.get_region(regname.GOODEGG3HOTOP),
+                                                    "Good Egg 3: Note Room Orange Pipe")
 
     world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG4HOTOW),
                                               "Good Egg 4: Dino Piranha Speed Run")
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4HOTOP))
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4TONOT),
-                                                    "Good Egg 4: Tower Orange Pipe")
+                                                    "Good Egg Comet: Tower Orange Pipe")
     world.get_region(regname.GOODEGG4TONOT).connect(world.get_region(regname.GOODEGG4HOTOP),
-                                                    "Good Egg 4: Note Room Orange Pipe")
+                                                    "Good Egg Comet: Note Room Orange Pipe")
     world.get_region(regname.GOODEGG4HOTOW).connect(world.get_region(regname.GOODEGG4DUMBB),
-                                                    "Good Egg 4: Towertop Sling & Launch Star")
+                                                    "Good Egg Comet: Towertop Sling & Launch Star")
     world.get_region(regname.GOODEGG4DUMBB).connect(world.get_region(regname.GOODEGG4SMLGR),
-                                                    "Good Egg 4: Dumbbell Boulder Launch Star")
+                                                    "Good Egg Comet: Dumbbell Boulder Launch Star")
     world.get_region(regname.GOODEGG4SMLGR).connect(world.get_region(regname.GOODEGG4BOULD),
-                                                    "Good Egg 4: Small Grass Planet Vine")
+                                                    "Good Egg Comet: Small Grass Planet Vine")
     world.get_region(regname.GOODEGG4BOULD).connect(world.get_region(regname.GOODEGG4PANEL),
-                                                    "Good Egg 4: Boulder Black Hole Green Pipe")
+                                                    "Good Egg Comet: Boulder Black Hole Green Pipe")
     world.get_region(regname.GOODEGG4BOULD).connect(world.get_region(regname.GOODEGG4GRASS),
-                                                    "Good Egg 4: Boulder Black Hole Vine")
+                                                    "Good Egg Comet: Boulder Black Hole Vine")
     world.get_region(regname.GOODEGG4PANEL).connect(world.get_region(regname.GOODEGG4GRASS),
-                                                    "Good Egg 4: Flipswitch Launch Star")
+                                                    "Good Egg Comet: Flipswitch Launch Star")
     world.get_region(regname.GOODEGG4GRASS).connect(world.get_region(regname.GOODEGG4DINOP),
-                                                    "Good Egg 4: Grass Climb Launch Star")
+                                                    "Good Egg Comet: Grass Climb Launch Star")
+    world.get_region(regname.GOODEGG).connect(world.get_region(regname.GOODEGG5PEARP),
+                                              "Good Egg Purple Coin: Purple Coin Omelet")
+    world.get_region(regname.GOODEGG5PEARP).connect(world.get_region(regname.GOODEGG5ROCKY),
+                                                    "Good Egg Purple Coin: Pear Launch Star")
+    world.get_region(regname.GOODEGG5PEARP).connect(world.get_region(regname.GOODEGG5YOSHI),
+                                                    "Good Egg Purple Coin: Pear Mid-Flight Launch Star")
+    world.get_region(regname.GOODEGG5ROCKY).connect(world.get_region(regname.GOODEGG5YOSHI),
+                                                    "Good Egg Purple Coin: Rocky Launch Star")
+    world.get_region(regname.GOODEGG5ROCKY).connect(world.get_region(regname.GOODEGG5PEARP),
+                                                    "Good Egg Purple Coin: Rocky Mid-Flight Launch Star")
+    world.get_region(regname.GOODEGG5YOSHI).connect(world.get_region(regname.GOODEGG5PEARP),
+                                                    "Good Egg Purple Coin: Yoshi Egg Launch Star")
+    world.get_region(regname.GOODEGG5YOSHI).connect(world.get_region(regname.GOODEGG5ROCKY),
+                                                    "Good Egg Purple Coin: Yoshi Egg Mid-Flight Launch Star")
+
     world.get_region(regname.TERRACE).connect(world.get_region(regname.HONEYHIVE), "Dome 1 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Second Orbit"], 4)))
     world.get_region(regname.TERRACE).connect(world.get_region(regname.LOOPDEELOOP), "Dome 1 Third Orbit Galaxy",
