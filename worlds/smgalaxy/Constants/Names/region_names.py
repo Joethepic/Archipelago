@@ -70,6 +70,7 @@ GATEWAY1SMLTU = "Gateway: Small Tuning Shard Planet"
 GATEWAY1LRGTU = "Gateway: Large Tuning Shard Planet"
 GATEWAY1LRGTI = "Gateway: Large Tuning Planet Inside"
 GATEWAY2HOMEP = "Gateway Comet: Home Planet"
+SWEETSW1SWEET = "Sweet Sweet: Holey Platforms"
 
 ## Terrace Galaxies
 ### Good Egg
@@ -173,3 +174,10 @@ HONEYHI5BIGTR = "Honeyhive Purple Coin: Beneath the Big Tree"
 HONEYHI5POUND = "Honeyhive Purple Coin: Tiny Tree Cliff"
 HONEYHI5CLIFF = "Honeyhive Purple Coin: Clifftop"
 HONEYHI6LUIGI = "Honeyhive Secret: Luigi up a Tree"
+
+### Minor Galaxies
+LOOPDLO1ENTRY = "Loopdeeloop: Course Entryway"
+LOOPDLO1COURS = "Loopdeeloop: Surfing Course"
+FLIPSWI1PANEL = "Flipswitch: Panel Half Cube"
+ROBOTRE1CAGEB = "Robot Reactor: Cage Break Planet"
+ROBOTRE1MEGAL = "Robot Reactor: Megaleg's Moon"

@@ -204,10 +204,19 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Honeyhive Purple Coin: Undercliff Return Pipe")
     world.get_region(regname.TERRACE).connect(world.get_region(regname.LOOPDEELOOP), "Dome 1 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
+    world.get_region(regname.LOOPDEELOOP).connect(world.get_region(regname.LOOPDLO1ENTRY),
+                                                  "Loopdeeloop: Surfing 101")
+    world.get_region(regname.LOOPDLO1ENTRY).connect(world.get_region(regname.LOOPDLO1COURS))
     world.get_region(regname.TERRACE).connect(world.get_region(regname.FLIPSWITCH), "Dome 1 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fourth Orbit"], 6)))
+    world.get_region(regname.FLIPSWITCH).connect(world.get_region(regname.FLIPSWI1PANEL),
+                                                 "Flipswitch: Painting the Planet Yellow")
     world.get_region(regname.TERRACE).connect(world.get_region(regname.BOWJR1), "Dome 1 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Fifth Orbit"], 7)))
+    world.get_region(regname.BOWJR1).connect(world.get_region(regname.ROBOTRE1CAGEB),
+                                             "Robot Reactor: Megaleg's Moon")
+    world.get_region(regname.ROBOTRE1CAGEB).connect(world.get_region(regname.ROBOTRE1MEGAL),
+                                                    "Robot Reactor: Cage Break Launch Star")
     # Dome 2
     world.get_region(regname.SHIP).connect(world.get_region(regname.FOUNTAIN), "Dome 2 Entry",
                     Has("Grand Star"))
@@ -277,6 +286,8 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 5) and HasGroup("Power Stars", count=world.options.stars_to_finish.value))
     world.get_region(regname.COTU).connect(world.get_region(regname.BOWSER3), "Galaxy's Center")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SWEETSWEET), "Sweet Sweet Hungry Luma")
+    world.get_region(regname.SWEETSWEET).connect(world.get_region(regname.SWEETSW1SWEET),
+                                                 "Sweet Sweet: Rocky Road")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SLINGPOD), "Sling Pod Hungry Luma",
                     Has("Grand Star"))
     world.get_region(regname.SHIP).connect(world.get_region(regname.DRIPDROP), "Drip Drop Hungry Luma",
