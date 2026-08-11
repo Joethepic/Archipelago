@@ -306,26 +306,85 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Bigmouth: Stomach Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SANDSPIRAL), "Sand Spiral Hungry Luma",
                     Has("Grand Star", 4))
+    world.get_region(regname.SANDSPIRAL).connect(world.get_region(regname.SANDSPI1SHIPB),
+                                                 "Sand Spiral: Choosing a Favorite Snack")
+    world.get_region(regname.SANDSPI1SHIPB).connect(world.get_region(regname.SANDSPI1SANDT),
+                                                 "Sand Spiral: Ship Bow Sling Star")
+    world.get_region(regname.SANDSPI1SANDT).connect(world.get_region(regname.SANDSPI1SPIRA),
+                                                 "Sand Spiral: Tunnel Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SNOWCAP), "Snow Cap Hungry Luma",
                     Has("Grand Star", 5))
+    world.get_region(regname.SNOWCAP).connect(world.get_region(regname.SNOWCAP1GLASS),
+                                                 "Snow Cap: Star Bunnies in the Snow")
+    world.get_region(regname.SNOWCAP1GLASS).connect(world.get_region(regname.SNOWCAP1SNOWY),
+                                                 "Snow Cap: Glass Sphere Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.GATEWAY), "Gateway Dome",
                     Has("Grand Star", 5))
-    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY1HOMEP), "Gateway: Grand Star Rescue")
-    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP), "Gateway Comet: Gateway's Purple Coins")
-    world.get_region(regname.GATEWAY1HOMEP).connect(world.get_region(regname.GATEWAY1HOLEY), "Gateway: Home Planet Launch Star")
-    world.get_region(regname.GATEWAY1HOLEY).connect(world.get_region(regname.GATEWAY1SMLTU), "Gateway: Holey Planet Launch Star")
-    world.get_region(regname.GATEWAY1SMLTU).connect(world.get_region(regname.GATEWAY1LRGTU), "Gateway: Small Tuning Planet Launch Star")
-    world.get_region(regname.GATEWAY1LRGTU).connect(world.get_region(regname.GATEWAY1LRGTI), "Gateway: Large Tuning Planet Pipe")
-    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP), "Gateway Comet: Gateway's Purple Coins")
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY1HOMEP),
+                                              "Gateway: Grand Star Rescue")
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP),
+                                              "Gateway Comet: Gateway's Purple Coins")
+    world.get_region(regname.GATEWAY1HOMEP).connect(world.get_region(regname.GATEWAY1HOLEY),
+                                                    "Gateway: Home Planet Launch Star")
+    world.get_region(regname.GATEWAY1HOLEY).connect(world.get_region(regname.GATEWAY1SMLTU),
+                                                    "Gateway: Holey Planet Launch Star")
+    world.get_region(regname.GATEWAY1SMLTU).connect(world.get_region(regname.GATEWAY1LRGTU),
+                                                    "Gateway: Small Tuning Planet Launch Star")
+    world.get_region(regname.GATEWAY1LRGTU).connect(world.get_region(regname.GATEWAY1LRGTI),
+                                                    "Gateway: Large Tuning Planet Pipe")
+    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP),
+                                              "Gateway Comet: Gateway's Purple Coins")
     world.get_region(regname.SHIP).connect(world.get_region(regname.BOOBONE), "Boo's Boneyard Hungry Luma",
                     Has("Grand Star", 5))
+    world.get_region(regname.BOOBONE).connect(world.get_region(regname.BOOBONE1SKULL),
+                                                 "Boo's Boneyard: Racing the Spooky Speedster")
+    world.get_region(regname.BOOBONE1SKULL).connect(world.get_region(regname.BOOBONE1PIT),
+                                                 "Boo's Boneyard: Skull Orange Pipe")
     world.get_region(regname.SHIP).connect(world.get_region(regname.TRIALS), "Planet of Trials Launch Star",
                     Has("Green Star"))
     world.get_region(regname.TRIALS).connect(world.get_region(regname.ROLLINGGIZ), "Rolling Gizmo Launch Star")
+    world.get_region(regname.ROLLINGGIZ).connect(world.get_region(regname.ROLLGIZ1LANDI),
+                                                 "Rolling Gizmo: Gizmos, Gears, and Gadgets")
+    world.get_region(regname.ROLLGIZ1LANDI).connect(world.get_region(regname.ROLLGIZ1MAINA),
+                                                 "Rolling Gizmo: Landing Ball Launcher")
     world.get_region(regname.TRIALS).connect(world.get_region(regname.LOOPDEESWOOP), "Loopdeeswoop Launch Star")
+    world.get_region(regname.LOOPDEESWOOP).connect(world.get_region(regname.LOOPSWO1LANDI),
+                                                   "Loopdeeswoop: The Galaxy's Greatest Wave")
+    world.get_region(regname.LOOPSWO1LANDI).connect(world.get_region(regname.LOOPSWO1TERR1),
+                                                    "Loopdeeswoop: Landing Sling Star")
+    world.get_region(regname.LOOPSWO1TERR1).connect(world.get_region(regname.LOOPSWO1TERR2),
+                                                    "Loopdeeswoop: First Terrace Sling Star")
+    world.get_region(regname.LOOPSWO1TERR2).connect(world.get_region(regname.LOOPSWO1LANDI),
+                                                    "Loopdeeswoop: Second Terrace Sling Star")
+    world.get_region(regname.LOOPSWO1LANDI).connect(world.get_region(regname.LOOPSWO1SWOOP),
+                                                    "Loopdeeswoop: Surfing Course")
     world.get_region(regname.TRIALS).connect(world.get_region(regname.BUBBLEBLAST), "Bubble Blast Launch Star")
-    # world.get_region(regname.SHIP).connect(world.get_region(regname.FINALE), "Grand Finale Launch Star",
-    #                 Has("Green Star") and Has("Power Star", 120))
+    world.get_region(regname.BUBBLEBLAST).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: The Electric Labyrinth")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LNORTH),
+                                                  "Bubble Blast: Star Platform North Pipe")
+    world.get_region(regname.BUBBLAS1LNORTH).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: North Sling Star")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LNORTW),
+                                                  "Bubble Blast: Star Platform Northwest Pipe")
+    world.get_region(regname.BUBBLAS1LNORTW).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: Northwest Sling Star")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LNORTE),
+                                                  "Bubble Blast: Star Platform Northeast Pipe")
+    world.get_region(regname.BUBBLAS1LNORTE).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: Northeast Sling Star")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LSOUTE),
+                                                  "Bubble Blast: Star Platform Southeast Pipe")
+    world.get_region(regname.BUBBLAS1LSOUTE).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: Southeast Sling Star")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LSOUTW),
+                                                  "Bubble Blast: Star Platform Southwest Pipe")
+    world.get_region(regname.BUBBLAS1LSOUTW).connect(world.get_region(regname.BUBBLAS1LSTARP),
+                                                  "Bubble Blast: Southwest Sling Star")
+    world.get_region(regname.BUBBLAS1LSTARP).connect(world.get_region(regname.BUBBLAS1LLONGF),
+                                                  "Bubble Blast: Star Platform Launch Star")
+    # world.get_region(regname.TRIALS).connect(world.get_region(regname.FINALE), "Grand Finale Launch Star",
+    #                  HasGroup("Power Star", 120))
     world.set_completion_rule(Has("Peach"))
 
 def rules_from_er_placements(world: "SMGWorld"):

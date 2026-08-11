@@ -70,6 +70,8 @@ GATEWAY1SMLTU = "Gateway: Small Tuning Shard Planet"
 GATEWAY1LRGTU = "Gateway: Large Tuning Shard Planet"
 GATEWAY1LRGTI = "Gateway: Large Tuning Planet Inside"
 GATEWAY2HOMEP = "Gateway Comet: Home Planet"
+
+## Observatory Specials
 SWEETSW1SWEET = "Sweet Sweet: Holey Platforms"
 SLINGPO1WEBPU = "Sling Pod Galaxy: Sling Pod Obstacle Course"
 DRIPDRO1WATER = "Drip Drop: Water Planet"
@@ -77,6 +79,28 @@ BIGMOUT1ENTRY = "Bigmouth: Open Mouth"
 BIGMOUT1THROA = "Bigmouth: Throat"
 BIGMOUT1LOWER = "Bigmouth: Lower Stomach"
 BIGMOUT1UPPER = "Bigmouth: Upper Stomach"
+SANDSPI1SHIPB = "Sand Spiral: Ship's Bow"
+SANDSPI1SANDT = "Sand Spiral: Sand Tunnel"
+SANDSPI1SPIRA = "Sand Spiral: Rocky Spiral"
+SNOWCAP1GLASS = "Snow Cap: Glass Sphere"
+SNOWCAP1SNOWY = "Snow Cap: Snowman Planet"
+BOOBONE1SKULL = "Boo's Boneyard: Skull Planet"
+BOOBONE1PIT = "Boo's Boneyard: Boo Obstacle Course"
+
+## Trials Planetoids
+ROLLGIZ1LANDI = "Rolling Gizmo: Landing Platform"
+ROLLGIZ1MAINA = "Rolling Gizmo: Gears, Ramps & Dice"
+LOOPSWO1LANDI = "Loopdeeswoop: Landing Platform"
+LOOPSWO1TERR1 = "Loopdeeswoop: First Terrace"
+LOOPSWO1TERR2 = "Loopdeeswoop: Second Terrace"
+LOOPSWO1SWOOP = "Loopdeeswoop: Surfing Course"
+BUBBLAS1LSTARP = "Bubble Blast: Landing Star Platform"
+BUBBLAS1LNORTH = "Bubble Blast: North Fence Section"
+BUBBLAS1LNORTW = "Bubble Blast: Northwest Fence Section"
+BUBBLAS1LNORTE = "Bubble Blast: Northeast Fence Section"
+BUBBLAS1LSOUTE = "Bubble Blast: Southeast Fence Section"
+BUBBLAS1LSOUTW = "Bubble Blast: Southwest Fence Section"
+BUBBLAS1LLONGF = "Bubble Blast: Electric Corridor"
 
 ## Terrace Galaxies
 ### Good Egg
