@@ -166,13 +166,42 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Honeyhive 2: Undercliff Return Pipe")
     world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI3LANDI),
                                                     "Honeyhive 3: Big Bad Bugaboom")
-
+    world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3SIDEP))
+    world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3WATRP))
+    world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3POUND))
+    world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI3FOUNC))
+    world.get_region(regname.HONEYHI3WATRP).connect(world.get_region(regname.HONEYHI3WATRT))
+    world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI6LUIGI))
+    world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI3BIGTR))
+    world.get_region(regname.HONEYHI3WATRT).connect(world.get_region(regname.HONEYHI3UNDER))
+    world.get_region(regname.HONEYHI3UNDER).connect(world.get_region(regname.HONEYHI3SMLHI),
+                                                    "Hineyhive 3: Undercliff Return Pipe")
+    world.get_region(regname.HONEYHI3WATRT).connect(world.get_region(regname.HONEYHI3BUGLA),
+                                                    "Honeyhive 3: Waterfall Tunnel Launch Star")
+    world.get_region(regname.HONEYHI3BIGTR).connect(world.get_region(regname.HONEYHI3LANDI),
+                                                    "Honeyhive 3: Big Tree Return Pipe")
+    world.get_region(regname.HONEYHI3BUGLA).connect(world.get_region(regname.HONEYHI3BUGAB))
     world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI4LANDI),
                                                     "Honeyhive Comet: Honeyhive Cosmic Mario Race")
-
+    world.get_region(regname.HONEYHI4LANDI).connect(world.get_region(regname.HONEYHI4WATRP))
+    world.get_region(regname.HONEYHI4WATRP).connect(world.get_region(regname.HONEYHI4WATRT))
+    world.get_region(regname.HONEYHI4WATRT).connect(world.get_region(regname.HONEYHI4UNDER))
     world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI5LANDI),
                                                     "Honeyhive Purple Coins: The Honeyhive's Purple Coins")
-
+    world.get_region(regname.HONEYHI5LANDI).connect(world.get_region(regname.HONEYHI5SIDEP))
+    world.get_region(regname.HONEYHI5LANDI).connect(world.get_region(regname.HONEYHI5WATRP))
+    world.get_region(regname.HONEYHI5LANDI).connect(world.get_region(regname.HONEYHI5BIGTR),
+                                                    "Honeyhive Purple Coin: Landing Ground Pound Vine")
+    world.get_region(regname.HONEYHI5SIDEP).connect(world.get_region(regname.HONEYHI5SMLHI))
+    world.get_region(regname.HONEYHI5BIGTR).connect(world.get_region(regname.HONEYHI5POUND),
+                                                    "Honeyhive Purple Coin: Big Tree Sling Star")
+    world.get_region(regname.HONEYHI5POUND).connect(world.get_region(regname.HONEYHI5CLIFF))
+    world.get_region(regname.HONEYHI5POUND).connect(world.get_region(regname.HONEYHI5FOUNC))
+    world.get_region(regname.HONEYHI5CLIFF).connect(world.get_region(regname.HONEYHI5FOUNC))
+    world.get_region(regname.HONEYHI5CLIFF).connect(world.get_region(regname.HONEYHI5WATRT))
+    world.get_region(regname.HONEYHI5WATRT).connect(world.get_region(regname.HONEYHI5UNDER))
+    world.get_region(regname.HONEYHI5UNDER).connect(world.get_region(regname.HONEYHI5SMLHI),
+                                                    "Honeyhive Purple Coin: Undercliff Return Pipe")
     world.get_region(regname.TERRACE).connect(world.get_region(regname.LOOPDEELOOP), "Dome 1 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_one_counts["Third Orbit"], 5)))
     world.get_region(regname.TERRACE).connect(world.get_region(regname.FLIPSWITCH), "Dome 1 Fourth Orbit Galaxy",
