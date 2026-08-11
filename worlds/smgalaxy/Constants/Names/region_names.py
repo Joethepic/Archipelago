@@ -71,6 +71,12 @@ GATEWAY1LRGTU = "Gateway: Large Tuning Shard Planet"
 GATEWAY1LRGTI = "Gateway: Large Tuning Planet Inside"
 GATEWAY2HOMEP = "Gateway Comet: Home Planet"
 SWEETSW1SWEET = "Sweet Sweet: Holey Platforms"
+SLINGPO1WEBPU = "Sling Pod Galaxy: Sling Pod Obstacle Course"
+DRIPDRO1WATER = "Drip Drop: Water Planet"
+BIGMOUT1ENTRY = "Bigmouth: Open Mouth"
+BIGMOUT1THROA = "Bigmouth: Throat"
+BIGMOUT1LOWER = "Bigmouth: Lower Stomach"
+BIGMOUT1UPPER = "Bigmouth: Upper Stomach"
 
 ## Terrace Galaxies
 ### Good Egg
@@ -181,3 +187,5 @@ LOOPDLO1COURS = "Loopdeeloop: Surfing Course"
 FLIPSWI1PANEL = "Flipswitch: Panel Half Cube"
 ROBOTRE1CAGEB = "Robot Reactor: Cage Break Planet"
 ROBOTRE1MEGAL = "Robot Reactor: Megaleg's Moon"
+
+## Fountain Galaxies

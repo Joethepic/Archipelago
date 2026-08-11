@@ -290,10 +290,20 @@ def set_rules(world: "SMGWorld", player: int):
                                                  "Sweet Sweet: Rocky Road")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SLINGPOD), "Sling Pod Hungry Luma",
                     Has("Grand Star"))
+    world.get_region(regname.SLINGPOD).connect(world.get_region(regname.SLINGPO1WEBPU),
+                                               "Sling Pod: A Very Sticky Situation")
     world.get_region(regname.SHIP).connect(world.get_region(regname.DRIPDROP), "Drip Drop Hungry Luma",
                     Has("Grand Star", 2))
+    world.get_region(regname.DRIPDROP).connect(world.get_region(regname.DRIPDRO1WATER),
+                                               "Drip Drop: Giant Eel Outbreak")
     world.get_region(regname.SHIP).connect(world.get_region(regname.BIGMOUTH), "Bigmouth Hungry Luma",
                     Has("Grand Star", 3))
+    world.get_region(regname.BIGMOUTH).connect(world.get_region(regname.BIGMOUT1ENTRY),
+                                               "Bigmouth: Bigmouth's Gold Bait")
+    world.get_region(regname.BIGMOUT1ENTRY).connect(world.get_region(regname.BIGMOUT1THROA))
+    world.get_region(regname.BIGMOUT1THROA).connect(world.get_region(regname.BIGMOUT1LOWER))
+    world.get_region(regname.BIGMOUT1LOWER).connect(world.get_region(regname.BIGMOUT1UPPER),
+                                                    "Bigmouth: Stomach Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SANDSPIRAL), "Sand Spiral Hungry Luma",
                     Has("Grand Star", 4))
     world.get_region(regname.SHIP).connect(world.get_region(regname.SNOWCAP), "Snow Cap Hungry Luma",
