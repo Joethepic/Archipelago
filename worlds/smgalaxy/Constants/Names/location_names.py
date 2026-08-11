@@ -1,0 +1,6 @@
+GOODEGGSTAR1 = "GE: Dino Piranha"
+GOODEGGSTAR2 = "GE: A Snack of Cosmic Proportions"
+GOODEGGSTAR3 = "GE: King Kaliente's Battle Fleet"
+GOODEGGSTAR4 = "GE: Dino Piranha Speed Run"
+GOODEGGSTAR5 = "GE: Purple Coin Omelet"
+GOODEGGSTAR6 = "GE: Luigi on the Roof"
