@@ -238,6 +238,16 @@ region_list: dict[str, SMGRegionData] = {
     regname.BUBBLAS1LSOUTE: SMGRegionData("Planetoid"),
     regname.BUBBLAS1LSOUTW: SMGRegionData("Planetoid"),
     regname.BUBBLAS1LLONGF: SMGRegionData("Planetoid"),
+    regname.GRANDFINALE: SMGRegionData("Planetoid"),
+    regname.GALREAC1LANDI: SMGRegionData("Planetoid"),
+    regname.GALREAC1WALLS: SMGRegionData("Planetoid"),
+    regname.GALREAC1SMSUN: SMGRegionData("Planetoid"),
+    regname.GALREAC1BLSUN: SMGRegionData("Planetoid"),
+    regname.GALREAC1SANDY: SMGRegionData("Planetoid"),
+    regname.GALREAC1GRAVI: SMGRegionData("Planetoid"),
+    regname.GALREAC1LAVAT: SMGRegionData("Planetoid"),
+    regname.GALREAC1STAIR: SMGRegionData("Planetoid"),
+    regname.GALREAC1BOSS: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]
@@ -248,7 +258,7 @@ boss_galaxy_list: list[str] = [key for key, data in region_list.items() if data.
 
 specials_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Special"]
 
-galaxies_list: list[SMGRegionData] = []
+galaxies_list: list[str] = []
 galaxies_list.extend(major_galaxy_list)
 galaxies_list.extend(minor_galaxy_list)
 galaxies_list.extend(boss_galaxy_list)

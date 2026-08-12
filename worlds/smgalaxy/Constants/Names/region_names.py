@@ -86,6 +86,15 @@ SNOWCAP1GLASS = "Snow Cap: Glass Sphere"
 SNOWCAP1SNOWY = "Snow Cap: Snowman Planet"
 BOOBONE1SKULL = "Boo's Boneyard: Skull Planet"
 BOOBONE1PIT = "Boo's Boneyard: Boo Obstacle Course"
+GALREAC1LANDI = "Galaxy Reactor: Landing"
+GALREAC1WALLS = "Galaxy Reactor: Castle Wall"
+GALREAC1SMSUN = "Galaxy Reactor: Orange Star"
+GALREAC1BLSUN = "Galaxy Reactor: Blue Star"
+GALREAC1SANDY = "Galaxy Reactor: Sandy Planet"
+GALREAC1GRAVI = "Galaxy Reactor: Gravity Wall"
+GALREAC1LAVAT = "Galaxy Reactor: Lava Tunnel"
+GALREAC1STAIR = "Galaxy Reactor: Boss Stairs"
+GALREAC1BOSS = "Galaxy Reactor: Bowser Arena"
 
 ## Trials Planetoids
 ROLLGIZ1LANDI = "Rolling Gizmo: Landing Platform"
@@ -101,6 +110,7 @@ BUBBLAS1LNORTE = "Bubble Blast: Northeast Fence Section"
 BUBBLAS1LSOUTE = "Bubble Blast: Southeast Fence Section"
 BUBBLAS1LSOUTW = "Bubble Blast: Southwest Fence Section"
 BUBBLAS1LLONGF = "Bubble Blast: Electric Corridor"
+GRANDFINALE = "Grand Finale: The Star Festival"
 
 ## Terrace Galaxies
 ### Good Egg

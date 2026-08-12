@@ -285,6 +285,17 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.SHIP).connect(world.get_region(regname.COTU), "Center Of the Universe Entry",
                     Has("Grand Star", 5) and HasGroup("Power Stars", count=world.options.stars_to_finish.value))
     world.get_region(regname.COTU).connect(world.get_region(regname.BOWSER3), "Galaxy's Center")
+    world.get_region(regname.BOWSER3).connect(world.get_region(regname.GALREAC1LANDI),
+                                              "Galaxy Reactor: The Fate of the Universe")
+    world.get_region(regname.GALREAC1LANDI).connect(world.get_region(regname.GALREAC1WALLS))
+    world.get_region(regname.GALREAC1WALLS).connect(world.get_region(regname.GALREAC1SMSUN))
+    world.get_region(regname.GALREAC1SMSUN).connect(world.get_region(regname.GALREAC1BLSUN))
+    world.get_region(regname.GALREAC1BLSUN).connect(world.get_region(regname.GALREAC1SANDY))
+    world.get_region(regname.GALREAC1SANDY).connect(world.get_region(regname.GALREAC1GRAVI))
+    world.get_region(regname.GALREAC1GRAVI).connect(world.get_region(regname.GALREAC1LAVAT))
+    world.get_region(regname.GALREAC1LAVAT).connect(world.get_region(regname.GALREAC1STAIR),
+                                                    "Galaxy Reactor: Lava Launch Star")
+    world.get_region(regname.GALREAC1STAIR).connect(world.get_region(regname.GALREAC1BOSS))
     world.get_region(regname.SHIP).connect(world.get_region(regname.SWEETSWEET), "Sweet Sweet Hungry Luma")
     world.get_region(regname.SWEETSWEET).connect(world.get_region(regname.SWEETSW1SWEET),
                                                  "Sweet Sweet: Rocky Road")
@@ -385,6 +396,7 @@ def set_rules(world: "SMGWorld", player: int):
                                                   "Bubble Blast: Star Platform Launch Star")
     # world.get_region(regname.TRIALS).connect(world.get_region(regname.FINALE), "Grand Finale Launch Star",
     #                  HasGroup("Power Star", 120))
+    # world.get_region(regname.FINALE).connect(world.get_region(regname.GRANDFINALE), "Grand Finale: The Star Festival")
     world.set_completion_rule(Has("Peach"))
 
 def rules_from_er_placements(world: "SMGWorld"):
