@@ -1,58 +1,5 @@
-from enum import StrEnum
-from typing import NamedTuple
-
+from ...Constants.patch_constants import *
 from ..extensions import RARCExtended
-
-ASTRO_GALAXY_RELATIVE_PATH: str = "/DATA/files/StageData/AstroGalaxy.arc"
-ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
-
-COMMON_PATH: str = "jmp/placement/common"
-LAYERA_PATH: str = "jmp/placement/layera"
-LAYERB_PATH: str = "jmp/placement/layerb"
-FILE_NAME: str = "objinfo"
-
-class ObjInfoFieldNames(StrEnum):
-    NAME: str = "name"
-    L_ID: str = "l_id"
-    OBJECT_ARGUMENT0: str = "Obj_arg0"
-    OBJECT_ARGUMENT1: str = "Obj_arg1"
-    OBJECT_ARGUMENT2: str = "Obj_arg2"
-    OBJECT_ARGUMENT3: str = "Obj_arg3"
-    OBJECT_ARGUMENT4: str = "Obj_arg4"
-    OBJECT_ARGUMENT5: str = "Obj_arg5"
-    OBJECT_ARGUMENT6: str = "Obj_arg6"
-    OBJECT_ARGUMENT7: str = "Obj_arg7"
-    CAMERA_SET_ID: str = "CameraSetId"
-    SWITCH_APPEAR: str = "SW_APPEAR"
-    SWITCH_DEAD: str = "SW_DEAD"
-    SWITCH_A: str = "SW_A"
-    SWITCH_B: str = "SW_B"
-    SWITCH_SLEEP: str = "SW_SLEEP"
-    MESSAGE_ID: str = "MessageId"
-    POSITION_X: str = "pos_x"
-    POSITION_Y: str = "pos_y"
-    POSITION_Z: str = "pos_z"
-    DIRECTION_X: str = "dir_x"
-    DIRECTION_Y: str = "dir_y"
-    DIRECTION_Z: str = "dir_z"
-    SCALE_X: str = "scale_x"
-    SCALE_Y: str = "scale_y"
-    SCALE_Z: str = "scale_z"
-    CAST_ID: str = "CastId"
-    VIEW_GROUP_ID: str = "ViewGroupId"
-    SHAPE_MODEL_NUMBER: str = "ShapeModelNo"
-    COMMON_PATH_ID: str = "CommonPath_ID"
-    CLIPPING_GROUP_ID: str = "ClippingGroupId"
-    GROUP_ID: str = "GroupId"
-    DEMO_GROUP_ID: str = "DemoGroupId"
-    MAP_PARTS_ID: str = "MapParts_ID"
-
-class GalaxyDestination(NamedTuple):
-    name: str
-    type: str
-    dome_index: int
-    orbit_index: int
-    old_luma_name: str
 
 class AstroGalaxy(RARCExtended):
     def __init__(self):

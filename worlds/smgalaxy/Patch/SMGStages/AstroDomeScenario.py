@@ -1,21 +1,5 @@
-from enum import StrEnum
-
+from ...Constants.patch_constants import *
 from ..extensions import RARCExtended
-
-ASTRO_DOME_SCENARIO_RELATIVE_PATH = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
-SCENARIO_DATA_FILE_NAME = "scenariodata.bcsv"
-
-class ScenarioDataFieldName(StrEnum):
-    SCENARIO_NUMBER: str = "ScenarioNo"
-    SCENARIO_NAME: str = "ScenarioName"
-    POWER_STAR_ID: str = "PowerStarId"
-    APPEAR_POWER_STAR_OBJect: str = "AppearPowerStarObj"
-    COMET: str = "Comet"
-    LUIGI_MODE_TIMER: str = "LuigiModeTimer"
-    ASTRO_DOME: str = "AstroDome"
-    IS_HIDDEN: str = "IsHidden"
-    ERROR_CHECK: str = "ErrorCheck"
-
 
 class AstroDomeScenario(RARCExtended):
     def __init__(self):

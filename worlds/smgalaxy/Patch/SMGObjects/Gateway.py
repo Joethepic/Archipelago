@@ -2,12 +2,9 @@ from gclib.rarc import RARC
 from gclib.j3d import BDL
 from gclib import fs_helpers as fs
 
+from ...Constants.patch_constants import *
 from ..extensions import RARCExtended
 from ..SMGDOL import SMGDOL
-
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-GATEWAY_RELATIVE_PATH: str = "/DATA/files/ObjectData/AstroChildRoom.arc"
-MINIATURE_GATEWAY_NAME: str = "MiniHeavensDoorGalaxy"
 
 class Gateway(RARCExtended):
     bdl_base_name = "astrochildroom.bdl"
