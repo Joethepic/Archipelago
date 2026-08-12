@@ -222,6 +222,37 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star"))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.SPACEJUNK), "Dome 2 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["First Orbit"], 8)))
+    world.get_region(regname.SPACEJUNK).connect(world.get_region(regname.SPACJUN1LANDI),
+                                                    "Space Junk 1: Pull Star Path")
+    world.get_region(regname.SPACJUN1LANDI).connect(world.get_region(regname.SPACJUN1CRYCY))
+    world.get_region(regname.SPACJUN1CRYCY).connect(world.get_region(regname.SPACJUN1SPHE3))
+    world.get_region(regname.SPACJUN1SPHE3).connect(world.get_region(regname.SPACJUN1HSHIP),
+                                                    "Space Junk 1: Three Spheres Launch Star")
+    world.get_region(regname.SPACJUN1HSHIP).connect(world.get_region(regname.SPACJUN1TOADS))
+    world.get_region(regname.SPACJUN1TOADS).connect(world.get_region(regname.SPACJUN1SILVE),
+                                                    "Space Junk 1: Toadship Sling Star")
+    world.get_region(regname.SPACEJUNK).connect(world.get_region(regname.SPACJUN2TOADS),
+                                                    "Space Junk 2: Kamella's Airship Attack")
+    world.get_region(regname.SPACJUN2TOADS).connect(world.get_region(regname.SPACJUN2AIRS1),
+                                                    "Space Junk 2: Toadship Launch Star")
+    world.get_region(regname.SPACJUN2AIRS1).connect(world.get_region(regname.SPACJUN2AIRS2),
+                                                    "Space Junk 2: Meteor Platform Sling Star")
+    world.get_region(regname.SPACJUN2AIRS2).connect(world.get_region(regname.SPACJUN2AIRS3),
+                                                    "Space Junk 2: Airship Launch Star")
+    world.get_region(regname.SPACJUN2AIRS3).connect(world.get_region(regname.SPACJUN2AIRSI),
+                                                    "Space Junk 2: Third Airship Chimney")
+    world.get_region(regname.SPACJUN2AIRS3).connect(world.get_region(regname.SPACJUN2BATTL),
+                                                    "Space Junk 2: Bridge Sling Star")
+    world.get_region(regname.SPACEJUNK).connect(world.get_region(regname.SPACJUN3TOADS),
+                                                    "Space Junk 2: Tarantox's Tangled Web")
+    world.get_region(regname.SPACJUN3TOADS).connect(world.get_region(regname.SPACJUN3CRYCY))
+    world.get_region(regname.SPACJUN3CRYCY).connect(world.get_region(regname.SPACJUN3GLASS))
+    world.get_region(regname.SPACJUN3GLASS).connect(world.get_region(regname.SPACJUN6YOSHI),
+                                                    "Space Junk Secret: Hungry Luma Launch Star")
+    world.get_region(regname.SPACJUN3GLASS).connect(world.get_region(regname.SPACJUN3FLOAT),
+                                                    "Space Junk 2: Under Glass Launch Star")
+    world.get_region(regname.SPACJUN3FLOAT).connect(world.get_region(regname.SPACJUN3HSHIP))
+    world.get_region(regname.SPACJUN3HSHIP).connect(world.get_region(regname.SPACJUN3TARAN))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.ROLLINGGREEN), "Dome 2 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BATTLEROCK), "Dome 2 Third Orbit Galaxy",
