@@ -33,30 +33,30 @@ locGE_table: dict[str, SMGLocationData] = {
 }
 
 locHH_table: dict[str, SMGLocationData]  = {
-    "HH: Bee Mario Takes Flight": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000006, "HoneyBeeKingdomGalaxy", game_address=0),
-    "HH: Trouble on the Tower": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000007, "HoneyBeeKingdomGalaxy", game_address=1),
-    "HH: Big Bad Bugabooom": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000008, "HoneyBeeKingdomGalaxy", game_address=2),
-    "HH: Luigi in the Honeyhive Kingdom": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009, "HoneyBeeKingdomGalaxy",
+    locname.HONEYHIVESTAR1: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000006, "HoneyBeeKingdomGalaxy", game_address=0),
+    locname.HONEYHIVESTAR2: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000007, "HoneyBeeKingdomGalaxy", game_address=1),
+    locname.HONEYHIVESTAR3: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000008, "HoneyBeeKingdomGalaxy", game_address=2),
+    locname.HONEYHIVESTAR6: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009, "HoneyBeeKingdomGalaxy",
                                           CanReachLocation(locname.GHOSTLYSTAR1), game_address=3),
-    "HH: Honeyhive Cosmic Mario Race": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 170000010, "HoneyBeeKingdomGalaxy", game_address=4)
+    locname.HONEYHIVESTAR4: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 170000010, "HoneyBeeKingdomGalaxy", game_address=4)
 }
 
 locspecialstages_table: dict[str, SMGLocationData]  = {
-    "LDL: Surfing 101": SMGLocationData(["Loopdeloop Galaxy", "Power Star Locations"], regname.LOOPDEELOOP, 170000012, "SurfingLv1Galaxy", game_address=0),
-    "FS: Painting the Planet Yellow": SMGLocationData(["Flipswitch Galaxy", "Power Star Locations"], regname.FLIPSWITCH, 170000013, "FlipPanelExGalaxy", game_address=0),
-    "RG: Rolling in the Clouds": SMGLocationData(["Rolling Green Galaxy", "Power Star Locations"], regname.ROLLINGGREEN, 170000014, "TamakoroExLv1Galaxy", game_address=0),
-    "HS: Shrinking Satellite": SMGLocationData(["Hurry-Scurry Galaxy", "Power Star Locations"], regname.HURRYSCUR, 170000015, "BreakDownPlanetGalaxy", game_address=0),
-    "BUB: Through the Poison Swamp": SMGLocationData(["Bubble Breeze Galaxy", "Power Star Locations"], regname.BUBBLEBREEZE, 170000016, "CubeBubbleExLv1Galaxy", game_address=0),
-    "HC: Scaling the Sticky Wall": SMGLocationData(["Honeyclimb Galaxy", "Power Star Locations"], regname.HONEYCLIMB, 170000118, "HoneyBeeExGalaxy", game_address=0),
-    "BB: The Floating Fortress": SMGLocationData(["Buoy Base Galaxy", "Power Star Locations"], regname.BUOY, 170000017, "OceanFloaterLandGalaxy", game_address=0),
-    "BB: The Secret of Buoy Base": SMGLocationData(["Buoy Base Galaxy", "Power Star Locations"], regname.BUOY, 170000018, "OceanFloaterLandGalaxy", game_address=0),
+    locname.LOOPDEELOOPSTAR: SMGLocationData(["Loopdeloop Galaxy", "Power Star Locations"], regname.LOOPDEELOOP, 170000012, "SurfingLv1Galaxy", game_address=0),
+    locname.FLIPSWITCHSTAR: SMGLocationData(["Flipswitch Galaxy", "Power Star Locations"], regname.FLIPSWITCH, 170000013, "FlipPanelExGalaxy", game_address=0),
+    locname.ROLLINGGREENSTAR: SMGLocationData(["Rolling Green Galaxy", "Power Star Locations"], regname.ROLLINGGREEN, 170000014, "TamakoroExLv1Galaxy", game_address=0),
+    locname.HURRYSCURRYSTAR: SMGLocationData(["Hurry-Scurry Galaxy", "Power Star Locations"], regname.HURRYSCUR, 170000015, "BreakDownPlanetGalaxy", game_address=0),
+    locname.BUBBLEBREEZESTAR: SMGLocationData(["Bubble Breeze Galaxy", "Power Star Locations"], regname.BUBBLEBREEZE, 170000016, "CubeBubbleExLv1Galaxy", game_address=0),
+    locname.HONEYCLIMBSTAR: SMGLocationData(["Honeyclimb Galaxy", "Power Star Locations"], regname.HONEYCLIMB, 170000118, "HoneyBeeExGalaxy", game_address=0),
+    locname.BUOYBASESTAR1: SMGLocationData(["Buoy Base Galaxy", "Power Star Locations"], regname.BUOY, 170000017, "OceanFloaterLandGalaxy", game_address=0),
+    locname.BUOYBASESTAR2: SMGLocationData(["Buoy Base Galaxy", "Power Star Locations"], regname.BUOY, 170000018, "OceanFloaterLandGalaxy", game_address=0),
     #TODO: FIX duplicate abbreviation 
-    "GG: Grand Star Rescue": SMGLocationData([regname.SHIP, "Power Star Locations"], regname.GATEWAY, 170000019, "HeavensDoorGalaxy", game_address=0),
-    "BF: Kingfin's Fearsome Waters": SMGLocationData(["Bonefin Galaxy", "Power Star Locations"], regname.BONEFIN, 170000021, "SkullSharkGalaxy", game_address=0),
-    "MS: Watch Your Step": SMGLocationData(["Matter Splatter Galaxy", "Power Star Locations"], regname.MATTER, 170000022, "DarkRoomGalaxy", game_address=0),
-    "RGT: Gizmos, Gears, and Gadgets": SMGLocationData(["Rolling Gizmo Galaxy", "Power Star Locations"], regname.ROLLINGGIZ, 170000023, "TamakoroExLv2Galaxy", game_address=0),
-    "LDT: The Galaxy's Greatest Wave": SMGLocationData(["Loopdeeswoop Galaxy", "Power Star Locations"], regname.LOOPDEESWOOP, 170000024, "SurfingLv2Galaxy", game_address=0),
-    "BBT: The Electric Labyrinth": SMGLocationData(["Bubble Blast Galaxy", "Power Star Locations"], regname.BUBBLEBLAST, 170000025, "CubeBubbleExLv2Galaxy", game_address=0)
+    locname.GATEWAYSTAR1: SMGLocationData([regname.SHIP, "Power Star Locations"], regname.GATEWAY, 170000019, "HeavensDoorGalaxy", game_address=0),
+    locname.BONEFINSTAR: SMGLocationData(["Bonefin Galaxy", "Power Star Locations"], regname.BONEFIN, 170000021, "SkullSharkGalaxy", game_address=0),
+    locname.MATTERSPLATTERSTAR: SMGLocationData(["Matter Splatter Galaxy", "Power Star Locations"], regname.MATTER, 170000022, "DarkRoomGalaxy", game_address=0),
+    locname.ROLLINGGIZMOSTAR: SMGLocationData(["Rolling Gizmo Galaxy", "Power Star Locations"], regname.ROLLINGGIZ, 170000023, "TamakoroExLv2Galaxy", game_address=0),
+    locname.LOOPDEESWOOPSTAR: SMGLocationData(["Loopdeeswoop Galaxy", "Power Star Locations"], regname.LOOPDEESWOOP, 170000024, "SurfingLv2Galaxy", game_address=0),
+    locname.BUBBLEBLASTSTAR: SMGLocationData(["Bubble Blast Galaxy", "Power Star Locations"], regname.BUBBLEBLAST, 170000025, "CubeBubbleExLv2Galaxy", game_address=0)
 }
 
 locbosses_table: dict[str, SMGLocationData]  = {
@@ -202,7 +202,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     "G: Purple Coins in the Bone Pen": SMGLocationData([regname.GHOSTLY, "Power Star Locations", "Purple Coins"], regname.GHOSTLY, 170000053, "PhantomGalaxy", game_address=5),
     "GL: Purple Coins in the Woods": SMGLocationData(["Gold Leaf Galaxy", "Power Star Locations", "Purple Coins"], regname.GOLDLEAF, 170000078, "ReverseKingdomGalaxy", game_address=5),
     "DDune: Purple Coin in the Desert": SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations", "Purple Coins"], regname.DUSTY, 170000070, "SandClockGalaxy", game_address=5),
-    "HH: The Honeyhive's Purple Coins": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations", "Purple Coins"], regname.HONEYHIVE, 170000011, "HoneyBeeKingdomGalaxy", game_address=5)
+    locname.HONEYHIVESTAR5: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations", "Purple Coins"], regname.HONEYHIVE, 170000011, "HoneyBeeKingdomGalaxy", game_address=5)
 }
 
 base_stars_locations = {**locGE_table, **locHH_table,
