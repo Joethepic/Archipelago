@@ -4,39 +4,9 @@ from enum import StrEnum
 import gclib.fs_helpers as fs
 from gclib.dol import DOL
 
+from ..Constants.patch_constants import *
 from .extensions import DOLExtended, CustomDOLSection
 from .bcsv import BCSV
-
-from ..Constants.Names.region_names import GATEWAY
-from ..regions import region_list
-
-GATEWAY: str = region_list[GATEWAY].in_game_name
-
-DOL_RELATIVE_PATH: str = "/DATA/sys/main.dol"
-
-NAME_TO_CREATE_FUNCTION_START_ADDRESS = 0x80533980
-NAME_TO_CREATE_FUNCTION_ELEMENT_COUNT = 1183
-NAME_TO_CREATE_FUNCTION_ELEMENT_SIZE = 0xC
-
-NAME_TO_ARCHIVE_START_ADDRESS = 0x805370f4
-NAME_TO_ARCHIVE_ELEMENT_COUNT = 440
-NAME_TO_ARCHIVE_ELEMENT_SIZE = 0x8
-
-NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_START_ADDRESS = 0x80537eb4
-NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_COUNT = 91
-NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_SIZE = 0x8
-
-GALAXY_UNLOCK_TABLE_START_ADDRESS = 0x8053c800
-GALAXY_UNLOCK_TABLE_END_ADDRESS = 0x8053d520
-
-CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS = 0x8026a8cc
-CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS = 0x8026a90c
-STRING_ADDRESS_MINISURPRISEDGALAXY = 0x8059838c
-
-ASTRO_DOME_ARRAY_ADDRESS = 0x8057a9e0
-ASTRO_DOME_SKY_ARRAY_ADDRESS = 0x8057aa24
-ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS = 0x8057aad4
-ASTRO_STAR_PLATE_ARRAY_ADDRESS = 0x8057ab70
 
 class Pointer:
     base_address: int
@@ -250,8 +220,8 @@ class NameObjFactory:
         to_surprised_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
                                                                if element.name_pointer.string[4:] in surprised_galaxy_names]
 
-        if GATEWAY in miniature_galaxy_names:
-            self.extra_create_element.name_pointer.string = "Mini" + GATEWAY
+        if GATEWAY_IN_GAME in miniature_galaxy_names:
+            self.extra_create_element.name_pointer.string = "Mini" + GATEWAY_IN_GAME
             self.extra_create_element.name_pointer.write_string()
             to_miniature_elements.append(self.extra_create_element)
         

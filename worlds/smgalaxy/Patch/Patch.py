@@ -31,7 +31,7 @@ EXPECTED_GAME_ID: str = "RMGE01"
 
 
 class WiiISO:
-    def __init__(self, patch_name: str):
+    def __init__(self, patch_path: str):
         """Initialize a Patch object for Super Mario Galaxy ISO modification.
         Args:
             patch_name (str): Name of the patch file
@@ -41,15 +41,11 @@ class WiiISO:
             temp_dir (str): Temporary extraction directory.
             iso_name (str): Name of the new ISO file.
         """
-        clean_iso_path: str = self.get_base_rom_path()
-        dest_path: str = os.path.split(clean_iso_path)[0]
-        temp_dir = os.path.join(dest_path, "temp")
-
-        self.clean_iso_path = clean_iso_path
-        self.dest_path = dest_path
-        self.temp_dir = temp_dir
-        self.iso_name = patch_name
-
+        self.clean_iso_path = self.get_base_rom_path()
+        self.dest_path = os.path.dirname(patch_path)
+        self.temp_dir = os.path.join(self.dest_path, "temp")
+        self.iso_name = ''.join(os.path.basename(patch_path).split('.')[:-1])
+        
         self.progress = None
         self.calling_function = None
 
@@ -104,6 +100,7 @@ class WiiISO:
         file_name = options["smgalaxy.world_options"]["iso_file"]
         if not os.path.exists(file_name):
             file_name = Utils.user_path(file_name)
+            options["smgalaxy.world_options"]["iso_file"] = file_name
         return file_name
     
     def extract(self):
@@ -136,10 +133,11 @@ class WiiISO:
         """Takes an extracted ISO directory and re-compiles it into a playable Wii ISO."""
         output_path = Path(self.dest_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        print("Initiating repacking ISO")
+
+        iso_path = os.path.join(self.dest_path, self.iso_name + '.iso')
+        print("Initiating repacking ISO to output: " + iso_path)
         self.calling_function = 'repack_iso'
-        rebuild_from_directory(self.temp_dir, self.dest_path + self.iso_name + '.iso', callback=self.progress_callback)
+        rebuild_from_directory(self.temp_dir, iso_path, callback=self.progress_callback)
         
         print("Repacking ISO complete")
 
@@ -224,11 +222,13 @@ class GalaxyShuffle:
             self.galaxy_destinations.append(new_galaxy)
 
 class Patch:
-    def __init__(self, patch_name: str, output: dict):
-        self.iso: WiiISO = WiiISO(patch_name)
+    def __init__(self, patch_path: str, output: dict):
+        self.iso: WiiISO = WiiISO(patch_path)
 
         RARCExtended.iso_base_path = self.iso.temp_dir
         DOLExtended.iso_base_path = self.iso.temp_dir
+
+        self.seed = int(output["Seed"])
 
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
@@ -336,6 +336,27 @@ class Patch:
         new_instruction = b'\x38\x60\x00\x00'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
         
+        address = 0x803bb3d8
+        new_instruction = b'\x38\x7f\x03\xf8'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        address = 0x803bb3dc
+        new_instruction = b'\x38\x00\x00\x04'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+
+        ########################
+        # Set swing permission #
+        ########################
+        address = 0x803b55b0
+        new_instruction = b'\x38\x60\x00\x01'
+        self.dol.write_data(fs.write_bytes, address, new_instruction)
+                                
+        #####################################################
+        # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY #
+        #####################################################
+        self.dol.write_data(fs.write_u8, 0x8053bb44, 1)
+        self.dol.write_data(fs.write_u8, 0x8053bb46, 0)
+
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
@@ -402,6 +423,13 @@ class Patch:
         new_instruction = b'\x7c\x7f\x1b\x78\x48\x1e\x68\x45\x7c\x64\x1b\x78\x48\x1a\x12\xc9\x80\x63\x00\x0c\x48\x1a\x21\x0d\x3c\x80\x80\x00\x60\x84\x18\xff\x1c\x63\x00\x08\x7c\x63\x22\x14\x7c\x63\xf8\xae'
         self.dol.write_data(fs.write_bytes, address, new_instruction)
 
+        ##################################
+        # Custom grandstar count loading #
+        ##################################
+        address = 0x803b1d10
+        new_instruction = b'\x3c\x60\x80\x00\x88\x63\x18\x82\x38\x63\x00\x01\x7c\x03\x20\x00\x41\x80\x00\x0c\x38\x60\x00\x01\x42\x80\x00\x08\x38\x60\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00'
+        #self.dol.write_data(fs.write_bytes, address, new_instruction)
+
         #########################
         # Skip wii strap screen #
         #########################
@@ -453,7 +481,7 @@ class Patch:
         self.astrodomeentrances.save()
         self.dol.save()
 
-        #self.save_copies()
+        self.save_copies()
 
     def save_copies(self):
         self.mario.save_to_new_file("MarioCopy.arc")
@@ -478,8 +506,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         with zipfile.ZipFile(patch_path, "r") as zf:
             output = json.loads(zf.read("patch.json").decode('shift-jis'))
 
-        patch_name: str = os.path.split(patch_path)[1].split('.')[0]
-        patch = Patch(patch_name, output)
+        patch = Patch(patch_path, output)
 
         galaxies: dict[str, str] = patch.galaxies
         galaxy_counts: dict[str, int] = patch.counts

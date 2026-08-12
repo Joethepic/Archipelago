@@ -70,7 +70,8 @@ class Dome1Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
-    will be capped to ensure generation if necessary, and will never be allowed to go above 9 total stars
+    will be capped to ensure generation if necessary.
+    The first orbit in Dome 1 will always have no star requirement.
 
     These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
     at least one world to start.
@@ -193,20 +194,20 @@ class Dome6Offsets(OptionCounter):
     }
 
 
-class  MarioColors(OptionDict):
+class MarioColors(OptionDict):
     """
     Choose new colors for part of Mario's Outfit! (These will also be applied to Luigi)
-    4 pieces are changeable: 'Hat & Shirt' , 'Overalls', 'Shoes', 'Gloves'
+    4 pieces are changeable: 'Hat' , 'Overalls', 'Shoes', 'Gloves'
 
     The following predetermined colors are available:
     "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
-    valid_keys = ["Hat & Shirt", "Overalls", "Shoes", "Gloves"]
+    valid_keys = ["Hat", "Overalls", "Shoes", "Gloves"]
     valid_values = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"]
     default = {
-        "Hat & Shirt": "Red",
+        "Hat": "Red",
         "Overalls": "Blue",
         "Shoes": "Brown",
         "Gloves": "White"
