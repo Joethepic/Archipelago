@@ -1,6 +1,6 @@
 from typing import Dict, NamedTuple, Optional, Set, Any
 from BaseClasses import Location, Region
-from rule_builder.rules import Rule
+from rule_builder.rules import Rule, CanReachLocation
 
 from.Constants.Names import region_names as regname
 from .Constants.Names import location_names as locname
@@ -24,18 +24,20 @@ class SMGLocationData(NamedTuple):
 
 # good egg galaxy
 locGE_table: dict[str, SMGLocationData] = {
-    locname.GOODEGGSTAR1: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000000, "EggStarGalaxy", game_address=0),
-    locname.GOODEGGSTAR2: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000001, "EggStarGalaxy", game_address=1),
-    locname.GOODEGGSTAR3: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000002, "EggStarGalaxy", game_address=2),
-    locname.GOODEGGSTAR6: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000003, "EggStarGalaxy", game_address=3),
-    locname.GOODEGGSTAR4: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000004, "EggStarGalaxy", game_address=4),
+    locname.GOODEGGSTAR1: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000000, "EggStarGalaxy",game_address=0),
+    locname.GOODEGGSTAR2: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000001, "EggStarGalaxy",game_address=1),
+    locname.GOODEGGSTAR3: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000002, "EggStarGalaxy",game_address=2),
+    locname.GOODEGGSTAR6: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000003, "EggStarGalaxy",
+                                          CanReachLocation(locname.GHOSTLYSTAR1),game_address=3),
+    locname.GOODEGGSTAR4: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG, 17000004, "EggStarGalaxy",game_address=4),
 }
 
 locHH_table: dict[str, SMGLocationData]  = {
     "HH: Bee Mario Takes Flight": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000006, "HoneyBeeKingdomGalaxy", game_address=0),
     "HH: Trouble on the Tower": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000007, "HoneyBeeKingdomGalaxy", game_address=1),
     "HH: Big Bad Bugabooom": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000008, "HoneyBeeKingdomGalaxy", game_address=2),
-    "HH: Luigi in the Honeyhive Kingdom": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009, "HoneyBeeKingdomGalaxy", game_address=3),
+    "HH: Luigi in the Honeyhive Kingdom": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009, "HoneyBeeKingdomGalaxy",
+                                          CanReachLocation(locname.GHOSTLYSTAR1), game_address=3),
     "HH: Honeyhive Cosmic Mario Race": SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 170000010, "HoneyBeeKingdomGalaxy", game_address=4)
 }
 
@@ -80,7 +82,8 @@ locBR_table: dict[str, SMGLocationData]  = {
     "BR: Topmaniac and Topman Tribe": SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000119, "BattleShipGalaxy", game_address=2),
     "BR: Battlerock's Garbage dump": SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000039, "BattleShipGalaxy", game_address=3),
     "BR: Topmanic's Dardevil Run": SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000040, "BattleShipGalaxy", game_address=4),
-    "BR: Luigi under the Saucer": SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000042, "BattleShipGalaxy", game_address=5)
+    "BR: Luigi under the Saucer": SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000042,
+                                                  "BattleShipGalaxy", CanReachLocation(locname.GHOSTLYSTAR1), game_address=5)
 }
 #TODO: note change abbreviation same as buoy base
 locBB_table: dict[str, SMGLocationData]  = {

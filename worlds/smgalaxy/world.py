@@ -9,11 +9,11 @@ import typing
 import logging
 
 from . import items, regions, Rules, web_world, Options
-from .Constants.Names import region_names as regname
+from .Constants.Names import region_names as regname, item_names as itemname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
-from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
+from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.Patch import SMGPlayerContainer
@@ -110,7 +110,7 @@ class SMGWorld(World):
         Rules.set_rules(self, self.player)
     
     def create_item(self, name: str) -> SMGItem:
-        item = items.SMGItem(name, self.player, items.item_table[name])
+        item = items.SMGItem(name, self.player, items.all_items_table[name])
         
         return item
 
@@ -120,12 +120,12 @@ class SMGWorld(World):
     def create_items(self):
         # creates the green stars in each player's itempool
         local_pool: list[SMGItem] = []
-        local_pool += [self.create_item("Green Star") for i in range(3)]
-        local_pool += [self.create_item("Grand Star") for i in range(7)]
+        local_pool += [self.create_item(itemname.GREEN) for i in range(3)]
+        local_pool += [self.create_item(itemname.GRAND) for i in range(7)]
         self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
         
         # make sure we don't create more stars than locations, somehow
-        local_pool += [self.create_item("Power Star") for i in range(self.options.stars_to_finish.value)]
+        local_pool += [self.create_item(itemname.POWER) for i in range(self.options.stars_to_finish.value)]
 
         # Calculate the number of additional filler items to create to fill all locations
         n_locations = len(self.multiworld.get_unfilled_locations(self.player))
@@ -136,7 +136,7 @@ class SMGWorld(World):
             extra_stars: int = self.random.randint(0, leftover_locations)
         else:
             extra_stars: int = 0
-        local_pool += [self.create_item("Power Star") for i in range(extra_stars)]
+        local_pool += [self.create_item(itemname.POWER) for i in range(extra_stars)]
         n_filler_items = n_locations - len(local_pool)
 
         # Create filler
