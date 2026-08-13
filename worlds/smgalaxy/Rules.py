@@ -272,7 +272,47 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.ROLLGREBATTL).connect(world.get_region(regname.ROLLGREFINIS))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BATTLEROCK), "Dome 2 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Third Orbit"], 10)))
-
+    world.get_region(regname.BATTLEROCK).connect(world.get_region(regname.BATTLE1LANDI),
+                                                    "Battlerock 1: Battlerock Barrage")
+    world.get_region(regname.BATTLE1LANDI).connect(world.get_region(regname.BATTLE1SPINY),
+                                                    "Battlerock 1: Landing Launch Star")
+    world.get_region(regname.BATTLE1SPINY).connect(world.get_region(regname.BATTLE1AUTOS))
+    world.get_region(regname.BATTLE1AUTOS).connect(world.get_region(regname.BATTLE1FINAL))
+    world.get_region(regname.BATTLE1FINAL).connect(world.get_region(regname.BATTLE7LUIGI))
+    world.get_region(regname.BATTLEROCK).connect(world.get_region(regname.BATTLE2LANDI),
+                                                    "Battlerock 2: Breaking into the Battlerock")
+    world.get_region(regname.BATTLE2LANDI).connect(world.get_region(regname.BATTLE2TETRA),
+                                                    "Battlerock 2: Landing Launch Star")
+    world.get_region(regname.BATTLE2TETRA).connect(world.get_region(regname.BATTLE6BREAK),
+                                                    "Battlerock Secret: Hungry Luma Launch Star")
+    world.get_region(regname.BATTLE2TETRA).connect(world.get_region(regname.BATTLE2MINEF),
+                                                    "Battlerock 2: Color Orbs  Launch Star")
+    world.get_region(regname.BATTLE2MINEF).connect(world.get_region(regname.BATTLE2CAGEO),
+                                                    "Battlerock 2: Minefield Launch Star")
+    world.get_region(regname.BATTLE2CAGEO).connect(world.get_region(regname.BATTLE2CAGEI),
+                                                    "Battlerock 2: Container Green Pipe")
+    world.get_region(regname.BATTLE2CAGEI).connect(world.get_region(regname.BATTLE2PATCH),
+                                                    "Battlerock 2: Caged Launch Star")
+    world.get_region(regname.BATTLEROCK).connect(world.get_region(regname.BATTLE3LANDI),
+                                                    "Battlerock 3: Topmaniac and the Topman Tribe")
+    world.get_region(regname.BATTLE3LANDI).connect(world.get_region(regname.BATTLE3TRIPL),
+                                                    "Battlerock 3: Landing Sling Star")
+    world.get_region(regname.BATTLE3TRIPL).connect(world.get_region(regname.BATTLE3LUMAP),
+                                                    "Battlerock 3: Triple Platform Launch Star")
+    world.get_region(regname.BATTLE3LUMAP).connect(world.get_region(regname.BATTLE3CLIFF),
+                                                    "Battlerock 3: Luma Launch Star")
+    world.get_region(regname.BATTLE3CLIFF).connect(world.get_region(regname.BATTLE3INSID),
+                                                    "Battlerock 3: Cliffside Green Pipe")
+    world.get_region(regname.BATTLE3INSID).connect(world.get_region(regname.BATTLE3BCAGE),
+                                                    "Battlerock 3: Near Crusher Green pipe")
+    world.get_region(regname.BATTLE3BCAGE).connect(world.get_region(regname.BATTLE3EXITG),
+                                                    "Battlerock 3: Circle Room Sling Star")
+    world.get_region(regname.BATTLE3EXITG).connect(world.get_region(regname.BATTLE3TOPMA),
+                                                    "Battlerock 3: Electric Gate Launch Star")
+    world.get_region(regname.BATTLEROCK).connect(world.get_region(regname.BATTLE4TOPMA),
+                                                 "Battlerock Comet: Topmaniac's Daredevil Run")
+    world.get_region(regname.BATTLEROCK).connect(world.get_region(regname.BATTLE5AUTOS),
+                                                    "Battlerock Purple Coins: Purple Coins on the Battlerock")
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.HURRYSCUR), "Dome 2 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fourth Orbit"], 11)))
     world.get_region(regname.HURRYSCUR).connect(world.get_region(regname.HURRSCULANDI),
