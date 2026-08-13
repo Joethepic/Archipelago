@@ -113,7 +113,7 @@ class StarColorHandler:
     async def set_all_star_colors(self):
         self.star_colors = []
         for location in location_table.values():
-            starname = self.get_pointer_name(location)
+            starname = await self.get_pointer_name(location)
             star_color = StarColor(starname, self.pointers[starname])
             self.star_colors.append(star_color)
 
@@ -235,6 +235,7 @@ class GalaxyContext(CommonContext):
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         if not await self.check_ingame():
             return
+        
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
