@@ -250,3 +250,16 @@ SPACJUN4HSHIP = "Space Junk Comet: Hocotate Ship"
 SPACJUN4TOADS = "Space Junk Comet: Toadship Platform"
 SPACJUN4SILVE = "Space Junk Comet: Cosmic Platforms"
 SPACJUN5PURPL = "Space Junk Purple Coins: Cosmic Platforms"
+
+### Battlerock
+
+### Dome Minors
+ROLLGRESTART = "Rolling Green: Landing Platform"
+ROLLGREBATTL = "Rolling Green: Goomba Battlefield"
+ROLLGREFINIS = "Rolling Green: Goal Platform"
+HURRSCULANDI = "Hurry-Scurry: Landing Platforms"
+HURRSCUPLANE = "Hurry-Scurry: Disappearing Planet"
+STARREALPIPE = "Star Reactor: Landing Pipe"
+STAREAGRAVIT = "Star Reactor: Gravity Wall"
+STAREASTAIRS = "Star Reactor: Stairs to Boss"
+STAREABOSSAR = "Star Reactor: Reactor Planet"

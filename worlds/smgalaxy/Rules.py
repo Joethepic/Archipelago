@@ -266,12 +266,26 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Space Junk Purple Coins: Purple Coin Spacewalk")
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.ROLLINGGREEN), "Dome 2 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
+    world.get_region(regname.ROLLINGGREEN).connect(world.get_region(regname.ROLLGRESTART),
+                                                    "Rolling Green: Rolling in the Clouds")
+    world.get_region(regname.ROLLGRESTART).connect(world.get_region(regname.ROLLGREBATTL))
+    world.get_region(regname.ROLLGREBATTL).connect(world.get_region(regname.ROLLGREFINIS))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BATTLEROCK), "Dome 2 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Third Orbit"], 10)))
+
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.HURRYSCUR), "Dome 2 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fourth Orbit"], 11)))
+    world.get_region(regname.HURRYSCUR).connect(world.get_region(regname.HURRSCULANDI),
+                                                    "Hurry-Scurry: Shrinking Satellite")
+    world.get_region(regname.HURRSCULANDI).connect(world.get_region(regname.HURRSCUPLANE),
+                                                    "Hurry-Scurry: Falling Launch Star")
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BOWSER1), "Dome 2 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Fifth Orbit"], 12)))
+    world.get_region(regname.BOWSER1).connect(world.get_region(regname.STARREALPIPE),
+                                                    "Star Reactor: The Fiery Stronghold")
+    world.get_region(regname.STARREALPIPE).connect(world.get_region(regname.STAREAGRAVIT))
+    world.get_region(regname.STAREAGRAVIT).connect(world.get_region(regname.STAREASTAIRS))
+    world.get_region(regname.STAREASTAIRS).connect(world.get_region(regname.STAREABOSSAR))
     # Dome 3
     world.get_region(regname.SHIP).connect(world.get_region(regname.KITCHEN), "Dome 3 Entry",
                     Has("Grand Star", 2))
