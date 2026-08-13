@@ -2,6 +2,7 @@ from typing import Dict, NamedTuple, Optional, Set
 from BaseClasses import Location, Region
 
 from.Constants.Names import region_names as regname
+from .Constants.Names import galaxy_in_game_names as galaxyIG
 
 class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
@@ -20,19 +21,19 @@ class SMGLocationData(NamedTuple):
 
 # good egg galaxy
 locGE_table: dict[str, SMGLocationData] = {
-    "GE: Dino Piranha": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000000, "EggStarGalaxy", game_address=0),
-    "GE: A Snack of Cosmic Proportions": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000001, "EggStarGalaxy", game_address=1),
-    "GE: King Kaliente's Battle Fleet": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000002, "EggStarGalaxy", game_address=2),
-    "GE: Luigi on the Roof": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000003, "EggStarGalaxy", game_address=3),
-    "GE: Dino Piranha Speed Run": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000004, "EggStarGalaxy", game_address=4),
+    "GE: Dino Piranha": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000000, galaxyIG.GOODEGG, game_address=0),
+    "GE: A Snack of Cosmic Proportions": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000001, galaxyIG.GOODEGG, game_address=1),
+    "GE: King Kaliente's Battle Fleet": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000002, galaxyIG.GOODEGG, game_address=2),
+    "GE: Luigi on the Roof": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000003, galaxyIG.GOODEGG, game_address=3),
+    "GE: Dino Piranha Speed Run": SMGLocationData(["Good Egg Galaxy", "Power Star"], regname.GOODEGG, 17000004, galaxyIG.GOODEGG, game_address=4),
 }
 
 locHH_table: dict[str, SMGLocationData]  = {
-    "HH: Bee Mario Takes Flight": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000006, "HoneyBeeKingdomGalaxy", game_address=0),
-    "HH: Trouble on the Tower": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000007, "HoneyBeeKingdomGalaxy", game_address=1),
-    "HH: Big Bad Bugabooom": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000008, "HoneyBeeKingdomGalaxy", game_address=2),
-    "HH: Luigi in the Honeyhive Kingdom": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000009, "HoneyBeeKingdomGalaxy", game_address=3),
-    "HH: Honeyhive Cosmic Mario Race": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 170000010, "HoneyBeeKingdomGalaxy", game_address=4)
+    "HH: Bee Mario Takes Flight": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000006, galaxyIG.HONNEYHIVE, game_address=0),
+    "HH: Trouble on the Tower": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000007, galaxyIG.HONNEYHIVE, game_address=1),
+    "HH: Big Bad Bugabooom": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000008, galaxyIG.HONNEYHIVE, game_address=2),
+    "HH: Luigi in the Honeyhive Kingdom": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 17000009, galaxyIG.HONNEYHIVE, game_address=3),
+    "HH: Honeyhive Cosmic Mario Race": SMGLocationData(["Honeyhive Galaxy", "Power Star"], regname.HONEYHIVE, 170000010, galaxyIG.HONNEYHIVE, game_address=4)
 }
 
 locspecialstages_table: dict[str, SMGLocationData]  = {
