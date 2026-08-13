@@ -190,7 +190,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     "SJ: Purple Coin Spacewalk": SMGLocationData(["Space Junk Galaxy", "Power Star", "Purple Coins"], regname.SPACEJUNK, 170000036, "StarDustGalaxy", game_address=5),
     "GG: Purple Coins on the Puzzle Cube": SMGLocationData(["Gusty Garden Galaxy", "Power Star", "Purple Coins"], regname.GUSTY, 170000059, "CosmosGardenGalaxy", game_address=5),
     # TODO: change abbreviation for galaxy
-    "BB: Beachcombing for Purple Coins": SMGLocationData(["Bubble Breeze Galaxy", "Power Star", "Purple Coins"], regname.BUBBLEBREEZE, 170000047, "HeavenlyBeachGalaxy", game_address=5),
+    "BB: Beachcombing for Purple Coins": SMGLocationData(["Bubble Breeze Galaxy", "Power Star", "Purple Coins"], regname.BUBBLEBREEZE, 170000047, "CubeBubbleExLv1Galaxy", game_address=5),
     "FF: Purple Coins on the Summit": SMGLocationData(["Freezeflame Galaxy", "Power Star", "Purple Coins"], regname.FREEZEFLAME, 170000066, "IceVolcanoGalaxy", game_address=5),
     "G: Purple Coins in the Bone Pen": SMGLocationData([regname.GHOSTLY, "Power Star", "Purple Coins"], regname.GHOSTLY, 170000053, "PhantomGalaxy", game_address=5),
     "GL: Purple Coins in the Woods": SMGLocationData(["Gold Leaf Galaxy", "Power Star", "Purple Coins"], regname.GOLDLEAF, 170000078, "ReverseKingdomGalaxy", game_address=5),

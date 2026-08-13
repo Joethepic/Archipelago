@@ -38,6 +38,7 @@ class Pointer:
     offsets: list[int]
     value_type: ValueType
     base: int
+
     def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
         if offsets is not None:
             self.address = -1
@@ -89,22 +90,36 @@ class GalaxyCommand(ClientCommandProcessor):
         """Toggle deathlink from client. Overrides default setting."""
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
+
 class StarColor(NamedTuple):
     name: str
     pointer: Pointer
+
+class StarColorEnum(IntEnum):
+    YELLOW = 0
+    BLUE = 1
+    GREEN = 2
+    RED = 3
+
 class StarColorHandler:
     pointers: dict[str, Pointer]
     star_colors: list[StarColor] = []
-    async def setstar_colors(self, galaxyName: str, starNum: int):
+
+    async def set_star_colors(self, galaxyName: str, starNum: int):
         for star in self.star_colors:
             if star.name == galaxyName + "Colours" + str(starNum):
-                star.pointer.write_value(1)
-    async def setAllStar_Colors(self):
+                star.pointer.write_value(StarColorEnum.BLUE)
+
+    async def set_all_star_colors(self):
         self.star_colors = []
         for location in location_table.values():
-            starname = location.in_game_galaxy_name + "Colours" + str(location.game_address)
+            starname = self.get_pointer_name(location)
             star_color = StarColor(starname, self.pointers[starname])
             self.star_colors.append(star_color)
+
+    async def get_pointer_name(self, location):
+        return location.in_game_galaxy_name + "Colours" + str(location.game_address)
+
     def __init__(self):
         self.star_colors = []
         # 0 for yellow, 1 for blue, 2 for green, 3 is red
@@ -236,7 +251,7 @@ class GalaxyContext(CommonContext):
         for location_id in self.checked_locations:
             for key, location in location_table.items():
                 if key == self.location_names.lookup_in_game(location_id):
-                    await self.starcolorhandler.setstar_colors(location.in_game_galaxy_name, location.game_address)
+                    await self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
                 else: 
                     continue
         await self.check_locations(self.locations_checked)
@@ -280,7 +295,7 @@ class GalaxyContext(CommonContext):
         
         for key, pointer in self.pointers.items():
             await pointer.recalculate()
-            await self.starcolorhandler.setAllStar_Colors()
+            await self.starcolorhandler.set_all_star_colors()
 
         self.needs_recalculating = False
     
