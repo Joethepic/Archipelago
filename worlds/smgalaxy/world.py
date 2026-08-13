@@ -9,7 +9,7 @@ import typing
 import logging
 
 from . import items, regions, Rules, web_world, Options
-from .Constants.Names import region_names as regname, item_names as itemname
+from .Constants.Names import region_names as regname, item_names as itemname, location_names as locname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
@@ -115,14 +115,15 @@ class SMGWorld(World):
         return item
 
     def get_filler_item_name(self) -> str:
-        return "1up Mushroom"
+        return itemname.ONEUP
     
     def create_items(self):
         # creates the green stars in each player's itempool
         local_pool: list[SMGItem] = []
         local_pool += [self.create_item(itemname.GREEN) for i in range(3)]
         local_pool += [self.create_item(itemname.GRAND) for i in range(7)]
-        self.multiworld.get_location("B: The Fate of the Universe", self.player).place_locked_item(self.create_item("Peach"))
+        self.get_location(locname.GALAXYREACTORSTAR1).place_locked_item(self.create_item("Peach"))
+        self.get_location(locname.GALAXYREACTORSTAR1).address = None
         
         # make sure we don't create more stars than locations, somehow
         local_pool += [self.create_item(itemname.POWER) for i in range(self.options.stars_to_finish.value)]
