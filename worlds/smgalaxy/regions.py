@@ -267,6 +267,13 @@ region_list: dict[str, SMGRegionData] = {
     regname.SPACJUN3FLOAT: SMGRegionData("Planetoid"),
     regname.SPACJUN3HSHIP: SMGRegionData("Planetoid"),
     regname.SPACJUN3TARAN: SMGRegionData("Planetoid"),
+    regname.SPACJUN4LANDI: SMGRegionData("Planetoid"),
+    regname.SPACJUN4CRYCY: SMGRegionData("Planetoid"),
+    regname.SPACJUN4SPHE3: SMGRegionData("Planetoid"),
+    regname.SPACJUN4HSHIP: SMGRegionData("Planetoid"),
+    regname.SPACJUN4TOADS: SMGRegionData("Planetoid"),
+    regname.SPACJUN4SILVE: SMGRegionData("Planetoid"),
+    regname.SPACJUN5PURPL: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

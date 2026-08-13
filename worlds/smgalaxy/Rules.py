@@ -253,6 +253,17 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Space Junk 2: Under Glass Launch Star")
     world.get_region(regname.SPACJUN3FLOAT).connect(world.get_region(regname.SPACJUN3HSHIP))
     world.get_region(regname.SPACJUN3HSHIP).connect(world.get_region(regname.SPACJUN3TARAN))
+    world.get_region(regname.SPACEJUNK).connect(world.get_region(regname.SPACJUN4LANDI),
+                                                    "Space Junk Comet: Pull Star Path Speed Run")
+    world.get_region(regname.SPACJUN4LANDI).connect(world.get_region(regname.SPACJUN4CRYCY))
+    world.get_region(regname.SPACJUN4CRYCY).connect(world.get_region(regname.SPACJUN4SPHE3))
+    world.get_region(regname.SPACJUN4SPHE3).connect(world.get_region(regname.SPACJUN4HSHIP),
+                                                    "Space Junk Comet: Three Spheres Launch Star")
+    world.get_region(regname.SPACJUN4HSHIP).connect(world.get_region(regname.SPACJUN4TOADS))
+    world.get_region(regname.SPACJUN4TOADS).connect(world.get_region(regname.SPACJUN4SILVE),
+                                                    "Space Junk Comet: Toadship Sling Star")
+    world.get_region(regname.SPACEJUNK).connect(world.get_region(regname.SPACJUN5PURPL),
+                                                    "Space Junk Purple Coins: Purple Coin Spacewalk")
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.ROLLINGGREEN), "Dome 2 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_two_counts["Second Orbit"], 9)))
     world.get_region(regname.FOUNTAIN).connect(world.get_region(regname.BATTLEROCK), "Dome 2 Third Orbit Galaxy",
