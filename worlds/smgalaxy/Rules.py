@@ -331,6 +331,38 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 2))
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BEACHBOWL), "Dome 3 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["First Orbit"], 13)))
+    world.get_region(regname.BEACHBOWL).connect(world.get_region(regname.BEACH1LANDI),
+                                                    "Beach Bowl 1: Sunken Treasure")
+    world.get_region(regname.BEACH1LANDI).connect(world.get_region(regname.BEACH1LAKES))
+    world.get_region(regname.BEACH1LANDI).connect(world.get_region(regname.BEACH1CLIFB))
+    world.get_region(regname.BEACH1LAKES).connect(world.get_region(regname.BEACH1CLIFB),
+                                                    "Beach Bowl 1: Lake Bottom Launch Star")
+    world.get_region(regname.BEACH1CLIFB).connect(world.get_region(regname.BEACH1CLIFT))
+    world.get_region(regname.BEACHBOWL).connect(world.get_region(regname.BEACH2LANDI),
+                                                    "Beach Bowl 2: Passing the Swim Test")
+    world.get_region(regname.BEACH2LANDI).connect(world.get_region(regname.BEACH2LAKES))
+    world.get_region(regname.BEACH2LANDI).connect(world.get_region(regname.BEACH2CLIFB))
+    world.get_region(regname.BEACH2CLIFB).connect(world.get_region(regname.BEACH2CLIFT))
+    world.get_region(regname.BEACH2LANDI).connect(world.get_region(regname.BEACH6WATRB),
+                                                    "Beach Bowl 2: Hidden Treasure Launch Star")
+    world.get_region(regname.BEACH6WATRB).connect(world.get_region(regname.BEACH6ICELA))
+    world.get_region(regname.BEACHBOWL).connect(world.get_region(regname.BEACH3LANDI),
+                                                    "Beach Bowl 3: The Secret Undersea Cavern")
+    world.get_region(regname.BEACH3LANDI).connect(world.get_region(regname.BEACH3LAKES))
+    world.get_region(regname.BEACH3LANDI).connect(world.get_region(regname.BEACH3CLIFB))
+    world.get_region(regname.BEACH3CLIFB).connect(world.get_region(regname.BEACH3CLIFT))
+    world.get_region(regname.BEACH3LAKES).connect(world.get_region(regname.BEACH3CAVES))
+    world.get_region(regname.BEACH3CAVES).connect(world.get_region(regname.BEACH3STCYC),
+                                                  "Beach Bowl 3: Cavern Launch Star")
+    world.get_region(regname.BEACH3LANDI).connect(world.get_region(regname.BEACH6WATRB),
+                                                    "Beach Bowl 3: Hidden Treasure Launch Star")
+    world.get_region(regname.BEACHBOWL).connect(world.get_region(regname.BEACH4STCYC),
+                                                    "Beach Bowl Comet: Fast Foes on the Cyclone Stone")
+    world.get_region(regname.BEACHBOWL).connect(world.get_region(regname.BEACH5LANDI),
+                                                    "Beach Bowl Purple Coins: Beachcombing for Purple Coins")
+    world.get_region(regname.BEACH5LANDI).connect(world.get_region(regname.BEACH5LAKES))
+    world.get_region(regname.BEACH5LANDI).connect(world.get_region(regname.BEACH5CLIFB))
+    world.get_region(regname.BEACH5CLIFB).connect(world.get_region(regname.BEACH5CLIFT))
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUBBLEBREEZE), "Dome 3 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.GHOSTLY), "Dome 3 Third Orbit Galaxy",
