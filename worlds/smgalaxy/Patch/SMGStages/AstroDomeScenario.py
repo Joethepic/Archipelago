@@ -7,11 +7,11 @@ from ...Constants.patch_constants import *
 from ..extensions import SMGObject
 
 class AstroDomeScenario(SMGObject):
-    def __init__(self, patcher: WiiIsoPatcher):
-        super().__init__(patcher, ASTRO_DOME_SCENARIO_PATH)
+    def __init__(self):
+        super().__init__(ASTRO_DOME_SCENARIO_PATH)
 
-    def update(self, shuffle: dict[int, int]) -> None:
-        self.shuffle_loading_zones(shuffle)
+    def update(self, dome_shuffle: dict[int, int], **kwargs) -> None:
+        self.shuffle_loading_zones(dome_shuffle)
 
     def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
         """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""

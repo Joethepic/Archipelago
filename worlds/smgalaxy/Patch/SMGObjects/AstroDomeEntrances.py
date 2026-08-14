@@ -1,48 +1,48 @@
-from wiithon import WiiIsoPatcher
-
 from ...Constants.patch_constants import *
 from ..extensions import SMGObject
 
 class AstroDomeEntrance(SMGObject):
     name: str
+    index: int
     file_data: bytes
 
-    def __init__(self, patcher: WiiIsoPatcher, dome_name: str):
-        super().__init__(patcher, ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
+    def __init__(self, dome_name: str, index: int):
+        super().__init__(ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
 
         self.file_data = self.patcher.read_file(self.path)
         self.name = dome_name
+        self.index = index
 
     def update(self) -> None:
         pass
 
     def rename(self, new_dome_name: str):
-        print(f"Renaming dome: {self.name}")
+        print(f"Renaming dome {self.name} -> {new_dome_name}")
 
         self.patcher.add_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.file_data)
 
-class AstroDomeEntrances:
+class AstroDomeEntrances(SMGObject):
     entrances: list[AstroDomeEntrance]
 
-    def __init__(self, patcher: WiiIsoPatcher):
-        self.entrances = [AstroDomeEntrance(patcher, DOMES[Domes.TERRACE]),
-                          AstroDomeEntrance(patcher, DOMES[Domes.FOUNTAIN]),
-                          AstroDomeEntrance(patcher, DOMES[Domes.KITCHEN]),
-                          AstroDomeEntrance(patcher, DOMES[Domes.BEDROOM]),
-                          AstroDomeEntrance(patcher, DOMES[Domes.ENGINE]),
-                          AstroDomeEntrance(patcher, DOMES[Domes.GARDEN])]
+    def __init__(self):
+        self.entrances = [AstroDomeEntrance(Domes.TERRACE, 1),
+                          AstroDomeEntrance(Domes.FOUNTAIN, 2),
+                          AstroDomeEntrance(Domes.KITCHEN, 3),
+                          AstroDomeEntrance(Domes.BEDROOM, 4),
+                          AstroDomeEntrance(Domes.ENGINE, 5),
+                          AstroDomeEntrance(Domes.GARDEN, 6)]
 
-    def update(self, dome_shuffle: dict[int, int]):
-        self.rename_files(dome_shuffle)
-    
-    def rename_files(self, dome_shuffle: dict[int, int]):
+    def update(self, dome_shuffle: dict[int, int], **kwargs):
+        # Remove to-be-replaced files
         for entrance in self.entrances:
-            entrance.patcher.remove_file(entrance.path)
+            self.patcher.remove_file(entrance.path)
 
         reverse_shuffle: dict[int, int] = {value: key for key, value in dome_shuffle.items()}
 
         for index, entrance in enumerate(self.entrances):
-            new_index: int = reverse_shuffle[index + 1]
-            new_dome_name: str = DOMES[new_index]
+            new_index: int = reverse_shuffle[index + 1] - 1
+            new_dome_name = self.entrances[new_index].name
             
             entrance.rename(new_dome_name)
+
+            self.patcher.add_file(entrance.path, entrance.file_data)

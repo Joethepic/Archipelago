@@ -11,12 +11,12 @@ from ..SMGObjects.Gateway import Gateway
 from ...Constants.Names.region_names import GATEWAY
 from ...regions import region_list
 
-class AstroDome(SMGObject):
-    def __init__(self, patcher: WiiIsoPatcher, dol: SMGDOL):
-        super().__init__(patcher, ASTRODOME_PATH)
+class AstroDomes(SMGObject):
+    def __init__(self, dol: SMGDOL):
+        super().__init__(ASTRODOME_PATH)
 
-        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(patcher)
-        self.gateway_galaxy: Gateway = Gateway(patcher, dol)
+        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(self.patcher)
+        self.gateway_galaxy: Gateway = Gateway(self.patcher, dol)
 
         # Get the in-game names from the region list
         self.major_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
@@ -29,8 +29,9 @@ class AstroDome(SMGObject):
                                       if data.type == "Special"]
         self.gateway: str = region_list[GATEWAY].in_game_name
 
-    def update(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int):
-        self.update_dome(new_galaxies, dome_index, interior_dome_index)
+    def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], **kwargs):
+        for index in range(1, 7):
+            self.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index])
 
     def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int):
         """

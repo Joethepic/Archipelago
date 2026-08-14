@@ -13,14 +13,16 @@ class SMGObject(abc.ABC):
     patcher: WiiIsoPatcher
     path: str
 
-    def __init__(self, patcher: WiiIsoPatcher, path: str):
-        self.patcher = patcher
+    def __init__(self, path: str):
         self.path = path
 
     @abc.abstractmethod
-    def update(self) -> None:
-        raise NotImplementedError(f"Unimplemented update method for object: {type(self)}")
+    def update(self, **kwargs) -> None:
+        """Arguments are variable depending on the given object."""
+        ...
 
+    """
     @contextmanager
     def edit_bcsv(self, path: str) -> ContextManager[T]:
         return self.patcher.edit_as(self.path + '/' + path, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis")
+    """

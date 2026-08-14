@@ -132,16 +132,16 @@ class MarioColours:
 class Mario(SMGObject):
     arc_file: Rarc
 
-    def __init__(self, patcher: WiiIsoPatcher):
-        super().__init__(patcher, MARIO_PATH)
+    def __init__(self):
+        super().__init__(MARIO_PATH)
         compressed_bytes: BytesIO = BytesIO(self.patcher.read_file(self.path))
         self.arc_file: Rarc = Rarc.read(Yaz0.decompress(compressed_bytes))
         self.bdl = BDL(BytesIO(self.arc_file.get_file("mario.bdl")))
 
         self.colours = MarioColours(self)
 
-    def update(self, items: dict[str, str]):
-        self.update_colours(items)
+    def update(self, mario_colours: dict[str, str], **kwargs):
+        self.update_colours(mario_colours)
         mario_bytes: BytesIO = BytesIO()
         self.arc_file.write(mario_bytes)
         self.patcher.replace_file(self.path, Yaz0.compress(mario_bytes).getvalue())

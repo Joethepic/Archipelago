@@ -8,11 +8,11 @@ from ..extensions import SMGObject
 
 
 class AstroGalaxy(SMGObject):
-    def __init__(self, patcher: WiiIsoPatcher):
-        super().__init__(patcher, ASTRO_GALAXY_PATH)
+    def __init__(self):
+        super().__init__(ASTRO_GALAXY_PATH)
     
-    def update(self, new_galaxies: list[GalaxyDestination]) -> None:
-        self.shuffle_lumas(new_galaxies)
+    def update(self, luma_shuffle: list[GalaxyDestination], **kwargs) -> None:
+        self.shuffle_lumas(luma_shuffle)
 
     def shuffle_lumas(self, new_galaxies: list[GalaxyDestination]) -> None:
         """

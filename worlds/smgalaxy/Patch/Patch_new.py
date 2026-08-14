@@ -5,11 +5,12 @@ from wiithon import WiiIsoPatcher
 
 from worlds.Files import APAutoPatchInterface, APPlayerContainer, AutoPatchRegister
 from NetUtils import convert_to_base_types
+from worlds.smgalaxy.Patch.extensions import SMGObject
 
 from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
-from .SMGStages.AstroDome import AstroDome
+from .SMGStages.AstroDome import AstroDomes
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
 from ..regions import region_list
@@ -78,23 +79,24 @@ class Patch:
         self.old_galaxies: list = list(self.galaxies.keys())
         self.new_galaxies: list = list(self.galaxies.values())
 
-        self.mario: Mario = Mario(patcher)
-        self.astrogalaxy: AstroGalaxy = AstroGalaxy(patcher)
-        self.astrodomescenario: AstroDomeScenario = AstroDomeScenario(patcher)
-        self.astrodome: AstroDome = AstroDome(patcher, self.dol)
-        self.astrodomeentrances: AstroDomeEntrances = AstroDomeEntrances(patcher)
+        SMGObject.patcher = patcher
+
+        self.objects: dict[str, SMGObject] = {
+            "Mario": Mario(),
+            "AstroGalaxy": AstroGalaxy(),
+            "AstroDomeScenario": AstroDomeScenario(),
+            "AstroDomes": AstroDomes(self.dol),
+            "AstroDomeEntrances": AstroDomeEntrances()
+        }
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
-        self.mario.update(self.mario_colours)
+        for object_name, object in self.objects.items():
+            print(f"Updating {object_name}")
 
-        self.astrogalaxy.update(luma_shuffle)
-
-        self.astrodomescenario.update(dome_shuffle)
-
-        for index in range(1, 7):
-            self.astrodome.update([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index])
-
-        self.astrodomeentrances.update(dome_shuffle)
+            object.update(mario_colours=self.mario_colours,
+                          galaxy_shuffle=galaxy_shuffle,
+                          dome_shuffle=dome_shuffle,
+                          luma_shuffle=luma_shuffle)
 
     def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
         galaxy_name = gateway_galaxy.name
@@ -111,11 +113,10 @@ class Patch:
         else:
             raise ValueError(f"{galaxy_name} cannot be found.")
 
-        print(f"Loading zone gateway -> {galaxy_name}")
+        print(f"Loading zone Gateway -> {galaxy_name}")
 
         # +4 to the name address to skip over the galaxy identifier tag (Mini/Surp)
-        self.astrodome.gateway_galaxy.replace_loading(name_address + 4)
-        return
+        self.objects["AstroDomes"].gateway_galaxy.replace_loading(name_address + 4)
 
     def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
         dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
