@@ -310,4 +310,11 @@ BEACH6WATRB = "Beach Bowl Secret: Waterfalls Base"
 BEACH6ICELA = "Beach Bowl Secret: Icy Pond"
 
 ### Ghostly
-GHOSTLY1
+GHOSTLY1TOADS = "Ghostly 1: Green Toadship"
+GHOSTLY1ENTRY = "Ghostly 1: Spooky Gateway"
+GHOSTLY1FOYER = "Ghostly 1: Mansion Foyer"
+GHOSTLY1BLACK = "Ghostly 1: Black Hole Room"
+GHOSTLY1LIBRA = "Ghostly 1: Secret Library"
+GHOSTLY1BALCO = "Ghostly 1: Outer Balcony"
+GHOSTLY1CORR1 = "Ghostly 1: Balcony Corridor"
+GHOSTLY1CORR2 = "Ghostly 1: Booshroom Library"

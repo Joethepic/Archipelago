@@ -325,6 +325,14 @@ region_list: dict[str, SMGRegionData] = {
     regname.BEACH1BLOCK: SMGRegionData("Planetoid"),
     regname.BEACH2BLOCK: SMGRegionData("Planetoid"),
     regname.BEACH3BLOCK: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1TOADS: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1ENTRY: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1FOYER: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1BLACK: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1LIBRA: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1BALCO: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1CORR1: SMGRegionData("Planetoid"),
+    regname.GHOSTLY1CORR2: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]
