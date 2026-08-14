@@ -1,19 +1,22 @@
 from wiithon import WiiIsoPatcher
 from wiithon.file_helper.bcsv import BCSV
 
+from worlds.smgalaxy.Patch import hashtable
+
+from ..SMGDOL import SMGDOL
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended, SMGObject
+from ..extensions import SMGObject
 from ..SMGObjects.SurprisedGalaxy import SurprisedGalaxy
 from ..SMGObjects.Gateway import Gateway
 from ...Constants.Names.region_names import GATEWAY
 from ...regions import region_list
 
 class AstroDome(SMGObject):
-    def __init__(self, patcher: WiiIsoPatcher):
+    def __init__(self, patcher: WiiIsoPatcher, dol: SMGDOL):
         super().__init__(patcher, ASTRODOME_PATH)
 
-        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy()
-        self.gateway_galaxy: Gateway = Gateway()
+        self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(patcher)
+        self.gateway_galaxy: Gateway = Gateway(patcher, dol)
 
         # Get the in-game names from the region list
         self.major_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()
@@ -38,12 +41,12 @@ class AstroDome(SMGObject):
         of the dome should look like in correspondance with the given index.
         """
         # Get the objinfo path of the dome corresponding to the dome index.
-        OBJINFO_PATH = PLACEMENT_PATH + index_to_layer[dome_index]
+        OBJINFO_PATH = PLACEMENT_PATH + index_to_layer[dome_index] + '/' + FILE_NAME
 
         galaxy_index = 0
-        with self.edit_bcsv(OBJINFO_PATH) as bcsv:
+        with self.patcher.edit_as(self.path + '/' + OBJINFO_PATH, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
             for entry in bcsv.entries:
-                if entry["name"].startwith("Mini"):
+                if entry["name"].startswith("Mini"):
                     galaxy: GalaxyDestination = new_galaxies[galaxy_index]
                     galaxy_index += 1
 

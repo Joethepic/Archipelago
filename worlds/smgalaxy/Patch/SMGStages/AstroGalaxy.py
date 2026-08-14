@@ -4,7 +4,7 @@ from wiithon.file_helper.bcsv import BCSV
 from worlds.smgalaxy.Patch import hashtable
 
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended, SMGObject
+from ..extensions import SMGObject
 
 
 class AstroGalaxy(SMGObject):
