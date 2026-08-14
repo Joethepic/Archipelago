@@ -14,6 +14,8 @@ class SMGLocationData(NamedTuple):
     location_groups: list[str] # type of randomization option table and group []
     region: str
     code: Optional[int]  # used to create ap_id, None for events
+    galaxy_name: str
+    star_num: int
     game_address: Optional[int] = 0  #
     default_access: Optional[dict[str, int]] = {}
 
@@ -173,7 +175,7 @@ locHL_table: dict[str, SMGLocationData]  = {
     "DDR: Giant Eel Breakout": SMGLocationData(["Drip Drop Galaxy", "Power Star"], regname.DRIPDROP, 170000112, game_address=0),
     "BM: Bigmouth's Gold Bait": SMGLocationData(["Bigmouth Galaxy", "Power Star"], regname.BIGMOUTH, 170000113, game_address=0),
     "Sandy Spiral: Choosing a Favorite Snack": SMGLocationData(["Sand Spiral Galaxy", "Power Star"], regname.SANDSPIRAL, 170000114, game_address=0),
-    "Bone's Boneyard: Racing the Spooky Speedster": SMGLocationData(["Boo's Boneyard Galaxy", "Power Star"], regname.BOOBONE, 170000115, game_address=0),
+    "Boo's Boneyard: Racing the Spooky Speedster": SMGLocationData(["Boo's Boneyard Galaxy", "Power Star"], regname.BOOBONE, 170000115, game_address=0),
     "SC: Star Bunnies in the Snow": SMGLocationData(["Snow Cap Galaxy", "Power Star"], regname.SNOWCAP, 170000116, game_address=0)
 }
 
