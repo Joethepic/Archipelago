@@ -366,6 +366,43 @@ def set_rules(world: "SMGWorld", player: int):
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.GHOSTLY), "Dome 3 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Third Orbit"], 15)))
+    world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY1TOADS),
+                                                    "Ghostly 1: Luigi and the Haunted Mansion")
+    world.get_region(regname.GHOSTLY1TOADS).connect(world.get_region(regname.GHOSTLY1ENTRY),
+                                                    "Ghostly 1: Toadship Launch Star")
+    world.get_region(regname.GHOSTLY1ENTRY).connect(world.get_region(regname.GHOSTLY1FOYER))
+    world.get_region(regname.GHOSTLY1FOYER).connect(world.get_region(regname.GHOSTLY1BLACK),
+                                                    "Ghostly 1: Foyer Locked Door")
+    world.get_region(regname.GHOSTLY1BLACK).connect(world.get_region(regname.GHOSTLY1LIBRA))
+    world.get_region(regname.GHOSTLY1BLACK).connect(world.get_region(regname.GHOSTLY1BALCO),
+                                                    "Ghostly 1: Black Hole Launch Star")
+    world.get_region(regname.GHOSTLY1BALCO).connect(world.get_region(regname.GHOSTLY1CORR1),
+                                                    "Ghostly 1: Balcony Locked Door")
+    world.get_region(regname.GHOSTLY1CORR1).connect(world.get_region(regname.GHOSTLY1CORR2))
+    world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY2TOADS),
+                                                    "Ghostly 2: A Very Spooky Spirit")
+    world.get_region(regname.GHOSTLY2TOADS).connect(world.get_region(regname.GHOSTLY2ENTRY),
+                                                    "Ghostly 2: Toadship Launch Star")
+    world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY2BOORA),
+                                                    "Ghostly 2: Pull Star Launch Star")
+    world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY3TOADS),
+                                                    "Ghostly 3: Beware of Bouldergeist")
+    world.get_region(regname.GHOSTLY3TOADS).connect(world.get_region(regname.GHOSTLY3ENTRY),
+                                                    "Ghostly 3: Toadship Launch Star")
+    world.get_region(regname.GHOSTLY3ENTRY).connect(world.get_region(regname.GHOSTLY3FOYER))
+    world.get_region(regname.GHOSTLY3FOYER).connect(world.get_region(regname.GHOSTLY3SPIDE),
+                                                    "Ghostly 3: Foyer Launch Star")
+    world.get_region(regname.GHOSTLY3SPIDE).connect(world.get_region(regname.GHOSTLY3SLING),
+                                                    "Ghostly 3: Spider Wall Launch Star")
+    world.get_region(regname.GHOSTLY3SLING).connect(world.get_region(regname.GHOSTLY3TRAMP),
+                                                    "Ghostly 3: Sling Pod Launch Star")
+    world.get_region(regname.GHOSTLY3TRAMP).connect(world.get_region(regname.GHOSTLY3BOSSA),
+                                                    "Ghostly 3: Trampoline Launch Star")
+    world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY4BOSSA),
+                                                    "Ghostly Comet: Bouldergeist's Daredevil Run")
+    world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY5PCOIN),
+                                                    "Ghostly Purple Coins: Purple Coins in the Bone Pen")
+
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUOY), "Dome 3 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fourth Orbit"], 16)))
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BOWJR2), "Dome 3 Fifth Orbit Galaxy",
