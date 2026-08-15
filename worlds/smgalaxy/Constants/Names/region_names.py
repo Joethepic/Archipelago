@@ -331,6 +331,8 @@ GHOSTLY3TRAMP = "Ghostly 3: Trampoline Planet"
 GHOSTLY3BOSSA = "Ghostly 3: Bouldergeist Arena"
 GHOSTLY4BOSSA = "Ghostly Comet: Bouldergeist Arena"
 GHOSTLY5PCOIN = "Ghostly Purple Coins: Purple Coin Pen"
+
+### Minor Galaxies
 BUBBRE1SWAMP1 = "Bubble Breeze: Crashed Toadship Swamp"
 BUBBRE1SWAMP2 = "Bubble Breeze: Swamp Maze"
 BUOY1LAKES = "Buoy Base: Buoy Lake"
@@ -343,6 +345,37 @@ AIRARM1GOOMB = "Airship Armada: Goomba Rock"
 AIRARM1AIRS3 = "Airship Armada: Third Airship"
 AIRARM1AUTOS = "Airship Armada: Autoscroll Platform"
 AIRARM1BATTL = "Airship Armada: Bowser Jr. Battleship"
+
+## Bedroom
+### Gusty Garden
+GUSTY1LANDI = "Gusty Garden 1: Garden Landing"
+GUSTY1PILLR = "Gusty Garden 1: Ruined Pillars Planet"
+GUSTY1BAGMA = "Gusty Garden 1: Hidden Bagman Planet"
+GUSTY1VINEY = "Gusty Garden 1: Viney Footprint Cluster"
+GUSTY1CMAZE = "Gusty Garden 1: Garden Maze Cube"
+GUSTY2LANDI = "Gusty Garden 2: Garden Landing"
+GUSTY2PILLR = "Gusty Garden 2: Ruined Pillars Planet"
+GUSTY2QUESD = "Gusty Garden 2: Question Dot Planet"
+GUSTY2QUEST = "Gusty Garden 2: Question Hook Planet"
+GUSTY2GRATE = "Gusty Garden 2: Grate Donut"
+GUSTY2APPLE = "Gusty Garden 2: Three Apples"
+GUSTY2VINED = "Gusty Garden 2: Vined Planet"
+GUSTY2BOSST = "Gusty Garden 2: Major Burrows Tree"
+GUSTY3LANDI = "Gusty Garden 3: Garden Landing"
+GUSTY3GRASS = "Gusty Garden 3: Grassy Footprints"
+GUSTY3PEARL = "Gusty Garden 3: Grass-Pearl Chain"
+GUSTY3CYMBA = "Gusty Garden 3: Three Cymbals"
+GUSTY3BLOCK = "Gusty Garden 3: Garden Landing"
+GUSTY4BOSST = "Gusty Garden Comet: Major Burrows Tree"
+GUSTY5CMAZE = "Gusty Garden Purple Coins: Garden Maze Cube"
+
+### Freezeflame
+
+
+### Dusty Dune
+
+
+### Minor galaxies
 HONEYCL1WALL1 = "Honeyclimb: First Wall"
 HONEYCL1WALL2 = "Honeyclimb: Second Wall"
 HONEYCL1WALL3 = "Honeyclimb: Third Wall"

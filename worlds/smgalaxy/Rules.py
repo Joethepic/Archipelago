@@ -435,8 +435,42 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 3))
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.GUSTY), "Dome 4 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["First Orbit"], 18)))
-    world.get_region(regname.GUSTY).connect(world.get_region(regname.AIRARM1AIRS1),
-                                                    "Airship Armada: Sinking the Airships")
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.GUSTY1LANDI),
+                                                    "Gusty Garden 1: Bunnies in the Wind")
+    world.get_region(regname.GUSTY1LANDI).connect(world.get_region(regname.GUSTY1PILLR))
+    world.get_region(regname.GUSTY1PILLR).connect(world.get_region(regname.GUSTY1BAGMA))
+    world.get_region(regname.GUSTY1BAGMA).connect(world.get_region(regname.GUSTY1VINEY))
+    world.get_region(regname.GUSTY1VINEY).connect(world.get_region(regname.GUSTY1CMAZE),
+                                                  "Gusty Garden 1: Footprints Launch Star")
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.GUSTY2LANDI),
+                                                    "Gusty Garden 2: The Dirty Tricks of Major Burrows")
+    world.get_region(regname.GUSTY2LANDI).connect(world.get_region(regname.GUSTY2PILLR))
+    world.get_region(regname.GUSTY2PILLR).connect(world.get_region(regname.GUSTY2QUESD))
+    world.get_region(regname.GUSTY2QUESD).connect(world.get_region(regname.GUSTY2QUEST),
+                                                  "Gusty Garden 2: Dot Sling Star")
+    world.get_region(regname.GUSTY2QUEST).connect(world.get_region(regname.GUSTY2APPLE),
+                                                  "Gusty Garden 2: Question Hook Launch Star")
+    world.get_region(regname.GUSTY2QUEST).connect(world.get_region(regname.GUSTY2GRATE),
+                                                  "Gusty Garden 2: Hook Pull to Launch Star")
+    world.get_region(regname.GUSTY2GRATE).connect(world.get_region(regname.GUSTY2APPLE),
+                                                  "Gusty Garden 2: Grate Launch Star")
+    world.get_region(regname.GUSTY2APPLE).connect(world.get_region(regname.GUSTY2VINED),
+                                                  "Gusty Garden 2: Apples Launch Star")
+    world.get_region(regname.GUSTY2VINED).connect(world.get_region(regname.GUSTY2BOSST),
+                                                  "Gusty Garden 2: Vined Launch Star")
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.GUSTY3LANDI),
+                                                    "Gusty Garden 3: Gusty Garden's Gravity Scramble")
+    world.get_region(regname.GUSTY3LANDI).connect(world.get_region(regname.GUSTY3GRASS))
+    world.get_region(regname.GUSTY3GRASS).connect(world.get_region(regname.GUSTY3PEARL),
+                                                  "Gusty Garden 3: Footprint Launch Star")
+    world.get_region(regname.GUSTY3PEARL).connect(world.get_region(regname.GUSTY3CYMBA),
+                                                  "Gusty Garden 3: Grass Pearls Launch Star")
+    world.get_region(regname.GUSTY3CYMBA).connect(world.get_region(regname.GUSTY3BLOCK),
+                                                  "Gusty Garden 3: Cymbal Launch Star")
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.GUSTY4BOSST),
+                                                    "Gusty Garden Comet: Major Burrows's Daredevil Run")
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.GUSTY5CMAZE),
+                                                    "Gusty Garden Purple Coins: Purple Coins on the Puzzle Cube")
 
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.FREEZEFLAME), "Dome 4 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
