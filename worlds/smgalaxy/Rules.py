@@ -435,14 +435,36 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 3))
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.GUSTY), "Dome 4 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["First Orbit"], 18)))
+    world.get_region(regname.GUSTY).connect(world.get_region(regname.AIRARM1AIRS1),
+                                                    "Airship Armada: Sinking the Airships")
+
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.FREEZEFLAME), "Dome 4 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.AIRARM1AIRS1),
+                                                    "Airship Armada: Sinking the Airships")
+
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.DUSTY), "Dome 4 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.AIRARM1AIRS1),
+                                                    "Airship Armada: Sinking the Airships")
+
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.HONEYCLIMB), "Dome 4 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fourth Orbit"], 21)))
+    world.get_region(regname.HONEYCLIMB).connect(world.get_region(regname.HONEYCL1WALL1),
+                                                    "Honeyclimb: Scaling the Sticky Wall")
+    world.get_region(regname.HONEYCL1WALL1).connect(world.get_region(regname.HONEYCL1WALL2),
+                                                    "Honeyclimb: First Wall Launch Star")
+    world.get_region(regname.HONEYCL1WALL2).connect(world.get_region(regname.HONEYCL1WALL3),
+                                                    "Honeyclimb: Second Wall Launch Star")
+
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.BOWSER2), "Dome 4 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fifth Orbit"], 22)))
+    world.get_region(regname.BOWSER2).connect(world.get_region(regname.DARKMAT1CASTB),
+                                                    "Dark Matter Plant: Darkness on the Horizon")
+    world.get_region(regname.DARKMAT1CASTB).connect(world.get_region(regname.DARKMAT1GRAVI))
+    world.get_region(regname.DARKMAT1GRAVI).connect(world.get_region(regname.DARKMAT1TOWER))
+    world.get_region(regname.DARKMAT1TOWER).connect(world.get_region(regname.DARKMAT1BOSSA))
+
     # Dome 5
     world.get_region(regname.SHIP).connect(world.get_region(regname.ENGINE), "Dome 5 Entry",
                     Has("Grand Star", 4))
