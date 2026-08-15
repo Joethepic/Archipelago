@@ -370,7 +370,30 @@ GUSTY4BOSST = "Gusty Garden Comet: Major Burrows Tree"
 GUSTY5CMAZE = "Gusty Garden Purple Coins: Garden Maze Cube"
 
 ### Freezeflame
-
+FREFLA1ICERI = "Freezeflame 1: Ice Ring"
+FREFLA1MOUNB = "Freezeflame 1: Ice Mountain Lake"
+FREFLA1SLIDE = "Freezeflame 1: Ice Mountain Slide"
+FREFLA1MIDDL = "Freezeflame 1: Ice Mountain Middle Ponds"
+FREFLA1BARBR = "Freezeflame 1: Baron Brrr's Lake"
+FREFLA2ICERI = "Freezeflame 2: Ice Ring"
+FREFLA2LAVA1 = "Freezeflame 2: Lava Planet Box Zone"
+FREFLA2LAVA2 = "Freezeflame 2: Lava Planet Behind Gate"
+FREFLA2LAVA3 = "Freezeflame 2: Lava Planet Slope Puzzle"
+FREFLA2LAVAC = "Freezeflame 2: Lava Planet Cave"
+FREFLA3ICERI = "Freezeflame 3: Ice Ring"
+FREFLA3ICELA = "Freezeflame 3: Ice Lava Lakes"
+FREFLA3ICEFI = "Freezeflame 3: Lava Ice Skating"
+FREFLA4ICEFI = "Freezeflame Comet: Ice Skating Race"
+FREFLA5MOUNB = "Freezeflame Purple Coins: Ice Mountain Lake"
+FREFLA5SLIDE = "Freezeflame Purple Coins: Ice Mountain Slide"
+FREFLA5MIDDL = "Freezeflame Purple Coins: Ice Mountain Middle Ponds"
+FREFLA5BARBR = "Freezeflame Purple Coins: Baron Brrr's Lake"
+FREFLA5BACK1 = "Freezeflame Purple Coins: Ice Mountain Backside 1"
+FREFLA5BACK2 = "Freezeflame Purple Coins: Ice Mountain Backside 2"
+FREFLA5BACK3 = "Freezeflame Purple Coins: Ice Mountaintop"
+FREFLA6BACK1 = "Freezeflame Secret: Ice Mountain Backside 1"
+FREFLA6BACK2 = "Freezeflame Secret: Ice Mountain Backside 2"
+FREFLA6BACK3 = "Freezeflame Secret: Ice Mountaintop"
 
 ### Dusty Dune
 

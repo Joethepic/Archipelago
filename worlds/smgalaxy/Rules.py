@@ -474,8 +474,51 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.FREEZEFLAME), "Dome 4 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Second Orbit"], 19)))
-    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.AIRARM1AIRS1),
-                                                    "Airship Armada: Sinking the Airships")
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.FREFLA1ICERI),
+                                                    "Freezeflame 1: The Frozen Peak of Baron Brrr")
+    world.get_region(regname.FREFLA1ICERI).connect(world.get_region(regname.FREFLA1MOUNB),
+                                                   "Freezeflame 1: Ice Ring Launch Star")
+    world.get_region(regname.FREFLA1MOUNB).connect(world.get_region(regname.FREFLA1SLIDE),
+                                                   "Freezeflame 1: Sling Star to Slide")
+    world.get_region(regname.FREFLA1MOUNB).connect(world.get_region(regname.FREFLA1MIDDL),
+                                                   "Freezeflame 1: Mountain Base Sling Star")
+    world.get_region(regname.FREFLA1MOUNB).connect(world.get_region(regname.FREFLA6BACK1),
+                                                   "Freezeflame Secret: Ice Jump Sling Star")
+    world.get_region(regname.FREFLA1MIDDL).connect(world.get_region(regname.FREFLA1BARBR),
+                                                   "Freezeflame 1: Middle Ponds Sling Star")
+    world.get_region(regname.FREFLA6BACK1).connect(world.get_region(regname.FREFLA6BACK2),
+                                                   "Freezeflame Secret: First Snowman Sling Star")
+    world.get_region(regname.FREFLA6BACK2).connect(world.get_region(regname.FREFLA6BACK3),
+                                                   "Freezeflame Secret: Second Snowman Sling Star")
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.FREFLA2ICERI),
+                                                    "Freezeflame 2: Freezeflame's Blistering Core")
+    world.get_region(regname.FREFLA2ICERI).connect(world.get_region(regname.FREFLA2LAVA1),
+                                                   "Freezeflame 2: Ice Ring Launch Star")
+    world.get_region(regname.FREFLA2LAVA1).connect(world.get_region(regname.FREFLA2LAVA2))
+    world.get_region(regname.FREFLA2LAVA2).connect(world.get_region(regname.FREFLA2LAVA3))
+    world.get_region(regname.FREFLA2LAVA3).connect(world.get_region(regname.FREFLA2LAVAC))
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.FREFLA3ICERI),
+                                                    "Freezeflame 3: Hot and Cold Collide")
+    world.get_region(regname.FREFLA3ICERI).connect(world.get_region(regname.FREFLA3ICELA),
+                                                   "Freezeflame 3: Ice Ring Launch Star")
+    world.get_region(regname.FREFLA3ICELA).connect(world.get_region(regname.FREFLA3ICEFI),
+                                                   "Freezeflame 3: Ice Lake Launch Star")
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.FREFLA4ICEFI),
+                                                    "Freezeflame Comet: Frosty Cosmic Mario Race")
+    world.get_region(regname.FREEZEFLAME).connect(world.get_region(regname.FREFLA5MOUNB),
+                                                    "Freezeflame Purple Coins: Purple Coins on the Summit")
+    world.get_region(regname.FREFLA5MOUNB).connect(world.get_region(regname.FREFLA5SLIDE),
+                                                   "Freezeflame Purple Coins: Sling Star to Slide")
+    world.get_region(regname.FREFLA5MOUNB).connect(world.get_region(regname.FREFLA5MIDDL),
+                                                   "Freezeflame Purple Coins: Mountain Base Sling Star")
+    world.get_region(regname.FREFLA5MOUNB).connect(world.get_region(regname.FREFLA5BACK1),
+                                                   "Freezeflame Purple Coins: Ice Jump Sling Star")
+    world.get_region(regname.FREFLA5MIDDL).connect(world.get_region(regname.FREFLA5BARBR),
+                                                   "Freezeflame Purple Coins: Middle Ponds Sling Star")
+    world.get_region(regname.FREFLA5BACK1).connect(world.get_region(regname.FREFLA5BACK2),
+                                                   "Freezeflame Purple Coins: First Snowman Sling Star")
+    world.get_region(regname.FREFLA5BACK2).connect(world.get_region(regname.FREFLA5BACK3),
+                                                   "Freezeflame Purple Coins: Second Snowman Sling Star")
 
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.DUSTY), "Dome 4 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
