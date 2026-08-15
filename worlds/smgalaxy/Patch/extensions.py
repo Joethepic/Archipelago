@@ -1,4 +1,4 @@
-import abc
+from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from typing import ContextManager, T
 
@@ -9,14 +9,14 @@ from . import hashtable
 
 NOP = b'\x60\x00\x00\x00'
 
-class SMGObject(abc.ABC):
+class SMGObject(ABC):
     patcher: WiiIsoPatcher
     path: str
 
     def __init__(self, path: str):
         self.path = path
 
-    @abc.abstractmethod
+    @abstractmethod
     def update(self, **kwargs) -> None:
         """Arguments are variable depending on the given object."""
         ...

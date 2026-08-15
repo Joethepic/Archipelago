@@ -19,7 +19,8 @@ class AstroDomeEntrance(SMGObject):
     def rename(self, new_dome_name: str):
         print(f"Renaming dome {self.name} -> {new_dome_name}")
 
-        self.patcher.add_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.file_data)
+        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.file_data)
+        print(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name))
 
 class AstroDomeEntrances(SMGObject):
     entrances: list[AstroDomeEntrance]
@@ -33,10 +34,6 @@ class AstroDomeEntrances(SMGObject):
                           AstroDomeEntrance(Domes.GARDEN, 6)]
 
     def update(self, dome_shuffle: dict[int, int], **kwargs):
-        # Remove to-be-replaced files
-        for entrance in self.entrances:
-            self.patcher.remove_file(entrance.path)
-
         reverse_shuffle: dict[int, int] = {value: key for key, value in dome_shuffle.items()}
 
         for index, entrance in enumerate(self.entrances):
@@ -44,5 +41,3 @@ class AstroDomeEntrances(SMGObject):
             new_dome_name = self.entrances[new_index].name
             
             entrance.rename(new_dome_name)
-
-            self.patcher.add_file(entrance.path, entrance.file_data)

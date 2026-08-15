@@ -5,15 +5,15 @@ from .Names.region_names import GATEWAY
 from ..regions import region_list
 
 # PATHS
-ASTRO_DOME_ENTRANCE_PATH = "ObjectData/AstroDomeEntrance{0}.arc"
-OBJECT_DATA_PATH = "ObjectData/"
-GATEWAY_PATH: str = "ObjectData/AstroChildRoom.arc"
+ASTRO_DOME_ENTRANCE_PATH = "/ObjectData/AstroDomeEntrance{0}.arc"
+OBJECT_DATA_PATH = "/ObjectData/"
+GATEWAY_PATH: str = "/ObjectData/AstroChildRoom.arc"
 GATEWAY_BDL_NAME = "astrochildroom.bdl"
-MARIO_PATH = "ObjectData/Mario.arc"
-SURPRISED_GALAXY_PATH = "ObjectData/MiniSurprisedGalaxy.arc"
-ASTRODOME_PATH = "StageData/AstroDome.arc"
-ASTRO_DOME_SCENARIO_PATH = "StageData/AstroDome/AstroDomeScenario.arc"
-ASTRO_GALAXY_PATH: str = "StageData/AstroGalaxy.arc"
+MARIO_PATH = "/ObjectData/Mario.arc"
+SURPRISED_GALAXY_PATH = "/ObjectData/MiniSurprisedGalaxy.arc"
+ASTRODOME_PATH = "/StageData/AstroDome.arc"
+ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
+ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
 DOL_PATH: str = "/DATA/sys/main.dol"
 
 # ASTRODOMEENTRANCES
