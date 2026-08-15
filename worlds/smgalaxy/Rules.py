@@ -362,8 +362,14 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.BEACH5LANDI).connect(world.get_region(regname.BEACH5LAKES))
     world.get_region(regname.BEACH5LANDI).connect(world.get_region(regname.BEACH5CLIFB))
     world.get_region(regname.BEACH5CLIFB).connect(world.get_region(regname.BEACH5CLIFT))
+
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUBBLEBREEZE), "Dome 3 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Second Orbit"], 14)))
+    world.get_region(regname.BUBBLEBREEZE).connect(world.get_region(regname.BUBBRE1SWAMP1),
+                                                    "Bubble Breeze: Through the Poison Swamp")
+    world.get_region(regname.BUBBRE1SWAMP1).connect(world.get_region(regname.BUBBRE1SWAMP2),
+                                                    "Bubble Breeze: Swamp Launch Star")
+
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.GHOSTLY), "Dome 3 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Third Orbit"], 15)))
     world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY1TOADS),
@@ -405,8 +411,25 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BUOY), "Dome 3 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fourth Orbit"], 16)))
+    world.get_region(regname.BUOY).connect(world.get_region(regname.BUOY1LAKES),
+                                                    "Buoy Base: The Floating Fortress")
+    world.get_region(regname.BUOY1LAKES).connect(world.get_region(regname.BUOY1UNDER),
+                                                    "Buoy Base Secret: Underwater Green Pipe")
+    world.get_region(regname.BUOY1LAKES).connect(world.get_region(regname.BUOY1TOWER))
+    world.get_region(regname.BUOY1TOWER).connect(world.get_region(regname.BUOY1WATER))
+
     world.get_region(regname.KITCHEN).connect(world.get_region(regname.BOWJR2), "Dome 3 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_three_counts["Fifth Orbit"], 17)))
+    world.get_region(regname.BOWJR2).connect(world.get_region(regname.AIRARM1AIRS1),
+                                                    "Airship Armada: Sinking the Airships")
+    world.get_region(regname.AIRARM1AIRS1).connect(world.get_region(regname.AIRARM1AIRS2))
+    world.get_region(regname.AIRARM1AIRS1).connect(world.get_region(regname.AIRARM1GOOMB))
+    world.get_region(regname.AIRARM1GOOMB).connect(world.get_region(regname.AIRARM1AIRS2))
+    world.get_region(regname.AIRARM1AIRS2).connect(world.get_region(regname.AIRARM1AIRS3))
+    world.get_region(regname.AIRARM1AIRS2).connect(world.get_region(regname.AIRARM1GOOMB))
+    world.get_region(regname.AIRARM1AIRS3).connect(world.get_region(regname.AIRARM1AUTOS))
+    world.get_region(regname.AIRARM1AUTOS).connect(world.get_region(regname.AIRARM1BATTL))
+
     # Dome 4
     world.get_region(regname.SHIP).connect(world.get_region(regname.BEDROOM), "Dome 4 Entry",
                     Has("Grand Star", 3))
