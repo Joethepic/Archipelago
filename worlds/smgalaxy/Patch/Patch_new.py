@@ -71,7 +71,6 @@ class Patch:
 
     def __init__(self, patcher: WiiIsoPatcher, output: dict):
         self.seed = int(output["Seed"])
-        self.dol: SMGDOL = SMGDOL(patcher)
 
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
@@ -90,6 +89,8 @@ class Patch:
             "AstroDomes": AstroDomes(self.dol),
             "AstroDomeEntrances": AstroDomeEntrances()
         }
+
+        self.dol: SMGDOL = SMGDOL()
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
         for object_name, object in self.objects.items():
