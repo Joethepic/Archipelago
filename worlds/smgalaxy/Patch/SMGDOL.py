@@ -509,7 +509,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
         self.write_instruction(PPC.li(3, 1))
         self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
-        self.write_instruction(PPC(3, 0))
+        self.write_instruction(PPC.li(3, 0))
         self.write_nop(5)
 
         #########################
