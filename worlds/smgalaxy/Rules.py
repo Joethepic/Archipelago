@@ -609,6 +609,72 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 4))
     world.get_region(regname.ENGINE).connect(world.get_region(regname.GOLDLEAF), "Dome 5 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["First Orbit"], 23)))
+    world.get_region(regname.GOLDLEAF).connect(world.get_region(regname.GOLDLE1LANDI),
+                                                    "Gold Leaf 1: Star Bunnies on the Hunt")
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1BIGTR))
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1FOUNC),
+                                                   "Gold Leaf 1: Swing to Sling Star")
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1CLIFF),
+                                                   "Gold Leaf 1: Beneath Planet Sling Star")
+    world.get_region(regname.GOLDLE1CLIFF).connect(world.get_region(regname.GOLDLE1BOULD),
+                                                   "Gold Leaf 1: Clifftop Green Pipe")
+    world.get_region(regname.GOLDLE1BIGTR).connect(world.get_region(regname.GOLDLE1POUND))
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1SMLHI))
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1WATRP))
+    world.get_region(regname.GOLDLE1LANDI).connect(world.get_region(regname.GOLDLE1WOODE),
+                                                   "Gold Leaf 1: Pull to Launch Star")
+    world.get_region(regname.GOLDLEAF).connect(world.get_region(regname.GOLDLE2LANDI),
+                                                    "Gold Leaf 2: Cataquack to the Skies")
+    world.get_region(regname.GOLDLE2LANDI).connect(world.get_region(regname.GOLDLE2BIGTR))
+    world.get_region(regname.GOLDLE2POUND).connect(world.get_region(regname.GOLDLE2FOUNC))
+    world.get_region(regname.GOLDLE2LANDI).connect(world.get_region(regname.GOLDLE2CLIFF),
+                                                   "Gold Leaf 2: Beneath Planet Sling Star")
+    world.get_region(regname.GOLDLE2CLIFF).connect(world.get_region(regname.GOLDLE2BOULD),
+                                                   "Gold Leaf 2: Clifftop Green Pipe")
+    world.get_region(regname.GOLDLE2BIGTR).connect(world.get_region(regname.GOLDLE2POUND))
+    world.get_region(regname.GOLDLE2LANDI).connect(world.get_region(regname.GOLDLE2SMLHI))
+    world.get_region(regname.GOLDLE2LANDI).connect(world.get_region(regname.GOLDLE2WATRP))
+    world.get_region(regname.GOLDLE2FOUNC).connect(world.get_region(regname.GOLDLE2HONYP),
+                                                   "Gold Leaf 2: Fountain Cliff Launch Star")
+    world.get_region(regname.GOLDLE2HONYP).connect(world.get_region(regname.GOLDLE2QCUBE))
+    world.get_region(regname.GOLDLE2QCUBE).connect(world.get_region(regname.GOLDLE2BIGMM))
+    world.get_region(regname.GOLDLE2BIGMM).connect(world.get_region(regname.GOLDLE2BELLS),
+                                                   "Gold Leaf 2: Big M-Block Launch Star")
+    world.get_region(regname.GOLDLE2BELLS).connect(world.get_region(regname.GOLDLE2FLOWE))
+    world.get_region(regname.GOLDLEAF).connect(world.get_region(regname.GOLDLE3LANDI),
+                                                    "Gold Leaf 3: When It Rains, It Pours")
+    world.get_region(regname.GOLDLE3LANDI).connect(world.get_region(regname.GOLDLE3POUND))
+    world.get_region(regname.GOLDLE3LANDI).connect(world.get_region(regname.GOLDLE3FOUNC))
+    world.get_region(regname.GOLDLE3LANDI).connect(world.get_region(regname.GOLDLE3CLIFF),
+                                                   "Gold Leaf 3: Beneath Planet Sling Star")
+    world.get_region(regname.GOLDLE3CLIFF).connect(world.get_region(regname.GOLDLE3BOULD),
+                                                   "Gold Leaf 3: Clifftop Green Pipe")
+    world.get_region(regname.GOLDLE3POUND).connect(world.get_region(regname.GOLDLE3BIGTR))
+    world.get_region(regname.GOLDLE3LANDI).connect(world.get_region(regname.GOLDLE3SMLHI))
+    world.get_region(regname.GOLDLE3LANDI).connect(world.get_region(regname.GOLDLE3WATRP))
+    world.get_region(regname.GOLDLE3POUND).connect(world.get_region(regname.GOLDLE3FLOAT))
+    world.get_region(regname.GOLDLE3FLOAT).connect(world.get_region(regname.GOLDLE3TOWER))
+    world.get_region(regname.GOLDLE3TOWER).connect(world.get_region(regname.GOLDLE3CANNO))
+    world.get_region(regname.GOLDLEAF).connect(world.get_region(regname.GOLDLE4LANDI),
+                                                    "Gold Leaf Comet: Cosmic Mario Forest Race")
+    world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4POUND))
+    world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4FOUNC))
+    world.get_region(regname.GOLDLE4POUND).connect(world.get_region(regname.GOLDLE4BIGTR))
+    world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4SMLHI))
+    world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4WATRP))
+    world.get_region(regname.GOLDLE4POUND).connect(world.get_region(regname.GOLDLE4FLOAT))
+    world.get_region(regname.GOLDLE4FLOAT).connect(world.get_region(regname.GOLDLE4TOWER))
+    world.get_region(regname.GOLDLE4TOWER).connect(world.get_region(regname.GOLDLE4CANNO))
+    world.get_region(regname.GOLDLEAF).connect(world.get_region(regname.GOLDLE5LANDI),
+                                                    "Gold Leaf Purple Coins: Purple Coins in the Woods")
+    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5POUND))
+    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5FOUNC))
+    world.get_region(regname.GOLDLE5POUND).connect(world.get_region(regname.GOLDLE5BIGTR))
+    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5SMLHI))
+    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5WATRP))
+    world.get_region(regname.GOLDLE5POUND).connect(world.get_region(regname.GOLDLE5FLOAT))
+    world.get_region(regname.GOLDLE5FLOAT).connect(world.get_region(regname.GOLDLE5TOWER))
+    world.get_region(regname.GOLDLE5TOWER).connect(world.get_region(regname.GOLDLE5CANNO))
     world.get_region(regname.ENGINE).connect(world.get_region(regname.SEASLIDE), "Dome 5 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Second Orbit"], 24)))
     world.get_region(regname.ENGINE).connect(world.get_region(regname.TOYTIME), "Dome 5 Third Orbit Galaxy",
