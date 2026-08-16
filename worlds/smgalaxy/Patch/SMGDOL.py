@@ -1,36 +1,30 @@
 from typing import Self
 from io import BytesIO
 
-from wiithon import WiiIsoPatcher
+from wiithon.helpers import PowerPC as PPC
 from wiithon.file_helper.dol import DOL
 from wiithon.file_helper.bcsv import BCSV
 from wiithon.helpers.Utils import read_string_until_null, write_string as wr_str
+
+from worlds.smgalaxy.Patch.extensions import SMGObject, SMGDOLObject
 
 from .hashtable import hash_to_name
 from ..Constants.patch_constants import *
 
 class Pointer:
+    dol: DOL
     base_address: int
     pointing_address: int
     
-    def __init__(self, dol: "SMGDOL", base_address: int):
-        self.dol = dol
-        
+    def __init__(self, base_address: int):
         self.base_address = base_address
-
         self.read_pointer()
 
     def read_pointer(self):
-        self.pointing_address = int.from_bytes(self.dol.dol.read_at(self.base_address, 4))
+        self.pointing_address = int.from_bytes(self.dol.read_at(self.base_address, 4))
     
     def write_pointer(self):
-        self.dol.dol.write_at(self.base_address, int.to_bytes(self.pointing_address, 4, "big"))
-
-    def swap_with_pointer(self, other: Self):
-        self.pointing_address, other.pointing_address = other.pointing_address, self.pointing_address
-
-        self.write_pointer()
-        other.write_pointer()
+        self.dol.write_at(self.base_address, int.to_bytes(self.pointing_address, 4, "big"))
 
 class CharPointer(Pointer):
     string: str | None
@@ -38,17 +32,23 @@ class CharPointer(Pointer):
     def read_pointer(self):
         super().read_pointer()
 
-        if self.pointing_address != 0:
-            stype, i, offset = self.dol.dol._virtual_to_section(self.pointing_address)
-            section = self.dol.dol.text_sections[i] if stype == 'text' else self.dol.dol.data_sections[i]
-            self.string = read_string_until_null(BytesIO(section), offset, "shift-jis")
-        else:
+        if self.pointing_address == 0:
             self.string = None
+            return
+        
+        stype, i, offset = self.dol._virtual_to_section(self.pointing_address)
+        section = self.dol.text_sections[i] if stype == 'text' else self.dol.data_sections[i]
+        self.string = read_string_until_null(BytesIO(section), offset, "shift-jis")
     
     def write_string(self) -> None:
-        self.dol.dol.write_at(self.pointing_address, self.string.encode("shift-jis") + b'\0')
+        self.dol.write_at(self.pointing_address, self.string.encode("shift-jis") + b'\0')
 
     def replace_prefix(self, new_prefix: str) -> None:
+        prefix_size = len(new_prefix)
+
+        if prefix_size > len(self.string):
+            raise ValueError(f"New prefix is larger than the string.\nPrefix: {new_prefix}, string: {self.string}")
+        
         self.string = new_prefix + self.string[len(new_prefix):]
         self.write_string()
 
@@ -78,20 +78,18 @@ class Name2ArchiveElement:
 
 class Name2MakeArchiveListFuncElement:
     name_pointer: CharPointer
-    archive_function: FunctionPointer
+    archive_function_pointer: FunctionPointer
 
-    def __init__(self, name_pointer: CharPointer, archive_function: FunctionPointer):
+    def __init__(self, name_pointer: CharPointer, archive_function_pointer: FunctionPointer):
         self.name_pointer = name_pointer
-        self.archive_function = archive_function
+        self.archive_function_pointer = archive_function_pointer
 
-class NameObjFactory:
+class NameObjFactory(SMGDOLObject):
     name_to_create_function_elements: list[Name2CreateFuncElement]
     name_to_archive_elements: list[Name2ArchiveElement]
     name_to_make_archive_list_function_elements: list[Name2MakeArchiveListFuncElement]
 
-    def __init__(self, dol: "SMGDOL"):
-        self.dol = dol
-
+    def __init__(self):
         self.miniature_function_address = CREATE_NAME_OBJECT_MINIATURE_GALAXY_FUNCTION_START_ADDRESS
         self.surprised_function_address = CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS
         self.surprised_galaxy_string_address = STRING_ADDRESS_MINISURPRISEDGALAXY
@@ -109,9 +107,9 @@ class NameObjFactory:
             create_function_address = offset + 0x4
             archive_name_address = offset + 0x8
 
-            name_pointer: CharPointer = CharPointer(self.dol, name_address)
-            create_function_pointer: FunctionPointer = FunctionPointer(self.dol, create_function_address)
-            archive_name_pointer: CharPointer = CharPointer(self.dol, archive_name_address)
+            name_pointer: CharPointer = CharPointer(name_address)
+            create_function_pointer: FunctionPointer = FunctionPointer(create_function_address)
+            archive_name_pointer: CharPointer = CharPointer(archive_name_address)
 
             element: Name2CreateFuncElement = Name2CreateFuncElement(name_pointer, create_function_pointer, archive_name_pointer)
 
@@ -132,8 +130,8 @@ class NameObjFactory:
             object_name_address = offset + 0x0
             archive_name_address = offset + 0x4
 
-            object_name_pointer: CharPointer = CharPointer(self.dol, object_name_address)
-            archive_name_pointer: CharPointer = CharPointer(self.dol, archive_name_address)
+            object_name_pointer: CharPointer = CharPointer(object_name_address)
+            archive_name_pointer: CharPointer = CharPointer(archive_name_address)
 
             element: Name2ArchiveElement = Name2ArchiveElement(object_name_pointer, archive_name_pointer)
 
@@ -151,8 +149,8 @@ class NameObjFactory:
             name_address = offset + 0x0
             archive_function_address = offset + 0x4
 
-            name_pointer: CharPointer = CharPointer(self.dol, name_address)
-            archive_function_pointer: FunctionPointer = FunctionPointer(self.dol, archive_function_address)
+            name_pointer: CharPointer = CharPointer(name_address)
+            archive_function_pointer: FunctionPointer = FunctionPointer(archive_function_address)
 
             element: Name2MakeArchiveListFuncElement = Name2MakeArchiveListFuncElement(name_pointer, archive_function_pointer)
 
@@ -173,12 +171,15 @@ class NameObjFactory:
         return [element for element in self.name_to_create_function_elements
                 if element.archive_name_pointer.string == archive_name]
 
-    def get_miniature_galaxy_name_to_make_archive_list_function_elements(self) -> list[Name2MakeArchiveListFuncElement]:
-        return [element for element in self.name_to_make_archive_list_function_elements
-                if element.name_pointer.string.startswith("Mini")][:-1]
-
     def set_miniature_galaxy_name_to_make_archive_list_function_elements(self, new_miniature_name_pointers: list[CharPointer]) -> None:
-        archive_miniature_elements = self.get_miniature_galaxy_name_to_make_archive_list_function_elements()
+        archive_miniature_elements: list[Name2MakeArchiveListFuncElement] = []
+
+        for element in self.name_to_make_archive_list_function_elements:
+            if element.name_pointer.string == "MiniKoopaBattleVs3Galaxy":
+                continue
+
+            if element.name_pointer.string.startswith("Mini"):
+                archive_miniature_elements.append(element)
         
         for archive_miniature_element, new_miniature_name_pointer in zip(archive_miniature_elements, new_miniature_name_pointers):
             archive_miniature_element.name_pointer.pointing_address = new_miniature_name_pointer.pointing_address
@@ -216,7 +217,11 @@ class NameObjFactory:
         for element in surprised_elements:
             self.set_name_to_create_function_element_as_surprised(element)
 
-    def set_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
+    def update(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str], **kwargs) -> None:
+        dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
+        luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
+        
+        self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
         # Get the elements in the array that should be converted to dome and luma galaxies
         to_miniature_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
                                                                if element.name_pointer.string[4:] in miniature_galaxy_names]
@@ -227,21 +232,14 @@ class NameObjFactory:
             self.extra_create_element.name_pointer.string = "Mini" + GATEWAY_IN_GAME
             self.extra_create_element.name_pointer.write_string()
             to_miniature_elements.append(self.extra_create_element)
+
+        if GATEWAY_IN_GAME in surprised_galaxy_names:
+            self.extra_create_element.name_pointer.string = "Surp" + GATEWAY_IN_GAME
+            self.extra_create_element.name_pointer.write_string()
+            to_surprised_elements.append(self.extra_create_element)
         
         self.set_as_miniature_galaxies(to_miniature_elements)
         self.set_as_surprised_galaxies(to_surprised_elements)
-
-    def swap_pointers(self, pointer1: Pointer, pointer2: Pointer) -> None:
-        pointer1.swap_with_pointer(pointer2)
-
-class GalaxyUnlockTableFieldNames(StrEnum):
-    NAME = "name"
-    MAP_PANE_NAME = "MapPaneName"
-    OPEN_CONDITION0 = "OpenCondition0"
-    OPEN_CONDITION1 = "OpenCondition1"
-    OPEN_CONDITION2 = "OpenCondition2"
-    POWER_STAR_REQUIREMENT = "PowerStarNum"
-    RETURN_DOME = "GrandGalaxyNo"
 
 class GalaxyUnlockTableEntry:
     def __init__(self, entry_index: int, name: str, open_condition0: str, open_condition1: str,
@@ -261,7 +259,7 @@ class GalaxyUnlockTableEntry:
                         str(self.power_star_requirement),
                         str(self.return_dome)])
 
-class GalaxyUnlockTable:
+class GalaxyUnlockTable(SMGDOLObject):
     table: BCSV
 
     start_address: int
@@ -270,56 +268,64 @@ class GalaxyUnlockTable:
 
     entries: list[GalaxyUnlockTableEntry]
 
-    def __init__(self, dol: DOL):
+    def __init__(self):
         self.start_address = GALAXY_UNLOCK_TABLE_START_ADDRESS
         self.end_address = GALAXY_UNLOCK_TABLE_END_ADDRESS
         self.size = self.end_address - self.start_address
 
         self.entries = []
 
-        table_bytes: bytes = dol.read_at(self.start_address, self.size)
+        table_bytes: bytes = self.dol.read_at(self.start_address, self.size)
         self.table = BCSV.import_bcsv(BytesIO(table_bytes), field_names=hash_to_name, str_fmt="shift-jis")
         
         for entry_index in range(len(self.table.entries)):
-            entry = self.get_entry(entry_index)
-
-            # Set empty by default, to be overridden later
-            entry.open_condition0 = ''
-            entry.open_condition1 = ''
-            entry.power_star_requirement = 0
-            entry.return_dome = 0
-            self.set_entry(entry)
-            
+            name = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.NAME]
+            entry = GalaxyUnlockTableEntry(entry_index, name, '', '' , 0, 0)
             self.entries.append(entry)
 
-    def get_entry(self, entry_index: int) -> GalaxyUnlockTableEntry:
-        name = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.NAME]
-        open_condition0 = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0]
-        open_condition1 = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1]
-        power_star_requirement = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT]
-        return_dome = self.table.entries[entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME]
+    def set_new_entry_values(self, name: str, star_requirement: int, dome_index: int) -> None:
+        for entry in self.entries:
+            if entry.name != name:
+                continue
 
-        return GalaxyUnlockTableEntry(entry_index, name, open_condition0, open_condition1,
-                                      power_star_requirement, return_dome)
-    
-    def set_entry(self, entry: GalaxyUnlockTableEntry) -> None:
-        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.NAME] = entry.name
-        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0] = entry.open_condition0
-        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1] = entry.open_condition1
-        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
-        self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME] = entry.return_dome
+            entry.power_star_requirement = star_requirement
+            entry.return_dome = dome_index
 
-    def save_to_dol(self, dol: DOL, address: int) -> None:
+    def update(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], **kwargs) -> None:
+        requirements: dict[int, dict[int, int]] = {i: {} for i in range(1,7)}
+                
+        for location, requirement in star_requirements.items():
+            dome_index = int(location[1])
+            orbit_index = int(location[3:])
+
+            requirements[dome_index][orbit_index] = requirement
+        
+        for galaxy in dome_galaxies:
+            star_requirement: int = requirements[galaxy.dome_index][galaxy.orbit_index + 1]
+
+            self.set_new_entry_values(galaxy.name, star_requirement, dome_index)
+            
+        for entry in self.entries:
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.NAME] = entry.name
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0] = entry.open_condition0
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1] = entry.open_condition1
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME] = entry.return_dome
+
         bcsv_bytes = self.table.export_bcsv(str_fmt="shift-jis")
-        dol.write_at(address, bcsv_bytes.getvalue())
 
-class AstroDomeModels:
+        if bcsv_bytes.seek(2, 0) > self.size:
+            raise ValueError(f"New embedded BCSV is bigger than the original BCSV.\nNew size: {bcsv_bytes.seek(2, 0)}, old size: {self.size}")
+
+        self.dol.write_at(self.start_address, bcsv_bytes.getvalue())
+
+class AstroDomeModels(SMGDOLObject):
     astro_dome: list[CharPointer]
     astro_dome_sky: list[CharPointer]
     astro_dome_entrance: list[CharPointer]
     astro_star_plate: list[CharPointer]
 
-    def __init__(self, dol: "SMGDOL"):
+    def __init__(self):
         self.astro_dome_address: int = ASTRO_DOME_ARRAY_ADDRESS
         self.astro_dome_sky_address: int = ASTRO_DOME_SKY_ARRAY_ADDRESS
         self.astro_dome_entrance_address: int = ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS
@@ -331,10 +337,11 @@ class AstroDomeModels:
         self.astro_star_plate = []
         
         for index in range(6):
-            astro_dome_pointer = CharPointer(dol, self.astro_dome_address + index * 0x4)
-            astro_dome_sky_pointer = CharPointer(dol, self.astro_dome_sky_address + index * 0x4)
-            astro_dome_entrance_pointer = CharPointer(dol, self.astro_dome_entrance_address + index * 0x4)
-            astro_star_plate_pointer = CharPointer(dol, self.astro_star_plate_address + index * 0x4)
+            offset = index * 0x4
+            astro_dome_pointer = CharPointer(self.astro_dome_address + offset)
+            astro_dome_sky_pointer = CharPointer(self.astro_dome_sky_address + offset)
+            astro_dome_entrance_pointer = CharPointer(self.astro_dome_entrance_address + offset)
+            astro_star_plate_pointer = CharPointer(self.astro_star_plate_address + offset)
 
             self.astro_dome.append(astro_dome_pointer)
             self.astro_dome_sky.append(astro_dome_sky_pointer)
@@ -346,72 +353,196 @@ class AstroDomeModels:
         
         reverse_shuffle: dict[int, int] = {value: key for key, value in shuffle.items()}
         addresses: list[int] = [pointer_list[i].pointing_address for i in range(6)]
+
         for index, address in enumerate(addresses):
             new_index = reverse_shuffle[index + 1] - 1
             pointer_list[new_index].pointing_address = address
             pointer_list[new_index].write_pointer()
     
-    def shuffle(self, shuffle: dict[int, int]):
+    def update(self, dome_shuffle: dict[int, int], **kwargs):
         #self.shuffle_list(self.astro_dome, shuffle)
         #self.shuffle_list(self.astro_dome_sky, shuffle)
-        self.shuffle_list(self.astro_dome_entrance, shuffle)
+        self.shuffle_list(self.astro_dome_entrance, dome_shuffle)
         #self.shuffle_list(self.astro_dome, shuffle)
 
-class SMGDOL:
-    """Extends the gclib DOL class to be easily useable for Super Mario Galaxy."""
-    name_object_factory: NameObjFactory
-    galaxy_unlock_table: GalaxyUnlockTable
+class SMGDOL(SMGObject):
     data: BytesIO
     custom_section_size: int = 0x1000
     custom_section_address: int
 
-    def __init__(self, patcher: WiiIsoPatcher):
-        self.dol: DOL = patcher.read_dol()
+    objects: dict[str, SMGDOLObject]
+
+    write_pointer: int
+
+    def __init__(self):
+        self.dol: DOL = self.patcher.read_dol()
         self.data = BytesIO(self.dol.to_bytes())
 
-        self.name_object_factory = NameObjFactory(self)
-        self.galaxy_unlock_table = GalaxyUnlockTable(self.dol)
-        self.astro_dome_models = AstroDomeModels(self)
+        Pointer.dol = self.dol
+        SMGDOLObject.dol = self.dol
 
-        diff, addrs = self.dol.inject_above_arena([b'\0' * self.custom_section_size])
+        self.objects = {
+            "NameObjectFactory": NameObjFactory(),
+            "GalaxyUnlockTable": GalaxyUnlockTable(),
+            "AstroDomeModels": AstroDomeModels()
+        }
+
+        self.write_pointer = 0
+
+        size, addrs = self.dol.inject_above_arena([b'\0' * self.custom_section_size])
         self.custom_section_address = addrs[0]
+        self.custom_section_size = size
 
-    def set_name_object_factory_galaxies(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str]) -> None:
-        self.name_object_factory.set_galaxies(miniature_galaxy_names, surprised_galaxy_names)
+        # Return custom function
+        self.write_instruction(PPC.addi(11, 1, 0x100), self.custom_section_address + self.custom_section_size - 6 * 0x4)
+        self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
+        self.write_instruction(PPC.lwz(0, 0x104, 1))
+        self.write_instruction(PPC.mtlr(0))
+        self.write_instruction(PPC.addi(1, 1, 0x100))
+        self.write_instruction(PPC.blr())
 
-    def get_galaxy_unlock_table_entry_by_name(self, name: str) -> GalaxyUnlockTableEntry | None:
-        for entry in self.galaxy_unlock_table.entries:
-            if entry.name == name:
-                return entry
+        # Setup custom function
+        self.write_instruction(PPC.stwu(1, -0x100, 1), self.custom_section_address)
+        self.write_instruction(PPC.mflr(0))
+        self.write_instruction(PPC.stw(0, 0x104, 1))
+        self.write_instruction(PPC.addi(11, 1, 0x100))
+        self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
+        self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
 
-        print(f"Entry was not found in Unlock table: {name}")
-        return None
+        self.add_deathlink()
+
+    def write_instruction(self, instruction_bytes: bytes, address: int = None) -> None:
+        if address is not None:
+            self.write_pointer = address
+
+        self.dol.write_at(self.write_pointer, instruction_bytes)
+        self.write_pointer += 4
+
+    def write_nop(self, count: int) -> None:
+        for _ in range(count):
+            self.write_instruction(PPC.nop())
 
     def add_deathlink(self):
-        self.dol.write_at(0x804A16C0, b'\x38\x63\xef\x90')
-        self.dol.write_at(0x804AAC98, b'\x38\xa5\xef\x90')
-
-        # Return
-        instructions = b'\x39\x61\x01\x00\x4b\xe6\x85\xcd\x80\x01\x01\x04\x7c\x08\x03\xa6\x38\x21\x01\x00\x4e\x80\x00\x20'
-        address: int = (self.custom_section_address + self.custom_section_size) - len(instructions)
-        self.dol.write_at(address, instructions)
-
-        # Setup
-        instructions = b'\x94\x21\xff\x00\x7c\x08\x02\xa6\x90\x01\x01\x04\x39\x61\x01\x00\x4b\xe6\x95\x5d\x4b\xce\xbb\x4d'
-        self.dol.write_at(self.custom_section_address, instructions)
-
         # Set 0x8000 into higher bits of r3
         # Load byte from 0x80001af0 into r3
         # Compare 0x80001af0 with 0
         # Jump over if its not 0
         # Jump to forceKillPlayerByAbyss
         # Set 0 into r3
-        # Store byte from r3 (0) into 0x80001af0 and reset it
-        address = self.custom_section_address + len(instructions) # Previous Instructions first
-        instructions = b'\x3f\xe0\x80\x00\x88\x7f\x1a\xf0\x2c\x03\x00\x00\x41\x82\x00\x10\x4b\xd4\x3e\xbd\x38\x60\x00\x00\x98\x7f\x1a\xf0'
-        self.dol.write_at(address, instructions)
 
-    def save(self):
+        self.write_instruction(PPC.lis(31, -0x8000))
+        self.write_instruction(PPC.lbz(3, 0x1AF0, 31))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
+        self.write_instruction(PPC.li(3, 0))
+        self.write_instruction(PPC.stb(3, 0x1AF0, 31))
+
+    def update_instructions(self):
+        #######################################################
+        # Skip opening cutscene and go immediately to gateway #
+        #######################################################
+        self.write_instruction(PPC.li(3, 0), 0x803bb3cc)
+        self.write_instruction(PPC.addi(3, 31, 0x3F8), 0x803bb3d8)
+        self.write_instruction(PPC.li(0, 4))
+
+        ########################
+        # Set swing permission #
+        ########################
+        self.write_instruction(PPC.li(3, 1), 0x803b55b0)
+
+        #######################################
+        # Miniature galaxy orbit manipulation #
+        #######################################
+        # Get obj_arg0 from miniature galaxy
+        self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
+        self.write_instruction(PPC.rlwnm(3, 3, 0x10, 0x10, 0x1F))
+
+        ################################
+        # Scenario select star loading #
+        ################################
+        # Keep loading regular stars even if they're not available yet
+        self.write_instruction(PPC.li(3, 1), 0x8037d9ec)
+
+        # Calculate all secret/comet stars, including possibly normally unavailable ones
+        self.write_instruction(PPC.li(3, 1), 0x8037da44)
+
+        # Show secret/comet stars as calculated above
+        self.write_instruction(PPC.li(3, 1), 0x8037db54)
+
+        # Set visibility to 1 (not collected) if appearing as collected has failed (ensuring it shows up even if not available)
+        self.write_instruction(PPC.li(6, 1), 0x8037db18)
+
+        # Always show up and appear correctly as collected/not collected
+        self.write_instruction(PPC.li(6, 1), 0x8037db74)
+        
+        #######################################
+        # Read star count from memory address #
+        #######################################
+        # Load upper 2 bytes of memory pointer (0x8000)
+        self.write_instruction(PPC.lis(3, -0x8000), 0x803b10fc)
+
+        # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
+        self.write_instruction(PPC.ori(3, 3, 0x1880))
+
+        # Skip the rest of the normal function
+        self.write_instruction(PPC.b(0x803b113c, self.write_pointer))
+
+        ###################################
+        # Custom powerstar colour loading #
+        ###################################
+        self.write_instruction(PPC.mr(31, 3), 0x8020f270)
+        self.write_instruction(PPC.bl(0x803f5ab8, self.write_pointer))
+        self.write_instruction(PPC.mr(4, 3))
+        self.write_instruction(PPC.bl(0x803b0544, self.write_instruction))
+        self.write_instruction(PPC.lwz(3, 0xC, 3))
+        self.write_instruction(PPC.bl(0x803b1390, self.write_pointer))
+        self.write_instruction(PPC.lis(4, -0x8000))
+        self.write_instruction(PPC.ori(4, 4, 0x18FF))
+        self.write_instruction(PPC.mulli(3, 3, 0x8))
+        self.write_instruction(PPC.add(3, 3, 4))
+        self.write_instruction(PPC.lbzx(3, 3, 31))
+        self.write_nop(1)
+        
+        ##################################
+        # Custom grandstar count loading #
+        ##################################
+        self.write_instruction(PPC.lis(3, -0x8000), 0x803b1d10)
+        self.write_instruction(PPC.lbz(3, 0x1882, 3))
+        self.write_instruction(PPC.addi(3, 3, 1))
+        self.write_instruction(PPC.cmp(0, 3, 4))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(3, 1))
+        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC(3, 0))
+        self.write_nop(5)
+
+        #########################
+        # Skip wii strap screen #
+        #########################
+        self.write_instruction(PPC.subf(4, 13, 0x3080), 0x80340408)
+        self.write_instruction(PPC.li(4, 1), 0x803406ac)
+        self.write_instruction(PPC.li(4, 2), 0x803406d0)
+
+        #################################################
+        # Show the bros button to select Mario or Luigi #
+        #################################################
+        self.write_instruction(PPC.li(3, 1), 0x8017cd70)
+
+        ####################
+        # Custom Functions #
+        ####################
+        # Jump to custom section
+        self.write_instruction(PPC.b(self.custom_section_address, self.write_pointer), 0x803995c0)
+
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
+        for object_name, object in self.objects.items():
+            print(f"Updating {object_name}")
+
+            object.update(miniature_galaxy_names=[galaxy.name for galaxy in dome_galaxies],
+                          surprised_galaxy_names=[galaxy.name for galaxy in luma_galaxies],
+                          dome_shuffle=dome_shuffle,
+                          dome_galaxies=dome_galaxies,
+                          star_requirements=star_requirements)
+
         self.add_deathlink()
-        self.dol.write_at(self.galaxy_unlock_table.start_address, b'\x00' * self.galaxy_unlock_table.size)
-        self.galaxy_unlock_table.save_to_dol(self.dol, self.galaxy_unlock_table.start_address)

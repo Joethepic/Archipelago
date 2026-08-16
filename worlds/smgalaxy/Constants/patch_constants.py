@@ -139,3 +139,12 @@ GATEWAY_ENTRANCE_ADDRESS_ONE: int = 0x8001f024
 GATEWAY_ENTRANCE_ADDRESS_TWO: int = 0x8001f028
 GATEWAY_EXIT_ADDRESS_ONE: int = 0x803bb2fc
 GATEWAY_EXIT_ADDRESS_TWO: int = 0x803bb300
+
+class GalaxyUnlockTableFieldNames(StrEnum):
+    NAME = "name"
+    MAP_PANE_NAME = "MapPaneName"
+    OPEN_CONDITION0 = "OpenCondition0"
+    OPEN_CONDITION1 = "OpenCondition1"
+    OPEN_CONDITION2 = "OpenCondition2"
+    POWER_STAR_REQUIREMENT = "PowerStarNum"
+    RETURN_DOME = "GrandGalaxyNo"

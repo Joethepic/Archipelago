@@ -67,6 +67,8 @@ class Patch:
     old_galaxies: list
     new_galaxies: list
 
+    objects: dict[str, SMGObject]
+
     def __init__(self, patcher: WiiIsoPatcher, output: dict):
         self.seed = int(output["Seed"])
         self.dol: SMGDOL = SMGDOL(patcher)
@@ -81,7 +83,7 @@ class Patch:
 
         SMGObject.patcher = patcher
 
-        self.objects: dict[str, SMGObject] = {
+        self.objects = {
             "Mario": Mario(),
             "AstroGalaxy": AstroGalaxy(),
             "AstroDomeScenario": AstroDomeScenario(),
@@ -98,13 +100,19 @@ class Patch:
                           dome_shuffle=dome_shuffle,
                           luma_shuffle=luma_shuffle)
 
+    def update_dol(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
+        self.dol.update(dome_galaxies=dome_galaxies,
+                        luma_galaxies=luma_galaxies,
+                        dome_shuffle=dome_shuffle,
+                        star_requirements=star_requirements)
+
     def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":
             return
         
-        mini_galaxy = self.dol.name_object_factory.get_name_to_create_function_elements_by_name("Mini" + galaxy_name)
-        surp_galaxy = self.dol.name_object_factory.get_name_to_create_function_elements_by_name("Surp" + galaxy_name)
+        mini_galaxy = self.dol.objects["NameObjectFactory"].get_name_to_create_function_elements_by_name("Mini" + galaxy_name)
+        surp_galaxy = self.dol.objects["NameObjectFactory"].get_name_to_create_function_elements_by_name("Surp" + galaxy_name)
 
         if mini_galaxy:
             name_address = mini_galaxy[0].name_pointer.pointing_address
@@ -117,164 +125,7 @@ class Patch:
 
         # +4 to the name address to skip over the galaxy identifier tag (Mini/Surp)
         self.objects["AstroDomes"].gateway_galaxy.replace_loading(name_address + 4)
-
-    def update_nameobjfactory(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination]) -> None:
-        dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
-        luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
         
-        self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
-
-    def update_galaxyunlocktable(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int]) -> None:
-        requirements: dict[int, dict[int, int]] = {i: {} for i in range(1,7)}
-        
-        for location, requirement in star_requirements.items():
-            dome_index: int = int(location[1])
-            orbit_index: int = int(location[3:])
-
-            requirements[dome_index][orbit_index] = requirement
-        
-        for galaxy in dome_galaxies:
-            star_requirement: int = requirements[galaxy.dome_index][galaxy.orbit_index + 1]
-
-            entry = self.dol.get_galaxy_unlock_table_entry_by_name(galaxy.name)
-            entry.power_star_requirement = star_requirement
-            entry.return_dome = galaxy.dome_index
-            self.dol.galaxy_unlock_table.set_entry(entry)
-
-    def update_instructions(self) -> None:
-        #######################################################
-        # Skip opening cutscene and go immediately to gateway #
-        #######################################################
-        address = 0x803bb3cc
-        new_instruction = b'\x38\x60\x00\x00'
-        self.dol.dol.write_at(address, new_instruction)
-        
-        address = 0x803bb3d8
-        new_instruction = b'\x38\x7f\x03\xf8'
-        self.dol.dol.write_at(address, new_instruction)
-
-        address = 0x803bb3dc
-        new_instruction = b'\x38\x00\x00\x04'
-        self.dol.dol.write_at(address, new_instruction)
-
-        ########################
-        # Set swing permission #
-        ########################
-        address = 0x803b55b0
-        new_instruction = b'\x38\x60\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-                                
-        #####################################################
-        # TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY #
-        #####################################################
-        self.dol.dol.write_at(0x8053bb44, (1).to_bytes(1, "big"))
-        self.dol.dol.write_at(0x8053bb46, (0).to_bytes(1, "big"))
-
-        #######################################
-        # Miniature galaxy orbit manipulation #
-        #######################################
-        # Get obj_arg0 from miniature galaxy
-        address = 0x80200758
-        new_instruction = b'\x80\x7f\x00\x8c'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Shift 16 bits to the right to get the upper bits where the custom index is stored
-        address = 0x8020075c
-        new_instruction = b'\x54\x63\x84\x3e'
-        self.dol.dol.write_at(address, new_instruction)
-
-        ################################
-        # Scenario select star loading #
-        ################################
-        # Keep loading regular stars even if they're not available yet
-        address = 0x8037d9ec
-        new_instruction = b'\x38\x60\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Calculate all secret/comet stars, including possibly normally unavailable ones
-        address = 0x8037da44
-        new_instruction = b'\x38\x60\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Show secret/comet stars as calculated above
-        address = 0x8037db54
-        new_instruction = b'\x38\x60\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Set visibility to 1 (not collected) if appearing as collected has failed (ensuring it shows up even if not available)
-        address = 0x8037db18
-        new_instruction = b'\x38\xc0\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Always show up and appear correctly as collected/not collected
-        address = 0x8037db74
-        new_instruction = b'\x38\xc6\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-        
-        #######################################
-        # Read star count from memory address #
-        #######################################
-        # Load upper 2 bytes of memory pointer (0x8000)
-        address = 0x803b10fc
-        new_instruction = b'\x3f\x80\x80\x00'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
-        address = 0x803b1100
-        new_instruction = b'\x88\x7c\x18\x80'
-        self.dol.dol.write_at(address, new_instruction)
-
-        # Skip the rest of the normal function
-        address = 0x803b1104
-        new_instruction = b'\x48\x00\x00\x38'
-        self.dol.dol.write_at(address, new_instruction)
-
-        ###################################
-        # Custom powerstar colour loading #
-        ###################################
-        address = 0x8020f270
-        new_instruction = b'\x7c\x7f\x1b\x78\x48\x1e\x68\x45\x7c\x64\x1b\x78\x48\x1a\x12\xc9\x80\x63\x00\x0c\x48\x1a\x21\x0d\x3c\x80\x80\x00\x60\x84\x18\xff\x1c\x63\x00\x08\x7c\x63\x22\x14\x7c\x63\xf8\xae'
-        self.dol.dol.write_at(address, new_instruction)
-
-        ##################################
-        # Custom grandstar count loading #
-        ##################################
-        address = 0x803b1d10
-        new_instruction = b'\x3c\x60\x80\x00\x88\x63\x18\x82\x38\x63\x00\x01\x7c\x03\x20\x00\x41\x80\x00\x0c\x38\x60\x00\x01\x42\x80\x00\x08\x38\x60\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00\x60\x00\x00\x00'
-        #self.dol.dol.write_at(address, new_instruction)
-
-        #########################
-        # Skip wii strap screen #
-        #########################
-        address = 0x80340408
-        new_instruction = b'\x38\x8d\xcf\x80'
-        self.dol.dol.write_at(address, new_instruction)
-
-        address = 0x803406ac
-        new_instruction = b'\x38\x80\x00\x00'
-        self.dol.dol.write_at(address, new_instruction)
-
-        address = 0x803406d0
-        new_instruction = b'\x38\x80\x00\x00'
-        self.dol.dol.write_at(address, new_instruction)
-
-        #################################################
-        # Show the bros button to select Mario or Luigi #
-        #################################################
-        address = 0x8017cd70
-        new_instruction = b'\x38\x60\x00\x01'
-        self.dol.dol.write_at(address, new_instruction)
-
-        ####################
-        # Custom Functions #
-        ####################
-        # Jump to custom section
-        address = 0x803995c0
-        new_instruction = b'\x48\x31\x49\xd1'
-        self.dol.dol.write_at(address, new_instruction)
-        self.dol.save()
-        
-
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
     game = GAME_NAME
     patch_file_ending = ".apsmg"
@@ -309,11 +160,9 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
             patch.update_gateway_location(gateway_galaxy)
 
-            patch.update_nameobjfactory(dome_galaxies, luma_galaxies)
-            patch.update_galaxyunlocktable(dome_galaxies, galaxy_counts)
-            patch.update_instructions()
+            patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts)
 
-            patcher.build(target)
+            patcher.build(target, lambda x: print(x))
         
 
 class SMGPlayerContainer(APPlayerContainer):

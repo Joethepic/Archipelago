@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from typing import ContextManager, T
 
 from wiithon import WiiIsoPatcher
+from wiithon.file_helper.dol import DOL
 from wiithon.file_helper.bcsv import BCSV
 
 from . import hashtable
@@ -18,7 +19,6 @@ class SMGObject(ABC):
 
     @abstractmethod
     def update(self, **kwargs) -> None:
-        """Arguments are variable depending on the given object."""
         ...
 
     """
@@ -26,3 +26,10 @@ class SMGObject(ABC):
     def edit_bcsv(self, path: str) -> ContextManager[T]:
         return self.patcher.edit_as(self.path + '/' + path, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis")
     """
+
+class SMGDOLObject(ABC):
+    dol: DOL
+
+    @abstractmethod
+    def update(self, **kwargs) -> None:
+        ...
