@@ -218,10 +218,6 @@ class NameObjFactory(SMGDOLObject):
             self.set_name_to_create_function_element_as_surprised(element)
 
     def update(self, miniature_galaxy_names: list[str], surprised_galaxy_names: list[str], **kwargs) -> None:
-        dome_galaxy_names = [galaxy.name for galaxy in dome_galaxies]
-        luma_galaxy_names = [galaxy.name for galaxy in luma_galaxies]
-        
-        self.dol.set_name_object_factory_galaxies(dome_galaxy_names, luma_galaxy_names)
         # Get the elements in the array that should be converted to dome and luma galaxies
         to_miniature_elements: list[Name2CreateFuncElement] = [element for element in self.name_to_create_function_elements
                                                                if element.name_pointer.string[4:] in miniature_galaxy_names]
