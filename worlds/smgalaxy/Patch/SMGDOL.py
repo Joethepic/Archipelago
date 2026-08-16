@@ -542,4 +542,4 @@ class SMGDOL(SMGObject):
 
         self.add_deathlink()
 
-        self.update_instruction()
+        self.update_instructions()
