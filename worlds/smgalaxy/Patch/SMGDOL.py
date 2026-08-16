@@ -546,3 +546,5 @@ class SMGDOL(SMGObject):
                           star_requirements=star_requirements)
 
         self.add_deathlink()
+
+        self.update_instruction()
