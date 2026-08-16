@@ -489,7 +489,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.mr(31, 3), 0x8020f270)
         self.write_instruction(PPC.bl(0x803f5ab8, self.write_pointer))
         self.write_instruction(PPC.mr(4, 3))
-        self.write_instruction(PPC.bl(0x803b0544, self.write_instruction))
+        self.write_instruction(PPC.bl(0x803b0544, self.write_pointer))
         self.write_instruction(PPC.lwz(3, 0xC, 3))
         self.write_instruction(PPC.bl(0x803b1390, self.write_pointer))
         self.write_instruction(PPC.lis(4, -0x8000))
