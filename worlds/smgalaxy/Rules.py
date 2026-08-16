@@ -522,8 +522,70 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.DUSTY), "Dome 4 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Third Orbit"], 20)))
-    world.get_region(regname.DUSTY).connect(world.get_region(regname.AIRARM1AIRS1),
-                                                    "Airship Armada: Sinking the Airships")
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.DUSTY1LANDI),
+                                                    "Dusty Dune 1: Soaring through the Desert Winds")
+    world.get_region(regname.DUSTY1LANDI).connect(world.get_region(regname.DUSTY1INPIP),
+                                                    "Dusty Dune 1: Past Tornadoes Pipe")
+    world.get_region(regname.DUSTY1INPIP).connect(world.get_region(regname.DUSTY1PIPEO),
+                                                    "Dusty Dune 1: Sling to Pipe")
+    world.get_region(regname.DUSTY1PIPEO).connect(world.get_region(regname.DUSTY1SANDT),
+                                                    "Dusty Dune 1: Near Pipe Launch Star")
+    world.get_region(regname.DUSTY1SANDT).connect(world.get_region(regname.DUSTY1SANTO),
+                                                    "Dusty Dune 1: Sand Climb Halfway Sling Stars")
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.DUSTY2LANDI),
+                                                    "Dusty Dune 2: Blasting through the Sand")
+    world.get_region(regname.DUSTY2LANDI).connect(world.get_region(regname.DUSTY2WOODE),
+                                                    "Dusty Dune 2: Landing Launch Star")
+    world.get_region(regname.DUSTY2WOODE).connect(world.get_region(regname.DUSTY2SAND1),
+                                                    "Dusty Dune 2: Wooden Ring Sling Stars")
+    world.get_region(regname.DUSTY2WOODE).connect(world.get_region(regname.DUSTY7SANDY),
+                                                    "Dusty Dune Green: Hungry Luma Launch Star")
+    world.get_region(regname.DUSTY2SAND1).connect(world.get_region(regname.DUSTY2SAND2),
+                                                    "Dusty Dune 2: Small Stream Sling Star")
+    world.get_region(regname.DUSTY2SAND2).connect(world.get_region(regname.DUSTY2SAND3),
+                                                    "Dusty Dune 2: Sand Ring Pull Stars")
+    world.get_region(regname.DUSTY2SAND3).connect(world.get_region(regname.DUSTY2NOTES),
+                                                    "Dusty Dune 2: Sand Sphere Green pipe")
+    world.get_region(regname.DUSTY2NOTES).connect(world.get_region(regname.DUSTY2MAZEY),
+                                                    "Dusty Dune 2: Note Room Green Pipe")
+    world.get_region(regname.DUSTY2SAND3).connect(world.get_region(regname.DUSTY2MAZEY),
+                                                    "Dusty Dune 2: Sand Sphere Launch Star")
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.DUSTY3LANDI),
+                                                    "Dusty Dune 3: Sunbaked Sand Castle")
+    world.get_region(regname.DUSTY3LANDI).connect(world.get_region(regname.DUSTY3POUN1),
+                                                    "Dusty Dune 3: Landing Launch Star")
+    world.get_region(regname.DUSTY3POUN1).connect(world.get_region(regname.DUSTY3SANDT),
+                                                    "Dusty Dune 3: Landing Launch Star")
+    world.get_region(regname.DUSTY3SANDT).connect(world.get_region(regname.DUSTY6BBILL),
+                                                    "Dusty Dune Secret: Sand Tide Stump Launch Star")
+    world.get_region(regname.DUSTY3SANDT).connect(world.get_region(regname.DUSTY3ROCKY),
+                                                    "Dusty Dune 3: Sand Tide Thorns Launch Star")
+    world.get_region(regname.DUSTY3ROCKY).connect(world.get_region(regname.DUSTY3OASIS),
+                                                    "Dusty Dune 3: Rocky Sling Star")
+    world.get_region(regname.DUSTY3OASIS).connect(world.get_region(regname.DUSTY3OASIS),
+                                                    "Dusty Dune 3: Oasis Sling Star")
+    world.get_region(regname.DUSTY3ROCKY).connect(world.get_region(regname.DUSTY3GLASO),
+                                                    "Dusty Dune 3: Rocky Launch Star")
+    world.get_region(regname.DUSTY3GLASO).connect(world.get_region(regname.DUSTY3GLASI),
+                                                    "Dusty Dune 3: Glass Tower Pipe")
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.DUSTY4LANDI),
+                                                    "Dusty Dune Comet: Sandblast Speed Run")
+    world.get_region(regname.DUSTY4LANDI).connect(world.get_region(regname.DUSTY4WOODE),
+                                                    "Dusty Dune Comet: Landing Launch Star")
+    world.get_region(regname.DUSTY4WOODE).connect(world.get_region(regname.DUSTY4SAND1),
+                                                    "Dusty Dune Comet: Wooden Ring Sling Stars")
+    world.get_region(regname.DUSTY4SAND1).connect(world.get_region(regname.DUSTY4SAND2),
+                                                    "Dusty Dune Comet: Small Stream Sling Star")
+    world.get_region(regname.DUSTY4SAND2).connect(world.get_region(regname.DUSTY4SAND3),
+                                                    "Dusty Dune Comet: Sand Ring Pull Stars")
+    world.get_region(regname.DUSTY4SAND3).connect(world.get_region(regname.DUSTY4NOTES),
+                                                    "Dusty Dune Comet: Sand Sphere Green pipe")
+    world.get_region(regname.DUSTY4NOTES).connect(world.get_region(regname.DUSTY4MAZEY),
+                                                    "Dusty Dune Comet: Note Room Green Pipe")
+    world.get_region(regname.DUSTY4SAND3).connect(world.get_region(regname.DUSTY4MAZEY),
+                                                    "Dusty Dune Comet: Sand Sphere Launch Star")
+    world.get_region(regname.DUSTY).connect(world.get_region(regname.DUSTY5MAZEY),
+                                                    "Dusty Dune Purple Coins: Purple Coins in the Desert")
 
     world.get_region(regname.BEDROOM).connect(world.get_region(regname.HONEYCLIMB), "Dome 4 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_four_counts["Fourth Orbit"], 21)))
