@@ -515,7 +515,7 @@ class SMGDOL(SMGObject):
         #########################
         # Skip wii strap screen #
         #########################
-        self.write_instruction(PPC.subf(4, 13, 0x3080), 0x80340408)
+        self.write_instruction(PPC.addi(4, 13, -0x3080), 0x80340408)
         self.write_instruction(PPC.li(4, 1), 0x803406ac)
         self.write_instruction(PPC.li(4, 2), 0x803406d0)
 
