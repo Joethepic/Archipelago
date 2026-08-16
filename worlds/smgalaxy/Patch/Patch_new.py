@@ -81,6 +81,7 @@ class Patch:
         self.new_galaxies: list = list(self.galaxies.values())
 
         SMGObject.patcher = patcher
+        self.dol: SMGDOL = SMGDOL()
 
         self.objects = {
             "Mario": Mario(),
@@ -89,8 +90,6 @@ class Patch:
             "AstroDomes": AstroDomes(self.dol),
             "AstroDomeEntrances": AstroDomeEntrances()
         }
-
-        self.dol: SMGDOL = SMGDOL()
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
         for object_name, object in self.objects.items():
