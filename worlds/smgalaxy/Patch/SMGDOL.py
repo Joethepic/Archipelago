@@ -391,7 +391,6 @@ class SMGDOL(SMGObject):
 
         size, addrs = self.dol.inject_above_arena([b'\0' * self.custom_section_size])
         self.custom_section_address = addrs[0]
-        self.custom_section_size = size
 
         # Return custom function
         self.write_instruction(PPC.addi(11, 1, 0x100), self.custom_section_address + self.custom_section_size - 6 * 0x4)
