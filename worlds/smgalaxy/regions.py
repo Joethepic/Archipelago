@@ -438,6 +438,11 @@ region_list: dict[str, SMGRegionData] = {
     regname.DUSTY4MAZEY: SMGRegionData("Planetoid"),
     regname.DUSTY5MAZEY: SMGRegionData("Planetoid"),
     regname.DUSTY7SANDY: SMGRegionData("Planetoid"),
+    regname.BONEFINTOAD: SMGRegionData("Planetoid"),
+    regname.BONEFINWATR: SMGRegionData("Planetoid"),
+    regname.LAVREALANDI: SMGRegionData("Planetoid"),
+    regname.LAVREALAVA1: SMGRegionData("Planetoid"),
+    regname.LAVREALAVA2: SMGRegionData("Planetoid"),
 }
 
 major_galaxy_list: list[str] = [key for key, data in region_list.items() if data.type == "Major"]

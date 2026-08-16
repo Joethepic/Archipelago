@@ -615,8 +615,18 @@ def set_rules(world: "SMGWorld", player: int):
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
     world.get_region(regname.ENGINE).connect(world.get_region(regname.BONEFIN), "Dome 5 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
+    world.get_region(regname.BONEFIN).connect(world.get_region(regname.BONEFINTOAD),
+                                                    "Bonefin: Kingfin's Fearsome Waters")
+    world.get_region(regname.BONEFINTOAD).connect(world.get_region(regname.BONEFINWATR),
+                                                    "Bonefin: Green Toadship Launch Star")
     world.get_region(regname.ENGINE).connect(world.get_region(regname.BOWJR3), "Dome 5 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fifth Orbit"], 27)))
+    world.get_region(regname.BOWJR3).connect(world.get_region(regname.LAVREALANDI),
+                                                    "Lava Reactor: King Kaliente's Spicy Return")
+    world.get_region(regname.LAVREALANDI).connect(world.get_region(regname.LAVREALAVA1),
+                                                    "Lava Reactor: Caged Launch Star")
+    world.get_region(regname.LAVREALAVA1).connect(world.get_region(regname.LAVREALAVA2),
+                                                    "Lava Reactor: Sinking Platforms Launch Star")
     # Dome 6
     world.get_region(regname.SHIP).connect(world.get_region(regname.GARDEN), "Dome 6 Entry",
                     Has("Grand Star", 5))

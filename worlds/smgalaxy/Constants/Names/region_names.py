@@ -434,3 +434,17 @@ DARKMAT1CASTB = "Dark Matter Plant: Castle Bottom"
 DARKMAT1GRAVI = "Dark Matter Plant: Gravity Wall"
 DARKMAT1TOWER = "Dark Matter Plant: Tower Approach"
 DARKMAT1BOSSA = "Dark Matter Plant: Bowser Reactor"
+
+## Engine
+### Gold Leaf
+
+### Sea Slide
+
+### Toy Time
+
+### Minor Galaxies
+BONEFINTOAD = "Bonefin: Green Toadship"
+BONEFINWATR = "Bonefin: Kingfin's Water Arena"
+LAVREALANDI = "Lava Reactor: Starting Planet"
+LAVREALAVA1 = "Lava Reactor: Sinking Platforms"
+LAVREALAVA2 = "Lava Reactor: King Kaliente Sinking Arena"
