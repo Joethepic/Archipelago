@@ -675,16 +675,47 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.GOLDLE5POUND).connect(world.get_region(regname.GOLDLE5FLOAT))
     world.get_region(regname.GOLDLE5FLOAT).connect(world.get_region(regname.GOLDLE5TOWER))
     world.get_region(regname.GOLDLE5TOWER).connect(world.get_region(regname.GOLDLE5CANNO))
+
     world.get_region(regname.ENGINE).connect(world.get_region(regname.SEASLIDE), "Dome 5 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Second Orbit"], 24)))
+    world.get_region(regname.SEASLIDE).connect(world.get_region(regname.SEASLI1LANDI),
+                                                    "Sea Slide 1: Going after Guppy")
+    world.get_region(regname.SEASLI1LANDI).connect(world.get_region(regname.SEASLI1SLIDE))
+    world.get_region(regname.SEASLI1SLIDE).connect(world.get_region(regname.SEASLI1TOADS))
+    world.get_region(regname.SEASLIDE).connect(world.get_region(regname.SEASLI2LANDI),
+                                                    "Sea Slide 2: Faster Than a Speeding Pengiun")
+    world.get_region(regname.SEASLI2LANDI).connect(world.get_region(regname.SEASLI2SLIDE))
+    world.get_region(regname.SEASLIDE).connect(world.get_region(regname.SEASLI3LANDI),
+                                                    "Sea Slide 3: The Silver Stars of Sea Slide")
+    world.get_region(regname.SEASLI3LANDI).connect(world.get_region(regname.SEASLI3SLIDE))
+    world.get_region(regname.SEASLI3SLIDE).connect(world.get_region(regname.SEASLI3TOADS))
+    world.get_region(regname.SEASLI3TOADS).connect(world.get_region(regname.SEASLI3SLIDE),
+                                                   "Sea Slide 3: Toadship Sling Star")
+    world.get_region(regname.SEASLI3SLIDE).connect(world.get_region(regname.SEASLI3BIGTR),
+                                                   "Sea Slide 3: Big Tree Sling Star")
+    world.get_region(regname.SEASLI3SLIDE).connect(world.get_region(regname.SEASLI3CENTE))
+    world.get_region(regname.SEASLI3CENTE).connect(world.get_region(regname.SEASLI3SLIDE),
+                                                   "Sea Slide 3: Central Launch Star")
+    world.get_region(regname.SEASLI3SLIDE).connect(world.get_region(regname.SEASLI6HURRY),
+                                                   "Sea Slide Secret: Hungry Luma Launch Star")
+    world.get_region(regname.SEASLIDE).connect(world.get_region(regname.SEASLI4LANDI),
+                                                    "Sea Slide Comet: Underwater Cosmic Mario Race")
+    world.get_region(regname.SEASLI4LANDI).connect(world.get_region(regname.SEASLI4SLIDE))
+    world.get_region(regname.SEASLIDE).connect(world.get_region(regname.SEASLI5LANDI),
+                                                    "Sea Slide Purple Coins: Purple Coins by the Seaside")
+    world.get_region(regname.SEASLI5LANDI).connect(world.get_region(regname.SEASLI5SLIDE))
+    world.get_region(regname.SEASLI5SLIDE).connect(world.get_region(regname.SEASLI5BIGTR))
+
     world.get_region(regname.ENGINE).connect(world.get_region(regname.TOYTIME), "Dome 5 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
+
     world.get_region(regname.ENGINE).connect(world.get_region(regname.BONEFIN), "Dome 5 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
     world.get_region(regname.BONEFIN).connect(world.get_region(regname.BONEFINTOAD),
                                                     "Bonefin: Kingfin's Fearsome Waters")
     world.get_region(regname.BONEFINTOAD).connect(world.get_region(regname.BONEFINWATR),
                                                     "Bonefin: Green Toadship Launch Star")
+
     world.get_region(regname.ENGINE).connect(world.get_region(regname.BOWJR3), "Dome 5 Fifth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fifth Orbit"], 27)))
     world.get_region(regname.BOWJR3).connect(world.get_region(regname.LAVREALANDI),
