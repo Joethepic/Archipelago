@@ -3,7 +3,6 @@ from wiithon.file_helper.bcsv import BCSV
 
 from worlds.smgalaxy.Patch import hashtable
 
-from ..SMGDOL import SMGDOL
 from ...Constants.patch_constants import *
 from ..extensions import SMGObject
 from ..SMGObjects.SurprisedGalaxy import SurprisedGalaxy
@@ -12,11 +11,11 @@ from ...Constants.Names.region_names import GATEWAY
 from ...regions import region_list
 
 class AstroDomes(SMGObject):
-    def __init__(self, dol: SMGDOL):
+    def __init__(self):
         super().__init__(ASTRODOME_PATH)
 
         self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(self.patcher)
-        self.gateway_galaxy: Gateway = Gateway(self.patcher, dol)
+        self.gateway_galaxy: Gateway = Gateway(self.patcher)
 
         # Get the in-game names from the region list
         self.major_galaxy_list: list[str] = [region_list[galaxy].in_game_name for galaxy, data in region_list.items()

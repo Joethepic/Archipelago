@@ -2,9 +2,11 @@ import zipfile, json
 from typing import NamedTuple
 
 from wiithon import WiiIsoPatcher
+from wiithon.file_helper.dol import DOL
 
 from worlds.Files import APAutoPatchInterface, APPlayerContainer, AutoPatchRegister
 from NetUtils import convert_to_base_types
+from worlds.smgalaxy.Constants.patch_constants import GATEWAY_ENTRANCE_ADDRESS_ONE, GATEWAY_ENTRANCE_ADDRESS_TWO, GATEWAY_EXIT_ADDRESS_ONE, GATEWAY_EXIT_ADDRESS_TWO
 from worlds.smgalaxy.Patch.extensions import SMGObject
 
 from .SMGDOL import SMGDOL
@@ -81,13 +83,12 @@ class Patch:
         self.new_galaxies: list = list(self.galaxies.values())
 
         SMGObject.patcher = patcher
-        self.dol: SMGDOL = SMGDOL()
 
         self.objects = {
             "Mario": Mario(),
             "AstroGalaxy": AstroGalaxy(),
             "AstroDomeScenario": AstroDomeScenario(),
-            "AstroDomes": AstroDomes(self.dol),
+            "AstroDomes": AstroDomes(),
             "AstroDomeEntrances": AstroDomeEntrances()
         }
 
@@ -100,13 +101,16 @@ class Patch:
                           dome_shuffle=dome_shuffle,
                           luma_shuffle=luma_shuffle)
 
-    def update_dol(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
+    def build_dol(self, dol: DOL) -> None:
+        self.dol = SMGDOL(dol)
+
+    def update_dol(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], gateway_galaxy: GalaxyDestination):
         self.dol.update(dome_galaxies=dome_galaxies,
                         luma_galaxies=luma_galaxies,
                         dome_shuffle=dome_shuffle,
                         star_requirements=star_requirements)
 
-    def update_gateway_location(self, gateway_galaxy: GalaxyDestination) -> None:
+        """
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":
             return
@@ -124,7 +128,26 @@ class Patch:
         print(f"Loading zone Gateway -> {galaxy_name}")
 
         # +4 to the name address to skip over the galaxy identifier tag (Mini/Surp)
-        self.objects["AstroDomes"].gateway_galaxy.replace_loading(name_address + 4)
+        name_address += 4
+        
+        upper_bytes: int = name_address >> 16
+        lower_bytes: int = name_address & 0xFFFF
+
+        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
+        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_ONE, new_instruction)
+
+        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
+        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_TWO, new_instruction)
+
+        upper_bytes: int = name_address >> 16
+        lower_bytes: int = name_address & 0xFFFF
+
+        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
+        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_ONE, new_instruction)
+
+        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
+        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_TWO, new_instruction)
+        """
         
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
     game = GAME_NAME
@@ -158,9 +181,11 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
             patch.update(dome_galaxies, dome_shuffle, luma_galaxies)
 
-            patch.update_gateway_location(gateway_galaxy)
+            def dol_patch(dol: DOL):
+                patch.build_dol(dol)
+                patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts, gateway_galaxy)
 
-            patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts)
+            patcher.patch_dol(dol_patch)
 
             patcher.build(target, lambda x: print(x))
         

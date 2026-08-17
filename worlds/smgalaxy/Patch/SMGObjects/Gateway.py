@@ -8,17 +8,14 @@ from wiithon import WiiIsoPatcher
 from wiithon.file_helper.rarc import *
 
 from ...Constants.patch_constants import *
-from ..SMGDOL import SMGDOL
 
 class Gateway:
     arc_file: Rarc
     bdl_entry: BytesIO
     patcher: WiiIsoPatcher
-    dol: SMGDOL
 
-    def __init__(self, patcher: WiiIsoPatcher, dol: SMGDOL):
+    def __init__(self, patcher: WiiIsoPatcher):
         self.patcher = patcher
-        self.dol = dol
         self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(patcher.read_file(GATEWAY_PATH))))
         self.bdl_entry = BytesIO(self.arc_file.get_file(GATEWAY_BDL_NAME))
 
@@ -61,30 +58,3 @@ class Gateway:
 
         print(f"Creating {MINIATURE_GATEWAY_NAME}.arc")
         self.patcher.add_file(new_file_path, Yaz0.compress(empty_arc.data).getvalue())
-
-    def replace_loading(self, name_address: int) -> None:
-        """
-        Replaces typical loading of gateway galaxy of the gateway island. Replaces both the entrance and exit.
-        """
-        self.replace_entrance(name_address)
-        self.replace_exit(name_address)
-
-    def replace_entrance(self, name_address: int) -> None:
-        upper_bytes: int = name_address >> 16
-        lower_bytes: int = name_address & 0xFFFF
-
-        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_ONE, new_instruction)
-
-        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_TWO, new_instruction)
-
-    def replace_exit(self, name_address: int) -> None:
-        upper_bytes: int = name_address >> 16
-        lower_bytes: int = name_address & 0xFFFF
-
-        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_ONE, new_instruction)
-
-        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_TWO, new_instruction)

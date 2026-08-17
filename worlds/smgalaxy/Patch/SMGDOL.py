@@ -370,8 +370,8 @@ class SMGDOL(SMGObject):
 
     write_pointer: int
 
-    def __init__(self):
-        self.dol: DOL = self.patcher.read_dol()
+    def __init__(self, dol: DOL):
+        self.dol: DOL = dol
         self.data = BytesIO(self.dol.to_bytes())
 
         Pointer.dol = self.dol
@@ -385,11 +385,11 @@ class SMGDOL(SMGObject):
 
         self.write_pointer = 0
 
-        size, addrs = self.dol.inject_above_arena([b'\0' * self.custom_section_size])
+        size, addrs = self.dol.inject_above_arena([PPC.nop() * int(self.custom_section_size/4)])
         self.custom_section_address = addrs[0]
 
         # Return custom function
-        self.write_instruction(PPC.addi(11, 1, 0x100), self.custom_section_address + self.custom_section_size - 6 * 0x4)
+        self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4
         self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
         self.write_instruction(PPC.lwz(0, 0x104, 1))
         self.write_instruction(PPC.mtlr(0))
@@ -400,11 +400,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.stwu(1, -0x100, 1), self.custom_section_address)
         self.write_instruction(PPC.mflr(0))
         self.write_instruction(PPC.stw(0, 0x104, 1))
-        self.write_instruction(PPC.addi(11, 1, 0x100))
         self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
         self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
-
-        self.add_deathlink()
 
     def write_instruction(self, instruction_bytes: bytes, address: int = None) -> None:
         if address is not None:
@@ -428,7 +425,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lis(31, -0x8000))
         self.write_instruction(PPC.lbz(3, 0x1AF0, 31))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(4, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
         self.write_instruction(PPC.stb(3, 0x1AF0, 31))
@@ -478,7 +475,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lis(3, -0x8000), 0x803b10fc)
 
         # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
-        self.write_instruction(PPC.ori(3, 3, 0x1880))
+        self.write_instruction(PPC.lwz(3, 0x1880, 3))
 
         # Skip the rest of the normal function
         self.write_instruction(PPC.b(0x803b113c, self.write_pointer))
@@ -528,7 +525,8 @@ class SMGDOL(SMGObject):
         # Custom Functions #
         ####################
         # Jump to custom section
-        self.write_instruction(PPC.b(self.custom_section_address, self.write_pointer), 0x803995c0)
+        self.write_pointer = 0x803995c0
+        self.write_instruction(PPC.b(self.custom_section_address, self.write_pointer))
 
     def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
         for object_name, object in self.objects.items():
