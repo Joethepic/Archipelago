@@ -708,6 +708,51 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.ENGINE).connect(world.get_region(regname.TOYTIME), "Dome 5 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
+    world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME1LANDI),
+                                                    "Toy Time 1: Heavy Metal Mecha-Bowser")
+    world.get_region(regname.TOYTIME1LANDI).connect(world.get_region(regname.TOYTIME1GRAVI),
+                                                    "Toy Time 1: Train Launch Star")
+    world.get_region(regname.TOYTIME1LANDI).connect(world.get_region(regname.TOYTIME1GRAVI),
+                                                    "Toy Time 1: Train Launch Star")
+    world.get_region(regname.TOYTIME1GRAVI).connect(world.get_region(regname.TOYTIME1CONVE),
+                                                    "Toy Time 1: Covered Launch Star")
+    world.get_region(regname.TOYTIME1CONVE).connect(world.get_region(regname.TOYTIME1CYLIN),
+                                                    "Toy Time 1: Conveyor Blocks Green Pipe")
+    world.get_region(regname.TOYTIME1CONVE).connect(world.get_region(regname.TOYTIME1PLATE),
+                                                    "Toy Time 1: Conveyors Launch Star")
+    world.get_region(regname.TOYTIME1PLATE).connect(world.get_region(regname.TOYTIME1ROBOB),
+                                                    "Toy Time 1: Salty Launch Star")
+    world.get_region(regname.TOYTIME1ROBOB).connect(world.get_region(regname.TOYTIME1ROBOL))
+    world.get_region(regname.TOYTIME1ROBOL).connect(world.get_region(regname.TOYTIME1ROBOD),
+                                                    "Toy Time 1: Left Leg Sling Star")
+    world.get_region(regname.TOYTIME1ROBOD).connect(world.get_region(regname.TOYTIME1ROBOA),
+                                                    "Toy Time 1: Under Cover Pipe")
+    world.get_region(regname.TOYTIME1ROBOA).connect(world.get_region(regname.TOYTIME1ROBOH),
+                                                    "Toy Time 1: Right Shoulder Launch Star")
+    world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME2LANDI),
+                                                    "Toy Time 2: Mario Meets Mario")
+    world.get_region(regname.TOYTIME2LANDI).connect(world.get_region(regname.TOYTIME2SCREW),
+                                                    "Toy Time 2: Train Launch Star")
+    world.get_region(regname.TOYTIME2SCREW).connect(world.get_region(regname.TOYTIME2MARIO),
+                                                    "Toy Time 2: Screw Tip Launch Star")
+    world.get_region(regname.TOYTIME2SCREW).connect(world.get_region(regname.TOYTIME6CHAIN),
+                                                    "Toy Time Secret: Hungry Luma Launch Star")
+    world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME3LANDI),
+                                                    "Toy Time 3: Bouncing Down Cake Lane")
+    world.get_region(regname.TOYTIME3LANDI).connect(world.get_region(regname.TOYTIME3SWEET),
+                                                    "Toy Time 3: Train Launch Star")
+    world.get_region(regname.TOYTIME3SWEET).connect(world.get_region(regname.TOYTIME3CREAM),
+                                                    "Toy Time 3: Spinning Cake Sling Star")
+    world.get_region(regname.TOYTIME3CREAM).connect(world.get_region(regname.TOYTIME3CAKES),
+                                                    "Toy Time 3: Cannon Launch Star")
+    world.get_region(regname.TOYTIME3CAKES).connect(world.get_region(regname.TOYTIME3PIPES),
+                                                    "Toy Time 3: Cake Green Pipe")
+    world.get_region(regname.TOYTIME3CAKES).connect(world.get_region(regname.TOYTIME3CANNO),
+                                                    "Toy Time 3: Cake Candles Launch Star")
+    world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME4CHAIN),
+                                                    "Toy Time Comet: Fast Foes of Toy Time")
+    world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME5LUIGI),
+                                                    "Toy Time Purple Coins: Luigi's Purple Coins")
 
     world.get_region(regname.ENGINE).connect(world.get_region(regname.BONEFIN), "Dome 5 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Fourth Orbit"], 26)))
