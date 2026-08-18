@@ -666,7 +666,7 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
     for name, data in locs.items():
         reg = world.get_region(data.region)
         location = SMGLocation(world.player, name, reg)
-        if data.default_access:
+        if data.default_access is not None:
             world.set_rule(location, data.default_access)
 
         reg.locations += [location]
