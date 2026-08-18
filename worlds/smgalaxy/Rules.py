@@ -877,7 +877,56 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MELTY), "Dome 6 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
-
+    world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY1VOLCA),
+                                                    "Melty Molten 1: The Sinking Lava Spire")
+    world.get_region(regname.MELTY1VOLCA).connect(world.get_region(regname.MELTY1INVOL))
+    world.get_region(regname.MELTY1VOLCA).connect(world.get_region(regname.MELTY1SPHER),
+                                                    "Melty Molten 1: Volcano Launch Star")
+    world.get_region(regname.MELTY1SPHER).connect(world.get_region(regname.MELTY6LAVAS),
+                                                    "Melty Molten Secret: Hungry Luma Launch Star")
+    world.get_region(regname.MELTY1SPHER).connect(world.get_region(regname.MELTY1UFOSS),
+                                                    "Melty Molten 1: Minefield Launch Star")
+    world.get_region(regname.MELTY1UFOSS).connect(world.get_region(regname.MELTY1LAVAB),
+                                                    "Melty Molten 1: UFO Sling Star")
+    world.get_region(regname.MELTY1LAVAB).connect(world.get_region(regname.MELTY1SINKI),
+                                                    "Melty Molten 1: Lava Ball Launch Star")
+    world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY2VOLCA),
+                                                    "Melty Molten 2: Through the Meteor Storm")
+    world.get_region(regname.MELTY2VOLCA).connect(world.get_region(regname.MELTY2WHOMP),
+                                                    "Melty Molten 2: Volcano Launch Star")
+    world.get_region(regname.MELTY2WHOMP).connect(world.get_region(regname.MELTY2METEO),
+                                                    "Melty Molten 2: Whomp Launch Star")
+    world.get_region(regname.MELTY2METEO).connect(world.get_region(regname.MELTY2TUBEY),
+                                                    "Melty Molten 2: Lava Platform Launch Star")
+    world.get_region(regname.MELTY2TUBEY).connect(world.get_region(regname.MELTY2CIRCL),
+                                                    "Melty Molten 2: Caged Launch Star")
+    world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY3VOLCA),
+                                                    "Melty Molten 3: Fiery Dino Piranha")
+    world.get_region(regname.MELTY3VOLCA).connect(world.get_region(regname.MELTY3UFOSS),
+                                                    "Melty Molten 3: Volcano Green Pipe")
+    world.get_region(regname.MELTY3UFOSS).connect(world.get_region(regname.MELTY3LAVA1),
+                                                    "Melty Molten 3: UFO Sling Star")
+    world.get_region(regname.MELTY3LAVA1).connect(world.get_region(regname.MELTY3LAVA2),
+                                                    "Melty Molten 3: First Lava Ball Launch Star")
+    world.get_region(regname.MELTY3LAVA2).connect(world.get_region(regname.MELTY3LAVPL),
+                                                    "Melty Molten 3: Second Lava Ball Launch Star")
+    world.get_region(regname.MELTY3LAVPL).connect(world.get_region(regname.MELTY3FDINO),
+                                                    "Melty Molten 3: Lava Platforms Launch Star")
+    world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY4VOLCA),
+                                                    "Melty Molten Comet: Lava Spire Daredevil Run")
+    world.get_region(regname.MELTY4VOLCA).connect(world.get_region(regname.MELTY4INVOL))
+    world.get_region(regname.MELTY4VOLCA).connect(world.get_region(regname.MELTY4SPHER),
+                                                    "Melty Molten Comet: Volcano Launch Star")
+    world.get_region(regname.MELTY4SPHER).connect(world.get_region(regname.MELTY4UFOSS),
+                                                    "Melty Molten Comet: Minefield Launch Star")
+    world.get_region(regname.MELTY4UFOSS).connect(world.get_region(regname.MELTY4LAVAB),
+                                                    "Melty Molten Comet: UFO Sling Star")
+    world.get_region(regname.MELTY4LAVAB).connect(world.get_region(regname.MELTY4SINKI),
+                                                    "Melty Molten Comet: Lava Ball Launch Star")
+    world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY5VOLCA),
+                                                    "Melty Molten Purple Coins: Red-Hot Purple Coins")
+    world.get_region(regname.MELTY5VOLCA).connect(world.get_region(regname.MELTY5INVOL),
+                                                  "Melty Molten Purple Coins: Double Sling to Volcano")
 
     #Remaining Ship Connections
     world.get_region(regname.SHIP).connect(world.get_region(regname.LIBRARY), "Library Entrance")
