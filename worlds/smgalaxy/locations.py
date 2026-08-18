@@ -1,6 +1,6 @@
 from typing import Dict, NamedTuple, Optional, Set, Any
 from BaseClasses import Location, Region
-from rule_builder.rules import Rule, CanReachLocation
+from rule_builder.rules import Rule, CanReachLocation, True_
 
 from.Constants.Names import region_names as regname
 from .Constants.Names import location_names as locname
@@ -18,7 +18,7 @@ class SMGLocationData(NamedTuple):
     region: str
     code: Optional[int]  # used to create ap_id, None for events
     in_game_galaxy_name: str
-    default_access: Rule[Any] = True
+    default_access: Rule[Any] = True_()
     game_address: Optional[int] = 0  #
 
 
