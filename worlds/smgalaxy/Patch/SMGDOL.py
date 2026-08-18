@@ -477,7 +477,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lis(3, -0x8000), 0x803b10fc)
 
         # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
-        self.write_instruction(PPC.lwz(3, 0x1880, 3))
+        self.write_instruction(PPC.lbz(3, 0x1880, 3))
 
         # Skip the rest of the normal function
         self.write_instruction(PPC.b(0x803b113c, self.write_pointer))
@@ -503,15 +503,15 @@ class SMGDOL(SMGObject):
         ##################################
         # Custom grandstar count loading #
         ##################################
-        self.write_instruction(PPC.lis(3, -0x8000), 0x803b1d10)
+        self.write_instruction(PPC.lis(3, -0x8000), 0x803b1d08)
         self.write_instruction(PPC.lbz(3, 0x1882, 3))
-        self.write_instruction(PPC.addi(3, 3, 1))
+        self.write_instruction(PPC.addi(4, 4, -0x1))
         self.write_instruction(PPC.cmp(0, 3, 4))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
         self.write_instruction(PPC.li(3, 1))
         self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
-        self.write_nop(5)
+        self.write_nop(11)
 
     def skip_wii_strap(self):
         #########################
@@ -542,9 +542,7 @@ class SMGDOL(SMGObject):
         self.manipulate_star_loading()
         self.read_star_count()
         self.custom_powerstar_colour_loading()
-
-        #self.custom_grandstar_count()
-
+        self.custom_grandstar_count()
         self.skip_wii_strap()
         self.show_bros_button()
         self.hook_to_custom_function()
