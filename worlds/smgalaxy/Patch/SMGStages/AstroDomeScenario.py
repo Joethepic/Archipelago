@@ -44,4 +44,4 @@ class AstroDomeScenario(SMGObject):
 
                 print(f"Loading zone dome {scenariono} -> dome {shuffle[scenariono]}")
 
-                entry["ScenarioNo"] = 1 << (shuffle[scenariono] - 1)
+                entry["ScenarioNo"] = shuffle[scenariono]
