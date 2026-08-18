@@ -69,7 +69,7 @@ GATEWAY1HOLEY = "Gateway: Holey Planet"
 GATEWAY1SMLTU = "Gateway: Small Tuning Shard Planet"
 GATEWAY1LRGTU = "Gateway: Large Tuning Shard Planet"
 GATEWAY1LRGTI = "Gateway: Large Tuning Planet Inside"
-GATEWAY2HOMEP = "Gateway Comet: Home Planet"
+GATEWAY2HOMEP = "Gateway Purple Coins: Home Planet"
 
 ## Observatory Specials
 SWEETSW1SWEET = "Sweet Sweet: Holey Platforms"
@@ -155,7 +155,7 @@ GOODEGG4DINOP = "Good Egg Comet: Dino Piranha Planet"
 GOODEGG5PEARP = "Good Egg Purple Coin: Pear-shaped Planet"
 GOODEGG5ROCKY = "Good Egg Purple Coin: Rocky Planet"
 GOODEGG5YOSHI = "Good Egg Purple Coin: Yoshi Egg Planet"
-GOODEGG6LUIGI = "Good Egg Secret: Luigi House"
+GOODEGG6LUIGI = "Good Egg Luigi: Luigi House"
 
 ### Honeyhive
 HONEYHI1LANDI = "Honeyhive 1: Landing Area"
