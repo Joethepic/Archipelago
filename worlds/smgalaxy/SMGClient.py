@@ -141,8 +141,8 @@ class GalaxyContext(CommonContext):
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
     async def disconnect(self, msg: str = '') -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
@@ -255,7 +255,6 @@ class GalaxyContext(CommonContext):
         
         for key, pointer in self.pointers.items():
             await pointer.recalculate()
-            logger.info(f"{key}: {hex(pointer.address)}")
 
         self.needs_recalculating = False
     
@@ -337,7 +336,7 @@ class GalaxyContext(CommonContext):
                     return
 
             await self.recalculate_pointers()
-
+            self.lives = await self.pointers["Lives"].get_value()
             # Currently verified connected to AP and dolphin is properly loaded
             await self.last_visited_galaxy()
             await self.smg_locs_checker()
@@ -370,9 +369,9 @@ class GalaxyContext(CommonContext):
             case "Connected":
                 self.highest_processed_item_index = 0
                 
-            case "Bounced":
-                if args["source"] != self.player_names[self.slot]:
-                    pass # handle (death) links
+            #case "Bounced":
+            #    if args["source"] != self.player_names[self.slot]:
+            #        pass # handle (death) links
 
             case "ConnectionRefused":
                 self.set_dolphin_status(AP_REFUSED_STATUS)
