@@ -774,12 +774,61 @@ def set_rules(world: "SMGWorld", player: int):
                     Has("Grand Star", 5))
     world.get_region(regname.GARDEN).connect(world.get_region(regname.DEEPDARK), "Dome 6 First Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["First Orbit"], 28)))
+    world.get_region(regname.DEEPDARK).connect(world.get_region(regname.DEEPDA1BEACH),
+                                                    "Deep Dark 1: The Underground Ghost Ship")
+    world.get_region(regname.DEEPDA1BEACH).connect(world.get_region(regname.DEEPDA1BWATR))
+    world.get_region(regname.DEEPDA1BEACH).connect(world.get_region(regname.DEEPDA1WOODE))
+    world.get_region(regname.DEEPDA1WOODE).connect(world.get_region(regname.DEEPDA1BEACH),
+                                                   "Deep Dark 1: Wooden Planet Sling Star")
+    world.get_region(regname.DEEPDA1BEACH).connect(world.get_region(regname.DEEPDA1FHOME))
+    world.get_region(regname.DEEPDA1BEACH).connect(world.get_region(regname.DEEPDA1GATES))
+    world.get_region(regname.DEEPDA1GATES).connect(world.get_region(regname.DEEPDA1WATER))
+    world.get_region(regname.DEEPDA1WATER).connect(world.get_region(regname.DEEPDA6BOOBX),
+                                                   "Deep Dark 1: Ship Hidden Launch Star")
+    world.get_region(regname.DEEPDA1WATER).connect(world.get_region(regname.DEEPDA1SHIPC))
+    world.get_region(regname.DEEPDA1SHIPC).connect(world.get_region(regname.DEEPDA1SMAST))
+    world.get_region(regname.DEEPDARK).connect(world.get_region(regname.DEEPDA2BEACH),
+                                                    "Deep Dark 2: Bubble Blastoff")
+    world.get_region(regname.DEEPDA2BEACH).connect(world.get_region(regname.DEEPDA2BWATR))
+    world.get_region(regname.DEEPDA2BEACH).connect(world.get_region(regname.DEEPDA2WOODE))
+    world.get_region(regname.DEEPDA2WOODE).connect(world.get_region(regname.DEEPDA2BEACH),
+                                                   "Deep Dark 2: Wooden Planet Sling Star")
+    world.get_region(regname.DEEPDA2BEACH).connect(world.get_region(regname.DEEPDA2FHOME))
+    world.get_region(regname.DEEPDA2BEACH).connect(world.get_region(regname.DEEPDA2WATER))
+    world.get_region(regname.DEEPDA2WATER).connect(world.get_region(regname.DEEPDA6BOOBX),
+                                                   "Deep Dark 2: Ship Hidden Launch Star")
+    world.get_region(regname.DEEPDA2WATER).connect(world.get_region(regname.DEEPDA2CLIFF))
+    world.get_region(regname.DEEPDA2CLIFF).connect(world.get_region(regname.DEEPDA2CLIFP),
+                                                   "Deep Dark 2: Clifftop Green Pipe")
+    world.get_region(regname.DEEPDA2CLIFF).connect(world.get_region(regname.DEEPDA2CHEEP))
+    world.get_region(regname.DEEPDA2CHEEP).connect(world.get_region(regname.DEEPDA2MELON))
+    world.get_region(regname.DEEPDARK).connect(world.get_region(regname.DEEPDA3BEACH),
+                                                    "Deep Dark 3: Guppy and the Underground Lake")
+    world.get_region(regname.DEEPDA3BEACH).connect(world.get_region(regname.DEEPDA3BWATR))
+    world.get_region(regname.DEEPDA3BEACH).connect(world.get_region(regname.DEEPDA3WATER))
+    world.get_region(regname.DEEPDA3WATER).connect(world.get_region(regname.DEEPDA6BOOBX),
+                                                   "Deep Dark 3: Ship Hidden Launch Star")
+    world.get_region(regname.DEEPDARK).connect(world.get_region(regname.DEEPDA4SHIPC),
+                                                    "Deep Dark Comet: Ghost Ship Daredevil Rune")
+    world.get_region(regname.DEEPDA4SHIPC).connect(world.get_region(regname.DEEPDA4SHIPW))
+    world.get_region(regname.DEEPDA4SHIPC).connect(world.get_region(regname.DEEPDA4SMAST))
+    world.get_region(regname.DEEPDARK).connect(world.get_region(regname.DEEPDA5SHIPC),
+                                                    "Deep Dark Purple Coins: Plunder the Purple Coins")
+    world.get_region(regname.DEEPDA5SHIPC).connect(world.get_region(regname.DEEPDA5SHIPW))
+    world.get_region(regname.DEEPDA5SHIPC).connect(world.get_region(regname.DEEPDA5SMAST))
+
     world.get_region(regname.GARDEN).connect(world.get_region(regname.DREADNOUGHT), "Dome 6 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Second Orbit"], 29)))
+
+
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MATTER), "Dome 6 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
+
+
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MELTY), "Dome 6 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
+
+
     #Remaining Ship Connections
     world.get_region(regname.SHIP).connect(world.get_region(regname.LIBRARY), "Library Entrance")
     world.get_region(regname.SHIP).connect(world.get_region(regname.COTU), "Center Of the Universe Entry",

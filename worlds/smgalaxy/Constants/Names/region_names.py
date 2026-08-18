@@ -541,3 +541,39 @@ BONEFINWATR = "Bonefin: Kingfin's Water Arena"
 LAVREALANDI = "Lava Reactor: Starting Planet"
 LAVREALAVA1 = "Lava Reactor: Sinking Platforms"
 LAVREALAVA2 = "Lava Reactor: King Kaliente Sinking Arena"
+
+## Garden
+### Deep Dark
+DEEPDA1BEACH = "Deep Dark 1: The Beach"
+DEEPDA1BWATR = "Deep Dark 1: Beach Water"
+DEEPDA1WOODE = "Deep Dark 1: Wooden Orb"
+DEEPDA1FHOME = "Deep Dark 1: Home Planet Balloon"
+DEEPDA1GATES = "Deep Dark 1: Behind Gate"
+DEEPDA1WATER = "Deep Dark 1: Deep Water Cavern"
+DEEPDA1SHIPC = "Deep Dark 1: Ship Cavern"
+DEEPDA1SMAST = "Deep Dark 1: Ship Mast"
+DEEPDA2BEACH = "Deep Dark 2: The Beach"
+DEEPDA2BWATR = "Deep Dark 2: Beach Water"
+DEEPDA2WATER = "Deep Dark 2: Deep Water Cavern"
+DEEPDA2WOODE = "Deep Dark 2: Wooden Orb"
+DEEPDA2FHOME = "Deep Dark 2: Home Planet Balloon"
+DEEPDA2CLIFF = "Deep Dark 2: Clifftops"
+DEEPDA2CLIFP = "Deep Dark 2: Note Room"
+DEEPDA2CHEEP = "Deep Dark 2: Bouncing Cheep Planet"
+DEEPDA2MELON = "Deep Dark 2: Watermelon Greenhouse Planet"
+DEEPDA3BEACH = "Deep Dark 3: The Beach"
+DEEPDA3BWATR = "Deep Dark 3: Beach Water"
+DEEPDA3WATER = "Deep Dark 3: Deep Water Cavern"
+DEEPDA4SHIPC = "Deep Dark Comet: Ship Cavern"
+DEEPDA4SHIPW = "Deep Dark Comet: Ship Cavern Water"
+DEEPDA4SMAST = "Deep Dark Comet: Ship Mast"
+DEEPDA5SHIPC = "Deep Dark Purple Coins: Ship Cavern"
+DEEPDA5SHIPW = "Deep Dark Purple Coins: Ship Cavern Water"
+DEEPDA5SMAST = "Deep Dark Purple Coins: Ship Mast"
+DEEPDA6BOOBX = "Deep Dark Secret: Boo Box"
+
+### Dreadnought
+
+### Melty Molten
+
+### Matter Splatter
