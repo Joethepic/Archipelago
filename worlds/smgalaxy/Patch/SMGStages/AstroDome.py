@@ -1,5 +1,5 @@
 from wiithon import WiiIsoPatcher
-from wiithon.file_helper.bcsv import BCSV
+from wiithon.formats.bcsv import BCSV
 
 from worlds.smgalaxy.Patch import hashtable
 

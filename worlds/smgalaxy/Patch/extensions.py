@@ -3,8 +3,8 @@ from contextlib import contextmanager
 from typing import ContextManager, T
 
 from wiithon import WiiIsoPatcher
-from wiithon.file_helper.dol import DOL
-from wiithon.file_helper.bcsv import BCSV
+from wiithon.formats.dol import DOL
+from wiithon.formats.bcsv import BCSV
 
 from . import hashtable
 

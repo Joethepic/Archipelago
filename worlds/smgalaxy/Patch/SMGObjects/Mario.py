@@ -8,7 +8,7 @@ from gclib.j3d import BDL
 from PIL.Image import Image
 
 from wiithon import WiiIsoPatcher
-from wiithon.file_helper.rarc import Rarc
+from wiithon.formats.rarc import Rarc
 
 from ...Constants.patch_constants import *
 from ...Options import MarioColors
@@ -136,7 +136,7 @@ class Mario(SMGObject):
         super().__init__(MARIO_PATH)
         compressed_bytes: BytesIO = BytesIO(self.patcher.read_file(self.path))
         self.arc_file: Rarc = Rarc.read(Yaz0.decompress(compressed_bytes))
-        self.bdl = BDL(BytesIO(self.arc_file.get_file("mario.bdl")))
+        self.bdl = BDL(BytesIO(self.arc_file.get_file("mario.bdl").data))
 
         self.colours = MarioColours(self)
 

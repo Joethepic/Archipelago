@@ -1,3 +1,9 @@
+from io import BytesIO
+
+from gclib.yaz0_yay0 import Yaz0
+
+from wiithon.formats.rarc import Rarc
+
 from ...Constants.patch_constants import *
 from ..extensions import SMGObject
 
@@ -9,7 +15,7 @@ class AstroDomeEntrance(SMGObject):
     def __init__(self, dome_name: str, index: int):
         super().__init__(ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
 
-        self.file_data = self.patcher.read_file(self.path)
+        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(self.patcher.read_file(self.path))))
         self.name = dome_name
         self.index = index
 
@@ -19,8 +25,10 @@ class AstroDomeEntrance(SMGObject):
     def rename(self, new_dome_name: str):
         print(f"Renaming dome {self.name} -> {new_dome_name}")
 
-        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.file_data)
-        print(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name))
+        self.arc_file.get_node("astrodomeentrance" + self.name.lower()).name = "astrodomeentrance" + new_dome_name.lower()
+        self.arc_file.get_file("astrodomeentrance" + self.name.lower() + ".bdl").name = "astrodomeentrance" + new_dome_name.lower() + ".bdl"
+
+        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.arc_file.get_bytes())
 
 class AstroDomeEntrances(SMGObject):
     entrances: list[AstroDomeEntrance]

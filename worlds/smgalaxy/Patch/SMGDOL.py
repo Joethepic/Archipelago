@@ -1,10 +1,9 @@
 from typing import Self
 from io import BytesIO
 
-from wiithon.helpers import PowerPC as PPC
-from wiithon.file_helper.dol import DOL
-from wiithon.file_helper.bcsv import BCSV
-from wiithon.helpers.Utils import read_string_until_null, write_string as wr_str
+from wiithon.ppc import instructions as PPC
+from wiithon.formats.dol import DOL
+from wiithon.formats.bcsv import BCSV
 
 from worlds.smgalaxy.Patch.extensions import SMGObject, SMGDOLObject
 
@@ -35,10 +34,9 @@ class CharPointer(Pointer):
         if self.pointing_address == 0:
             self.string = None
             return
-        
-        stype, i, offset = self.dol._virtual_to_section(self.pointing_address)
-        section = self.dol.text_sections[i] if stype == 'text' else self.dol.data_sections[i]
-        self.string = read_string_until_null(BytesIO(section), offset, "shift-jis")
+
+        raw = self.dol.read_until_null_at(self.pointing_address)
+        self.string = raw.decode("shift-jis")
     
     def write_string(self) -> None:
         self.dol.write_at(self.pointing_address, self.string.encode("shift-jis") + b'\0')

@@ -1,3 +1,3 @@
 gclib[speedups] @ git+https://github.com/LagoLunatic/gclib.git@abae309e05a8de4c2642e903611e65b4b124e1ce
 disc-riider-py==0.3.1
-wiithon @ git+https://github.com/Demorck/wiithon.git@f04826fe14f1815f9ce164f5b8b7798ec77124b9
+wiithon @ git+https://github.com/Demorck/wiithon.git@cf00a3b527e6cbb8c3fa1f58a21e3a54ef210241

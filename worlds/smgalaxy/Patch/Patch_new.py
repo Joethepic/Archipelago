@@ -2,11 +2,13 @@ import zipfile, json
 from typing import NamedTuple
 
 from wiithon import WiiIsoPatcher
-from wiithon.file_helper.dol import DOL
+from wiithon.formats.dol import DOL
+from wiithon.ppc import instructions as PPC
 
 from worlds.Files import APAutoPatchInterface, APPlayerContainer, AutoPatchRegister
 from NetUtils import convert_to_base_types
-from worlds.smgalaxy.Constants.patch_constants import GATEWAY_ENTRANCE_ADDRESS_ONE, GATEWAY_ENTRANCE_ADDRESS_TWO, GATEWAY_EXIT_ADDRESS_ONE, GATEWAY_EXIT_ADDRESS_TWO
+
+from worlds.smgalaxy.Constants.patch_constants import GATEWAY_ENTRANCE_ADDRESS, GATEWAY_EXIT_ADDRESS
 from worlds.smgalaxy.Patch.extensions import SMGObject
 
 from .SMGDOL import SMGDOL
@@ -110,7 +112,6 @@ class Patch:
                         dome_shuffle=dome_shuffle,
                         star_requirements=star_requirements)
 
-        """
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":
             return
@@ -133,21 +134,13 @@ class Patch:
         upper_bytes: int = name_address >> 16
         lower_bytes: int = name_address & 0xFFFF
 
-        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_ONE, new_instruction)
+        self.dol.write_instruction(PPC.lis(3, upper_bytes), GATEWAY_ENTRANCE_ADDRESS)
+        self.dol.write_instruction(PPC.ori(3, 3, lower_bytes))
 
-        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_ENTRANCE_ADDRESS_TWO, new_instruction)
 
-        upper_bytes: int = name_address >> 16
-        lower_bytes: int = name_address & 0xFFFF
-
-        new_instruction = b'\x3c\x60' + int.to_bytes(upper_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_ONE, new_instruction)
-
-        new_instruction = b'\x60\x63' + int.to_bytes(lower_bytes, 2)
-        self.dol.dol.write_at(GATEWAY_EXIT_ADDRESS_TWO, new_instruction)
-        """
+        self.dol.write_instruction(PPC.lis(3, upper_bytes), GATEWAY_EXIT_ADDRESS)
+        self.dol.write_instruction(PPC.ori(3, 3, lower_bytes))
+        
         
 class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegister):
     game = GAME_NAME
