@@ -13,7 +13,7 @@ import random
 
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-from worlds.smgalaxy.Patch.Patch_new import SuperMarioGalaxyRandomiser
+from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
