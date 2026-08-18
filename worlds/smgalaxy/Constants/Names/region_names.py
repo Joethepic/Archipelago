@@ -600,3 +600,7 @@ DREADN5STARS = "Dreadnought Purple Coins: Star Platform"
 ### Melty Molten
 
 ### Matter Splatter
+MATTER1LANDI = "Matter Splatter: Landing Corridor"
+MATTER1WALLS = "Matter Splatter: Wall Jump Splatter"
+MATTER1SPRIN = "Matter Splatter: Spring Shroom Climb"
+MATTER1MAZES = "Matter Splatter: Secret Maze"

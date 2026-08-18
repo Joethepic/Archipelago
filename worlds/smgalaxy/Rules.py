@@ -866,7 +866,14 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MATTER), "Dome 6 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
-
+    world.get_region(regname.MATTER).connect(world.get_region(regname.MATTER1LANDI),
+                                                    "Matter Splatter: Watch Your Step")
+    world.get_region(regname.MATTER1LANDI).connect(world.get_region(regname.MATTER1WALLS),
+                                                    "Matter Splatter: Corridor Green Pipe")
+    world.get_region(regname.MATTER1WALLS).connect(world.get_region(regname.MATTER1SPRIN),
+                                                    "Matter Splatter: Wall Jump Green Pipe")
+    world.get_region(regname.MATTER1SPRIN).connect(world.get_region(regname.MATTER1MAZES),
+                                                    "Matter Splatter: Spring Jump Green Pipe")
 
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MELTY), "Dome 6 Fourth Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Fourth Orbit"], 31)))
