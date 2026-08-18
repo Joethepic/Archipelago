@@ -1,7 +1,10 @@
 from __future__ import annotations
 import asyncio
-import time
 from enum import Enum
+import os
+from enum import Enum
+from pathlib import Path
+import time
 import struct
 import sys
 from typing import NamedTuple, Optional
@@ -10,7 +13,7 @@ import random
 
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
+from worlds.smgalaxy.Patch.Patch_new import SuperMarioGalaxyRandomiser
 
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
@@ -50,7 +53,7 @@ class Pointer:
         if self.offsets is not None:
             self.address = dme.follow_pointers(self.base, self.offsets)
         else:
-            self.address = base
+            self.address = self.base
 
     async def get_value(self) -> int | str:
         """Gets the value of the pointer at its address. Raises a ValueError if not properly initialised.
@@ -448,8 +451,12 @@ def launch(*launch_args: str):
     args = parser.parse_args(launch_args)
 
     if args.apsmg_file:
-        SuperMarioGalaxyRandomiser().patch(args.apsmg_file)
-        
+        output_directory = Path(args.apsmg_file).parent
+        iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
+        iso_path = os.path.join(output_directory, iso_name + '.iso')
+
+        SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
     colorama.deinit()
