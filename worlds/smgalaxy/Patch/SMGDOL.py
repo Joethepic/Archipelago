@@ -378,7 +378,7 @@ class SMGDOL(SMGObject):
         self.objects = {
             "NameObjectFactory": NameObjFactory(),
             "GalaxyUnlockTable": GalaxyUnlockTable(),
-            "AstroDomeModels": AstroDomeModels()
+            #"AstroDomeModels": AstroDomeModels()
         }
 
         self.write_pointer = 0
@@ -428,7 +428,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(3, 0))
         self.write_instruction(PPC.stb(3, 0x1AF0, 31))
 
-    def update_instructions(self):
+    def skip_opening(self):
         #######################################################
         # Skip opening cutscene and go immediately to gateway #
         #######################################################
@@ -436,11 +436,13 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(3, 31, 0x3F8), 0x803bb3d8)
         self.write_instruction(PPC.li(0, 4))
 
+    def set_swing_permission(self):
         ########################
         # Set swing permission #
         ########################
         self.write_instruction(PPC.li(3, 1), 0x803b55b0)
 
+    def manipulate_miniature_orbit(self):
         #######################################
         # Miniature galaxy orbit manipulation #
         #######################################
@@ -448,6 +450,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
         self.write_instruction(PPC.rlwnm(3, 3, 0x10, 0x10, 0x1F))
 
+    def manipulate_star_loading(self):
         ################################
         # Scenario select star loading #
         ################################
@@ -465,7 +468,8 @@ class SMGDOL(SMGObject):
 
         # Always show up and appear correctly as collected/not collected
         self.write_instruction(PPC.li(6, 1), 0x8037db74)
-        
+
+    def read_star_count(self):
         #######################################
         # Read star count from memory address #
         #######################################
@@ -478,6 +482,7 @@ class SMGDOL(SMGObject):
         # Skip the rest of the normal function
         self.write_instruction(PPC.b(0x803b113c, self.write_pointer))
 
+    def custom_powerstar_colour_loading(self):
         ###################################
         # Custom powerstar colour loading #
         ###################################
@@ -493,7 +498,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.add(3, 3, 4))
         self.write_instruction(PPC.lbzx(3, 3, 31))
         self.write_nop(1)
-        
+
+    def custom_grandstar_count(self):
         ##################################
         # Custom grandstar count loading #
         ##################################
@@ -507,6 +513,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(3, 0))
         self.write_nop(5)
 
+    def skip_wii_strap(self):
         #########################
         # Skip wii strap screen #
         #########################
@@ -514,17 +521,33 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(4, 1), 0x803406ac)
         self.write_instruction(PPC.li(4, 2), 0x803406d0)
 
+    def show_bros_button(self):
         #################################################
         # Show the bros button to select Mario or Luigi #
         #################################################
         self.write_instruction(PPC.li(3, 1), 0x8017cd70)
 
+    def hook_to_custom_function(self):
         ####################
         # Custom Functions #
         ####################
         # Jump to custom section
         self.write_pointer = 0x803995c0
         self.write_instruction(PPC.b(self.custom_section_address, self.write_pointer))
+
+    def update_instructions(self):
+        self.skip_opening()
+        self.set_swing_permission()
+        self.manipulate_miniature_orbit()
+        self.manipulate_star_loading()
+        self.read_star_count()
+        self.custom_powerstar_colour_loading()
+
+        #self.custom_grandstar_count()
+
+        self.skip_wii_strap()
+        self.show_bros_button()
+        self.hook_to_custom_function()
 
     def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
         for object_name, object in self.objects.items():

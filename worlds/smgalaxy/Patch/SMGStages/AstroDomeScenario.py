@@ -35,13 +35,16 @@ class AstroDomeScenario(SMGObject):
         if not self.is_valid_shuffle(shuffle):
             raise ValueError(f"Invalid shuffle: {shuffle}")
 
+        reverse_shuffle = {value: key for key, value in shuffle.items()}
+
         print("Updating dome loading zones...")
 
         bcsv: BCSV
         with self.patcher.edit_as(self.path + '/' + SCENARIO_DATA_FILE_NAME, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
             for entry in bcsv.entries:
-                scenariono = entry["ScenarioNo"]
+                scenario_no = entry["ScenarioNo"]
 
-                print(f"Loading zone dome {scenariono} -> dome {shuffle[scenariono]}")
+                print(f"Loading zone dome {scenario_no} -> dome {shuffle[scenario_no]}")
 
-                entry["ScenarioNo"] = shuffle[scenariono]
+                entry["ScenarioNo"] = shuffle[scenario_no]
+                entry["AstroDome"] = 1 << (reverse_shuffle[scenario_no] - 1)

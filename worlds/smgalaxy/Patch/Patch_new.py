@@ -178,7 +178,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
                 patch.build_dol(dol)
                 patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts, gateway_galaxy)
 
-            #patcher.patch_dol(dol_patch)
+            patcher.patch_dol(dol_patch)
 
             patcher.build(target, lambda x: print(x))
         
