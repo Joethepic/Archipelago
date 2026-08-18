@@ -18,7 +18,7 @@ class SMGLocationData(NamedTuple):
     region: str
     code: Optional[int]  # used to create ap_id, None for events
     in_game_galaxy_name: str
-    default_access: Rule[Any] = True_()
+    default_access: Rule[Any] = None
     game_address: Optional[int] = 0  #
 
 
