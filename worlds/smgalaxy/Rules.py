@@ -819,7 +819,50 @@ def set_rules(world: "SMGWorld", player: int):
 
     world.get_region(regname.GARDEN).connect(world.get_region(regname.DREADNOUGHT), "Dome 6 Second Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Second Orbit"], 29)))
-
+    world.get_region(regname.DREADNOUGHT).connect(world.get_region(regname.DREADN1HOURG),
+                                                    "Dreadnought 1: Infiltrating the Dreadnought")
+    world.get_region(regname.DREADN1HOURG).connect(world.get_region(regname.DREADN1ENTRY),
+                                                    "Dreadnought 1: Hourglass Launch Star")
+    world.get_region(regname.DREADN1ENTRY).connect(world.get_region(regname.DREADN1INSD1),
+                                                    "Dreadnought 1: Dreadnought Entry Green Pipe")
+    world.get_region(regname.DREADN1INSD1).connect(world.get_region(regname.DREADN1TOPMN),
+                                                    "Dreadnought 1: Inside Dreadnought Green Pipe")
+    world.get_region(regname.DREADN1TOPMN).connect(world.get_region(regname.DREADN1METAL),
+                                                    "Dreadnought 1: Climb Launch Star")
+    world.get_region(regname.DREADN1METAL).connect(world.get_region(regname.DREADN1PLATF),
+                                                    "Dreadnought 1: Metal Cube Sling Star")
+    world.get_region(regname.DREADNOUGHT).connect(world.get_region(regname.DREADN2CHIMP),
+                                                    "Dreadnought 2: Dreadnought's Colossal Cannons")
+    world.get_region(regname.DREADN2CHIMP).connect(world.get_region(regname.DREADN2AUTOS),
+                                                    "Dreadnought 2: Bridge Launch Star")
+    world.get_region(regname.DREADNOUGHT).connect(world.get_region(regname.DREADN3LANDI),
+                                                    "Dreadnought 3: Revenge of the Topman Tribe")
+    world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN3TOPPL),
+                                                    "Dreadnought 3: Landing Sling Star")
+    world.get_region(regname.DREADN3TOPPL).connect(world.get_region(regname.DREADN3METAL),
+                                                    "Dreadnought 3: Caged Luma Sling Star")
+    world.get_region(regname.DREADN3METAL).connect(world.get_region(regname.DREADN3PULLP),
+                                                    "Dreadnought 3: Pull to Launch Star")
+    world.get_region(regname.DREADN3PULLP).connect(world.get_region(regname.DREADN3MINES),
+                                                    "Dreadnought 3: Cannon Pull Launch Star")
+    world.get_region(regname.DREADN3MINES).connect(world.get_region(regname.DREADN3BOSSA),
+                                                    "Dreadnought 3: Minefield Launch Star")
+    world.get_region(regname.DREADNOUGHT).connect(world.get_region(regname.DREADN4LANDI),
+                                                    "Dreadnought Comet: Topman Tribe Speed Run")
+    world.get_region(regname.DREADN4LANDI).connect(world.get_region(regname.DREADN4TOPPL),
+                                                    "Dreadnought Comet: Landing Sling Star")
+    world.get_region(regname.DREADN4TOPPL).connect(world.get_region(regname.DREADN4METAL),
+                                                    "Dreadnought Comet: Caged Luma Sling Star")
+    world.get_region(regname.DREADN4METAL).connect(world.get_region(regname.DREADN4PULLP),
+                                                    "Dreadnought Comet: Pull to Launch Star")
+    world.get_region(regname.DREADN4PULLP).connect(world.get_region(regname.DREADN4MINES),
+                                                    "Dreadnought Comet: Cannon Pull Launch Star")
+    world.get_region(regname.DREADN4MINES).connect(world.get_region(regname.DREADN4BOSSA),
+                                                    "Dreadnought Comet: Minefield Launch Star")
+    world.get_region(regname.DREADNOUGHT).connect(world.get_region(regname.DREADN5AUTOS),
+                                                    "Dreadnought Purple Coins: Battlestation's Purple Coins")
+    world.get_region(regname.DREADN5AUTOS).connect(world.get_region(regname.DREADN5STARS),
+                                                    "Dreadnought Purple Coins: Autoscroller Launch Star")
 
     world.get_region(regname.GARDEN).connect(world.get_region(regname.MATTER), "Dome 6 Third Orbit Galaxy",
                     HasGroup("Power Stars", count=min(world.options.dome_six_counts["Third Orbit"], 30)))
