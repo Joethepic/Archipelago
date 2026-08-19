@@ -1,52 +1,51 @@
+from io import BytesIO
+
+from gclib.yaz0_yay0 import Yaz0
+
+from wiithon.formats.rarc import Rarc
+
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended
+from ..extensions import SMGObject
 
-class AstroDomeEntrance(RARCExtended):
+class AstroDomeEntrance(SMGObject):
     name: str
+    index: int
+    file_data: bytes
 
-    def __init__(self, dome_name: str):
-        self.relative_path = ASTRO_DOME_ENTRANCE_RELATIVE_PATH.format(dome_name)
-        super().__init__()
+    def __init__(self, dome_name: str, index: int):
+        super().__init__(ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
 
+        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(self.patcher.read_file(self.path))))
         self.name = dome_name
+        self.index = index
+
+    def update(self) -> None:
+        pass
 
     def rename(self, new_dome_name: str):
-        self.relative_path = ASTRO_DOME_ENTRANCE_RELATIVE_PATH.format(new_dome_name)
-        self.absolute_file_path = self.iso_base_path + self.relative_path
-        
-        print(f"Renaming dome: {self.name}")
+        print(f"Renaming dome {self.name} -> {new_dome_name}")
 
-        file_name: str = "astrodomeentrance" + new_dome_name.lower()
+        self.arc_file.get_node("astrodomeentrance" + self.name.lower()).name = "astrodomeentrance" + new_dome_name.lower()
+        self.arc_file.get_file("astrodomeentrance" + self.name.lower() + ".bdl").name = "astrodomeentrance" + new_dome_name.lower() + ".bdl"
 
-        root_node = self.get_node_by_path('')
-        root_node.name = file_name
-        
-        for file in self.file_entries:
-            if file.name.endswith(".bdl"):
-                file.name = file_name + ".bdl"
+        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.arc_file.get_bytes())
 
-        self.name = new_dome_name
-
-class AstroDomeEntrances:
+class AstroDomeEntrances(SMGObject):
     entrances: list[AstroDomeEntrance]
 
     def __init__(self):
-        self.entrances = [AstroDomeEntrance(DOMES[Domes.TERRACE]),
-                          AstroDomeEntrance(DOMES[Domes.FOUNTAIN]),
-                          AstroDomeEntrance(DOMES[Domes.KITCHEN]),
-                          AstroDomeEntrance(DOMES[Domes.BEDROOM]),
-                          AstroDomeEntrance(DOMES[Domes.ENGINE]),
-                          AstroDomeEntrance(DOMES[Domes.GARDEN])]
-    
-    def rename_files(self, dome_shuffle: dict[int, int]):
+        self.entrances = [AstroDomeEntrance(Domes.TERRACE, 1),
+                          AstroDomeEntrance(Domes.FOUNTAIN, 2),
+                          AstroDomeEntrance(Domes.KITCHEN, 3),
+                          AstroDomeEntrance(Domes.BEDROOM, 4),
+                          AstroDomeEntrance(Domes.ENGINE, 5),
+                          AstroDomeEntrance(Domes.GARDEN, 6)]
+
+    def update(self, dome_shuffle: dict[int, int], **kwargs):
         reverse_shuffle: dict[int, int] = {value: key for key, value in dome_shuffle.items()}
 
         for index, entrance in enumerate(self.entrances):
-            new_index: int = reverse_shuffle[index + 1]
-            new_dome_name: str = DOMES[new_index]
+            new_index: int = reverse_shuffle[index + 1] - 1
+            new_dome_name = self.entrances[new_index].name
             
             entrance.rename(new_dome_name)
-
-    def save(self):
-        for entrance in self.entrances:
-            entrance.save()

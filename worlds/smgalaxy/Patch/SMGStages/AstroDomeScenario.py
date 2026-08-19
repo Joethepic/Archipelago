@@ -1,23 +1,24 @@
+from wiithon import WiiIsoPatcher
+from wiithon.formats.bcsv import BCSV
+
+from worlds.smgalaxy.Patch import hashtable
+
 from ...Constants.patch_constants import *
-from ..extensions import RARCExtended
+from ..extensions import SMGObject
 
-class AstroDomeScenario(RARCExtended):
+class AstroDomeScenario(SMGObject):
     def __init__(self):
-        self.relative_path = ASTRO_DOME_SCENARIO_RELATIVE_PATH
-        super().__init__()
+        super().__init__(ASTRO_DOME_SCENARIO_PATH)
 
-        # Get the scenariodata bcsv
-        self.scenariodata = self.get_bcsv_file('', SCENARIO_DATA_FILE_NAME)
-        
-        # Get the indices of the fields
-        self.scenariono_index = self.scenariodata.get_field_index(ScenarioDataFieldName.SCENARIO_NUMBER)
-        self.astrodome_index = self.scenariodata.get_field_index(ScenarioDataFieldName.ASTRO_DOME)
+    def update(self, dome_shuffle: dict[int, int], **kwargs) -> None:
+        self.shuffle_loading_zones(dome_shuffle)
 
     def is_valid_shuffle(self, dome_shuffle: dict[int, int]) -> bool:
         """Validate that the dome shuffle mapping contains all indices 1-6 as both keys and values."""
         for index in range(1,7):
             if index not in dome_shuffle.keys() or index not in dome_shuffle.values():
                 return False
+            
         return True
 
     def shuffle_loading_zones(self, shuffle: dict[int, int]) -> None:
@@ -34,14 +35,16 @@ class AstroDomeScenario(RARCExtended):
         if not self.is_valid_shuffle(shuffle):
             raise ValueError(f"Invalid shuffle: {shuffle}")
 
+        reverse_shuffle = {value: key for key, value in shuffle.items()}
+
         print("Updating dome loading zones...")
-        
-        for entry_index in range(self.scenariodata.entry_count):
-            scenariono = self.scenariodata.get_value_by_index(entry_index, self.scenariono_index)
-            new_value = 1 << (shuffle[scenariono] - 1)
 
-            print(f"Loading zone dome {scenariono} -> dome {shuffle[scenariono]}")
+        bcsv: BCSV
+        with self.patcher.edit_as(self.path + '/' + SCENARIO_DATA_FILE_NAME, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
+            for entry in bcsv.entries:
+                scenario_no = entry["ScenarioNo"]
 
-            self.scenariodata.set_value_by_index(entry_index, self.astrodome_index, new_value)
+                print(f"Loading zone dome {scenario_no} -> dome {shuffle[scenario_no]}")
 
-        self.scenariodata.save_changes()
+                entry["ScenarioNo"] = shuffle[scenario_no]
+                entry["AstroDome"] = 1 << (reverse_shuffle[scenario_no] - 1)

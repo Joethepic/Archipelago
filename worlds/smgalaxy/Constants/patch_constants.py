@@ -5,32 +5,24 @@ from .Names.region_names import GATEWAY
 from ..regions import region_list
 
 # PATHS
-ASTRO_DOME_ENTRANCE_RELATIVE_PATH = "/DATA/files/ObjectData/AstroDomeEntrance{0}.arc"
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-GATEWAY_RELATIVE_PATH: str = "/DATA/files/ObjectData/AstroChildRoom.arc"
-MARIO_RELATIVE_PATH = "/DATA/files/ObjectData/Mario.arc"
-OBJECT_DATA_RELATIVE_PATH = "/DATA/files/ObjectData/"
-SURPRISED_GALAXY_RELATIVE_PATH = "/DATA/files/ObjectData/MiniSurprisedGalaxy.arc"
-ASTRODOME_RELATIVE_PATH = "/DATA/files/StageData/AstroDome.arc"
-ASTRO_DOME_SCENARIO_RELATIVE_PATH = "/DATA/files/StageData/AstroDome/AstroDomeScenario.arc"
-ASTRO_GALAXY_RELATIVE_PATH: str = "/DATA/files/StageData/AstroGalaxy.arc"
-DOL_RELATIVE_PATH: str = "/DATA/sys/main.dol"
+ASTRO_DOME_ENTRANCE_PATH = "/ObjectData/AstroDomeEntrance{0}.arc"
+OBJECT_DATA_PATH = "/ObjectData/"
+GATEWAY_PATH: str = "/ObjectData/AstroChildRoom.arc"
+GATEWAY_BDL_NAME = "astrochildroom.bdl"
+MARIO_PATH = "/ObjectData/Mario.arc"
+SURPRISED_GALAXY_PATH = "/ObjectData/MiniSurprisedGalaxy.arc"
+ASTRODOME_PATH = "/StageData/AstroDome.arc"
+ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
+ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
 
 # ASTRODOMEENTRANCES
-DOMES: dict[int, str] = {1: "Observatory",
-                         2: "Well",
-                         3: "Kitchen",
-                         4: "BedRoom",
-                         5: "Machine",
-                         6: "Tower"}
-
-class Domes(IntEnum):
-    TERRACE = 1
-    FOUNTAIN = 2
-    KITCHEN = 3
-    BEDROOM = 4
-    ENGINE = 5
-    GARDEN = 6
+class Domes(StrEnum):
+    TERRACE = "Observatory"
+    FOUNTAIN = "Well"
+    KITCHEN = "Kitchen"
+    BEDROOM = "BedRoom"
+    ENGINE = "Machine"
+    GARDEN = "Tower"
 
 # GATEWAY
 MINIATURE_GATEWAY_NAME: str = "MiniHeavensDoorGalaxy"
@@ -41,44 +33,44 @@ OLD_CAP_COLOUR = (181, 0, 0)
 OLD_GLOVES_COLOUR = (153, 153, 153)
 
 # ASTRODOME
-PLACEMENT_PATH = "jmp/placement/"
+PLACEMENT_PATH = "/jmp/placement/"
 FILE_NAME = "objinfo"
 
 class ObjInfoFieldNames(StrEnum):
-    NAME: str = "name"
-    L_ID: str = "l_id"
-    OBJECT_ARGUMENT0: str = "Obj_arg0"
-    OBJECT_ARGUMENT1: str = "Obj_arg1"
-    OBJECT_ARGUMENT2: str = "Obj_arg2"
-    OBJECT_ARGUMENT3: str = "Obj_arg3"
-    OBJECT_ARGUMENT4: str = "Obj_arg4"
-    OBJECT_ARGUMENT5: str = "Obj_arg5"
-    OBJECT_ARGUMENT6: str = "Obj_arg6"
-    OBJECT_ARGUMENT7: str = "Obj_arg7"
-    CAMERA_SET_ID: str = "CameraSetId"
-    SWITCH_APPEAR: str = "SW_APPEAR"
-    SWITCH_DEAD: str = "SW_DEAD"
-    SWITCH_A: str = "SW_A"
-    SWITCH_B: str = "SW_B"
-    SWITCH_SLEEP: str = "SW_SLEEP"
-    MESSAGE_ID: str = "MessageId"
-    POSITION_X: str = "pos_x"
-    POSITION_Y: str = "pos_y"
-    POSITION_Z: str = "pos_z"
-    DIRECTION_X: str = "dir_x"
-    DIRECTION_Y: str = "dir_y"
-    DIRECTION_Z: str = "dir_z"
-    SCALE_X: str = "scale_x"
-    SCALE_Y: str = "scale_y"
-    SCALE_Z: str = "scale_z"
-    CAST_ID: str = "CastId"
-    VIEW_GROUP_ID: str = "ViewGroupId"
-    SHAPE_MODEL_NUMBER: str = "ShapeModelNo"
-    COMMON_PATH_ID: str = "CommonPath_ID"
-    CLIPPING_GROUP_ID: str = "ClippingGroupId"
-    GROUP_ID: str = "GroupId"
-    DEMO_GROUP_ID: str = "DemoGroupId"
-    MAP_PARTS_ID: str = "MapParts_ID"
+    NAME = "name"
+    L_ID = "l_id"
+    OBJECT_ARGUMENT0 = "Obj_arg0"
+    OBJECT_ARGUMENT1 = "Obj_arg1"
+    OBJECT_ARGUMENT2 = "Obj_arg2"
+    OBJECT_ARGUMENT3 = "Obj_arg3"
+    OBJECT_ARGUMENT4 = "Obj_arg4"
+    OBJECT_ARGUMENT5 = "Obj_arg5"
+    OBJECT_ARGUMENT6 = "Obj_arg6"
+    OBJECT_ARGUMENT7 = "Obj_arg7"
+    CAMERA_SET_ID = "CameraSetId"
+    SWITCH_APPEAR = "SW_APPEAR"
+    SWITCH_DEAD = "SW_DEAD"
+    SWITCH_A = "SW_A"
+    SWITCH_B = "SW_B"
+    SWITCH_SLEEP = "SW_SLEEP"
+    MESSAGE_ID = "MessageId"
+    POSITION_X = "pos_x"
+    POSITION_Y = "pos_y"
+    POSITION_Z = "pos_z"
+    DIRECTION_X = "dir_x"
+    DIRECTION_Y = "dir_y"
+    DIRECTION_Z = "dir_z"
+    SCALE_X = "scale_x"
+    SCALE_Y = "scale_y"
+    SCALE_Z = "scale_z"
+    CAST_ID = "CastId"
+    VIEW_GROUP_ID = "ViewGroupId"
+    SHAPE_MODEL_NUMBER = "ShapeModelNo"
+    COMMON_PATH_ID = "CommonPath_ID"
+    CLIPPING_GROUP_ID = "ClippingGroupId"
+    GROUP_ID = "GroupId"
+    DEMO_GROUP_ID = "DemoGroupId"
+    MAP_PARTS_ID = "MapParts_ID"
 
 class GalaxyDestination(NamedTuple):
     name: str
@@ -95,26 +87,25 @@ index_to_layer = {1: 'layera',
                   6: 'layerf'}
 
 # ASTRODOMESCENARIO
-SCENARIO_DATA_FILE_NAME = "scenariodata.bcsv"
+SCENARIO_DATA_FILE_NAME = "/scenariodata.bcsv"
 
 class ScenarioDataFieldName(StrEnum):
-    SCENARIO_NUMBER: str = "ScenarioNo"
-    SCENARIO_NAME: str = "ScenarioName"
-    POWER_STAR_ID: str = "PowerStarId"
-    APPEAR_POWER_STAR_OBJect: str = "AppearPowerStarObj"
-    COMET: str = "Comet"
-    LUIGI_MODE_TIMER: str = "LuigiModeTimer"
-    ASTRO_DOME: str = "AstroDome"
-    IS_HIDDEN: str = "IsHidden"
-    ERROR_CHECK: str = "ErrorCheck"
+    SCENARIO_NUMBER = "ScenarioNo"
+    SCENARIO_NAME = "ScenarioName"
+    POWER_STAR_ID = "PowerStarId"
+    APPEAR_POWER_STAR_OBJect = "AppearPowerStarObj"
+    COMET = "Comet"
+    LUIGI_MODE_TIMER = "LuigiModeTimer"
+    ASTRO_DOME = "AstroDome"
+    IS_HIDDEN = "IsHidden"
+    ERROR_CHECK = "ErrorCheck"
 
 # ASTROGALAXY
 ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 
-COMMON_PATH: str = "jmp/placement/common"
-LAYERA_PATH: str = "jmp/placement/layera"
-LAYERB_PATH: str = "jmp/placement/layerb"
-FILE_NAME: str = "objinfo"
+COMMON_PATH: str = "/jmp/placement/common/" #TODO add stage name root folder once wiithon fixes it.
+LAYERA_PATH: str = "/jmp/placement/layera/"
+LAYERB_PATH: str = "/jmp/placement/layerb/"
 
 # SMGDOL
 GATEWAY_IN_GAME: str = region_list[GATEWAY].in_game_name
@@ -142,3 +133,15 @@ ASTRO_DOME_ARRAY_ADDRESS = 0x8057a9e0
 ASTRO_DOME_SKY_ARRAY_ADDRESS = 0x8057aa24
 ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS = 0x8057aad4
 ASTRO_STAR_PLATE_ARRAY_ADDRESS = 0x8057ab70
+
+GATEWAY_ENTRANCE_ADDRESS: int = 0x8001f024
+GATEWAY_EXIT_ADDRESS: int = 0x803bb2fc
+
+class GalaxyUnlockTableFieldNames(StrEnum):
+    NAME = "name"
+    MAP_PANE_NAME = "MapPaneName"
+    OPEN_CONDITION0 = "OpenCondition0"
+    OPEN_CONDITION1 = "OpenCondition1"
+    OPEN_CONDITION2 = "OpenCondition2"
+    POWER_STAR_REQUIREMENT = "PowerStarNum"
+    RETURN_DOME = "GrandGalaxyNo"

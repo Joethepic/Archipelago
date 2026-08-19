@@ -1,7 +1,10 @@
 from __future__ import annotations
 import asyncio
-import time
 from enum import Enum
+import os
+from enum import Enum
+from pathlib import Path
+import time
 import struct
 import sys
 from typing import NamedTuple, Optional
@@ -40,10 +43,7 @@ class Pointer:
     base: int
 
     def __init__(self, offsets: list[int], value_type: ValueType, base: int = GAMESYSTEM):
-        if offsets is not None:
-            self.address = -1
-        else:
-            self.address = base
+        self.address = -1
         self.offsets = offsets
         self.value_type = value_type
         self.base = base
@@ -144,7 +144,7 @@ class GalaxyContext(CommonContext):
     pointers: dict[str, Pointer] = {}
 
     highest_processed_item_index: int
-    starcolorhandler: StarColorHandler
+
     lives: int
 
     def make_gui(self) -> type["kvui.GameManager"]:
@@ -172,12 +172,14 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
+        
         self.pointers = {**star_count_flag_pointers,
+                         **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
-        self.starcolorhandler = StarColorHandler()
 
     async def disconnect(self, msg: str = '') -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
@@ -276,10 +278,9 @@ class GalaxyContext(CommonContext):
                   dme.write_byte(0x80001880, (stars + 1))
 
                 case 170000005:
-                  # TODO: FIGURE OUT HOW TO GIVE GRAND STARS IN GAME
                   logger.debug("Grand Star Received")
-                  stars = dme.read_byte(0x80001880)
-                  dme.write_byte(0x80001880, (stars + 1))
+                  stars = dme.read_byte(0x80001882)
+                  dme.write_byte(0x80001882, (stars + 1))
 
                 case 170000006:
                   # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
@@ -351,27 +352,34 @@ class GalaxyContext(CommonContext):
             # If DME is not already hooked or connected in any way
             if not dme.is_hooked() and not await self.try_hook():
                 return
-
+                
             if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                 #checks the id of the game as a string
                 romgameid: bytes = dme.read_bytes(0x80000000,6)
                 if romgameid.decode() != EXPECTED_GAME_ID:
                     dme.un_hook()
+
                     self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
+
                     await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                     return
+
                 if not self.auth:
                     await self.get_username()
-
+                    
                 # Inform the player we are ready and waiting for them to connect.
                 if not self.rom_loaded:
                     self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
                     self.rom_loaded = True
+
                     await self.server_auth(self.password_required)
+
                 if not self.slot:
                     await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                     return
+
             await self.recalculate_pointers()
+            self.lives = await self.pointers["Lives"].get_value()
             # Currently verified connected to AP and dolphin is properly loaded
             await self.last_visited_galaxy()
             await self.smg_locs_checker()
@@ -389,6 +397,7 @@ class GalaxyContext(CommonContext):
             try:
                 await self.dme_loop()
                 await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+
             except Exception as dolphinEx:
                 logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
     
@@ -404,8 +413,8 @@ class GalaxyContext(CommonContext):
                 self.highest_processed_item_index = 0
                 
             #case "Bounced":
-                #if args["source"] != self.player_names[self.slot]:
-                #    pass # handle (death) links
+            #    if args["source"] != self.player_names[self.slot]:
+            #        pass # handle (death) links
 
             case "ConnectionRefused":
                 self.set_dolphin_status(AP_REFUSED_STATUS)
@@ -483,8 +492,12 @@ def launch(*launch_args: str):
     args = parser.parse_args(launch_args)
 
     if args.apsmg_file:
-        SuperMarioGalaxyRandomiser().patch(args.apsmg_file)
-        
+        output_directory = Path(args.apsmg_file).parent
+        iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
+        iso_path = os.path.join(output_directory, iso_name + '.iso')
+
+        SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
     colorama.deinit()
