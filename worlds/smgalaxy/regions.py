@@ -666,10 +666,10 @@ def create_locations(locs: dict[str, SMGLocationData], world: "SMGWorld"):
     for name, data in locs.items():
         reg = world.get_region(data.region)
         location = SMGLocation(world.player, name, reg)
-        reg.locations += [location]
         logging.info(location.name)
         if data.default_access is not None:
             world.set_rule(location, data.default_access)
+        reg.locations += [location]
 
 def disconnect_from_option(world: "SMGWorld") -> str:
     Dome1Slot1 = "Good Egg Galaxy"
