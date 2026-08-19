@@ -12,7 +12,7 @@ from ...regions import region_list
 
 class AstroDomes(SMGObject):
     def __init__(self):
-        super().__init__(ASTRODOME_PATH)
+        super().__init__(ASTRO_DOME_PATH)
 
         self.surprised_galaxy: SurprisedGalaxy = SurprisedGalaxy(self.patcher)
         self.gateway_galaxy: Gateway = Gateway(self.patcher)
@@ -73,4 +73,3 @@ class AstroDomes(SMGObject):
 
                 if entry["name"].startswith("AstroDome"):
                     entry["Obj_arg0"] = interior_dome_index
-

@@ -11,7 +11,7 @@ GATEWAY_PATH: str = "/ObjectData/AstroChildRoom.arc"
 GATEWAY_BDL_NAME = "astrochildroom.bdl"
 MARIO_PATH = "/ObjectData/Mario.arc"
 SURPRISED_GALAXY_PATH = "/ObjectData/MiniSurprisedGalaxy.arc"
-ASTRODOME_PATH = "/StageData/AstroDome.arc"
+ASTRO_DOME_PATH = "/StageData/AstroDome.arc"
 ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
 ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
 
