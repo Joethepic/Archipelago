@@ -555,7 +555,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.DUSTY3LANDI).connect(world.get_region(regname.DUSTY3POUN1),
                                                     "Dusty Dune 3: Landing Launch Star")
     world.get_region(regname.DUSTY3POUN1).connect(world.get_region(regname.DUSTY3SANDT),
-                                                    "Dusty Dune 3: Landing Launch Star")
+                                                    "Dusty Dune 3: Elevator Launch Star")
     world.get_region(regname.DUSTY3SANDT).connect(world.get_region(regname.DUSTY6BBILL),
                                                     "Dusty Dune Secret: Sand Tide Stump Launch Star")
     world.get_region(regname.DUSTY3SANDT).connect(world.get_region(regname.DUSTY3ROCKY),
@@ -710,8 +710,6 @@ def set_rules(world: "SMGWorld", player: int):
                     HasGroup("Power Stars", count=min(world.options.dome_five_counts["Third Orbit"], 25)))
     world.get_region(regname.TOYTIME).connect(world.get_region(regname.TOYTIME1LANDI),
                                                     "Toy Time 1: Heavy Metal Mecha-Bowser")
-    world.get_region(regname.TOYTIME1LANDI).connect(world.get_region(regname.TOYTIME1GRAVI),
-                                                    "Toy Time 1: Train Launch Star")
     world.get_region(regname.TOYTIME1LANDI).connect(world.get_region(regname.TOYTIME1GRAVI),
                                                     "Toy Time 1: Train Launch Star")
     world.get_region(regname.TOYTIME1GRAVI).connect(world.get_region(regname.TOYTIME1CONVE),
@@ -931,7 +929,7 @@ def set_rules(world: "SMGWorld", player: int):
     #Remaining Ship Connections
     world.get_region(regname.SHIP).connect(world.get_region(regname.LIBRARY), "Library Entrance")
     world.get_region(regname.SHIP).connect(world.get_region(regname.COTU), "Center Of the Universe Entry",
-                    Has("Grand Star", 5) and HasGroup("Power Stars", count=world.options.stars_to_finish.value))
+                    Has("Grand Star", 5) & HasGroup("Power Stars", count=world.options.stars_to_finish.value))
     world.get_region(regname.COTU).connect(world.get_region(regname.BOWSER3), "Galaxy's Center")
     world.get_region(regname.BOWSER3).connect(world.get_region(regname.GALREAC1LANDI),
                                               "Galaxy Reactor: The Fate of the Universe")
@@ -991,8 +989,6 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Gateway: Small Tuning Planet Launch Star")
     world.get_region(regname.GATEWAY1LRGTU).connect(world.get_region(regname.GATEWAY1LRGTI),
                                                     "Gateway: Large Tuning Planet Pipe")
-    world.get_region(regname.GATEWAY).connect(world.get_region(regname.GATEWAY2HOMEP),
-                                              "Gateway Comet: Gateway's Purple Coins")
     world.get_region(regname.SHIP).connect(world.get_region(regname.BOOBONE), "Boo's Boneyard Hungry Luma",
                     Has("Grand Star", 5))
     world.get_region(regname.BOOBONE).connect(world.get_region(regname.BOOBONE1SKULL),

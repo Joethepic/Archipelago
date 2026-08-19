@@ -32,7 +32,7 @@ locGE_table: dict[str, SMGLocationData] = {
                                           "EggStarGalaxy",game_address=2),
     locname.GOODEGGSTAR6: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG6LUIGI, 17000003,
                                           "EggStarGalaxy",
-                                          CanReachLocation(locname.GHOSTLYSTAR1),game_address=3),
+                                          CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2),game_address=3),
     locname.GOODEGGSTAR4: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG4DINOP, 17000004,
                                           "EggStarGalaxy",game_address=4),
 }
@@ -46,7 +46,7 @@ locHH_table: dict[str, SMGLocationData]  = {
                                             "HoneyBeeKingdomGalaxy", game_address=2),
     locname.HONEYHIVESTAR6: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009,
                                             "HoneyBeeKingdomGalaxy",
-                                          CanReachLocation(locname.GHOSTLYSTAR1), game_address=3),
+                                          CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=3),
     locname.HONEYHIVESTAR4: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 170000010,
                                             "HoneyBeeKingdomGalaxy", game_address=4)
 }
@@ -101,7 +101,7 @@ locBR_table: dict[str, SMGLocationData]  = {
     locname.BATTLEROCKSTAR6: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000039, "BattleShipGalaxy", game_address=3),
     locname.BATTLEROCKSTAR4: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000040, "BattleShipGalaxy", game_address=4),
     locname.BATTLEROCKSTAR7: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000042,
-                                                  "BattleShipGalaxy", CanReachLocation(locname.GHOSTLYSTAR1), game_address=5)
+                                                  "BattleShipGalaxy", CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=5)
 }
 #TODO: note change abbreviation same as buoy base
 locBB_table: dict[str, SMGLocationData]  = {
