@@ -51,7 +51,7 @@ class AstroDomes(SMGObject):
                     galaxy_index += 1
 
                     # Set the new name
-                    entry["name"] = galaxy.name
+                    entry["name"] = "Mini" + galaxy.name
 
                     # Store the orbit index in the upper bits
                     obj_arg0 = galaxy.orbit_index << 16
