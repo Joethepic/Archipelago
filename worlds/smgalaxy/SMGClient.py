@@ -237,6 +237,8 @@ class GalaxyContext(CommonContext):
 
                 case 170000005:
                   logger.debug("Grand Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
                   stars = dme.read_byte(0x80001882)
                   dme.write_byte(0x80001882, (stars + 1))
 
