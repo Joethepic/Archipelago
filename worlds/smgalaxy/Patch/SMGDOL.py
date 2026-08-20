@@ -413,17 +413,15 @@ class SMGDOL(SMGObject):
             self.write_instruction(PPC.nop())
 
     def add_deathlink(self):
-        # Set 0x8000 into higher bits of r3
-        # Load byte from 0x80001af0 into r3
-        # Compare 0x80001af0 with 0
-        # Jump over if its not 0
-        # Jump to forceKillPlayerByAbyss
-        # Set 0 into r3
-
+        # Load address from 0x80001af0
         self.write_instruction(PPC.lis(31, -0x8000))
-        self.write_instruction(PPC.lbz(3, 0x1AF0, 31))
+        self.write_instruction(PPC.lbz(3, 0x1af0, 31))
+
+        # Skip the function if its zero
         self.write_instruction(PPC.cmpi(0, 3, 0))
         self.write_instruction(PPC.bc(4, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+
+        # Kill mario and reset
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
         self.write_instruction(PPC.stb(3, 0x1AF0, 31))
@@ -447,8 +445,12 @@ class SMGDOL(SMGObject):
         # Miniature galaxy orbit manipulation #
         #######################################
         # Get obj_arg0 from miniature galaxy
+        def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
+            """rlwinm rA, rS, SH, MB, ME  - rotate rS left by SH bits, AND with mask(MB, ME), store in rA"""
+            return PPC._fmt_m(21, rS, rA, sh, mb, me)
+
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
-        self.write_instruction(PPC.rlwnm(3, 3, 0x10, 0x10, 0x1F))
+        self.write_instruction(rlwinm(3, 3, 16, 0x10, 0x1F))
 
     def manipulate_star_loading(self):
         ################################
