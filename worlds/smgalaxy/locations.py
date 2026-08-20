@@ -101,7 +101,7 @@ locBR_table: dict[str, SMGLocationData]  = {
     locname.BATTLEROCKSTAR6: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000039, "BattleShipGalaxy", game_address=3),
     locname.BATTLEROCKSTAR4: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000040, "BattleShipGalaxy", game_address=4),
     locname.BATTLEROCKSTAR7: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLEROCK, 170000042,
-                                                  "BattleShipGalaxy", CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=5)
+                                                  "BattleShipGalaxy", CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=6)
 }
 #TODO: note change abbreviation same as buoy base
 locBB_table: dict[str, SMGLocationData]  = {
@@ -142,7 +142,7 @@ locDDune_table: dict[str, SMGLocationData]  = {
     locname.DUSTYDUNESTAR3: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations"], regname.DUSTY, 170000069, "SandClockGalaxy", game_address=2),
     locname.DUSTYDUNESTAR4: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations"], regname.DUSTY, 170000071, "SandClockGalaxy", game_address=3),
     locname.DUSTYDUNESTAR6: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations"], regname.DUSTY, 170000072, "SandClockGalaxy", game_address=4),
-    locname.DUSTYDUNESTAR7: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations"], regname.DUSTY, 170000073, "SandClockGalaxy", game_address=5)
+    locname.DUSTYDUNESTAR7: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations"], regname.DUSTY, 170000073, "SandClockGalaxy", game_address=6)
 } 
 
 locGL_table: dict[str, SMGLocationData]  = {
