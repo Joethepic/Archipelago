@@ -222,8 +222,9 @@ class GalaxyContext(CommonContext):
         """Modify the items we have received to change things in game."""
         if not await self.check_ingame():
             return
-        logger.info(self.pointers["index"].address)
-        self.highest_processed_item_index = await self.pointers["index"].get_value()
+        # currently errors on using pointer
+        #logger.info(self.pointers["Index"].address)
+        #self.highest_processed_item_index = await self.pointers["Index"].get_value()
         # Note: will resend items upon reconnection
         for item_id in self.items_received[self.highest_processed_item_index]:
             # TODO: change to constants and probably a NamedTuple aswell
@@ -251,7 +252,7 @@ class GalaxyContext(CommonContext):
                   dme.write_byte(0x80001880, (stars + 1))
             
             self.highest_processed_item_index += 1
-            await self.pointers["index"].write_value(self.highest_processed_item_index)
+            #await self.pointers["Index"].write_value(self.highest_processed_item_index)
     async def recalculate_pointers(self) -> None:
         """Recalculate the chain of offsets for each pointer as to avoid stale memory reading."""
         if not self.needs_recalculating:
