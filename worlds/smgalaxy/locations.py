@@ -38,16 +38,16 @@ locGE_table: dict[str, SMGLocationData] = {
 }
 
 locHH_table: dict[str, SMGLocationData]  = {
-    locname.HONEYHIVESTAR1: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000006,
+    locname.HONEYHIVESTAR1: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI1TREET, 17000006,
                                             "HoneyBeeKingdomGalaxy", game_address=0),
-    locname.HONEYHIVESTAR2: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000007,
+    locname.HONEYHIVESTAR2: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI2TOWRT, 17000007,
                                             "HoneyBeeKingdomGalaxy", game_address=1),
-    locname.HONEYHIVESTAR3: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000008,
+    locname.HONEYHIVESTAR3: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI3BUGAB, 17000008,
                                             "HoneyBeeKingdomGalaxy", game_address=2),
-    locname.HONEYHIVESTAR6: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 17000009,
+    locname.HONEYHIVESTAR6: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI6LUIGI, 17000009,
                                             "HoneyBeeKingdomGalaxy",
                                           CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=3),
-    locname.HONEYHIVESTAR4: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHIVE, 170000010,
+    locname.HONEYHIVESTAR4: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI4UNDER, 170000010,
                                             "HoneyBeeKingdomGalaxy", game_address=4)
 }
 
@@ -219,7 +219,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     locname.GHOSTLYSTAR5: SMGLocationData([regname.GHOSTLY, "Power Star Locations", "Purple Coins"], regname.GHOSTLY, 170000053, "PhantomGalaxy", game_address=5),
     locname.GOLDLEAFSTAR5: SMGLocationData(["Gold Leaf Galaxy", "Power Star Locations", "Purple Coins"], regname.GOLDLEAF, 170000078, "ReverseKingdomGalaxy", game_address=5),
     locname.DUSTYDUNESTAR5: SMGLocationData(["Dusty Dune Galaxy", "Power Star Locations", "Purple Coins"], regname.DUSTY, 170000070, "SandClockGalaxy", game_address=5),
-    locname.HONEYHIVESTAR5: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations", "Purple Coins"], regname.HONEYHIVE, 170000011, "HoneyBeeKingdomGalaxy", game_address=5)
+    locname.HONEYHIVESTAR5: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations", "Purple Coins"], regname.HONEYHI5CLIFF, 170000011, "HoneyBeeKingdomGalaxy", game_address=5)
 }
 
 base_stars_locations = {**locGE_table, **locHH_table,
