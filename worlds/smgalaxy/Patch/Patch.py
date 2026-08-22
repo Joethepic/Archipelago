@@ -180,7 +180,9 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
             patcher.patch_dol(dol_patch)
 
-            patcher.build(target, lambda x: print(x))
+            print("Starting building...")
+
+            patcher.build(target)
         
 
 class SMGPlayerContainer(APPlayerContainer):
