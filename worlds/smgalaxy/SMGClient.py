@@ -141,8 +141,8 @@ class GalaxyContext(CommonContext):
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         #"Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
     async def disconnect(self, msg: str = '') -> None:
@@ -226,7 +226,7 @@ class GalaxyContext(CommonContext):
         #logger.info(self.pointers["Index"].address)
         #self.highest_processed_item_index = await self.pointers["Index"].get_value()
         # Note: will resend items upon reconnection
-        for item_id in self.items_received[self.highest_processed_item_index]:
+        for item_id in self.items_received[self.highest_processed_item_index:]:
             # TODO: change to constants and probably a NamedTuple aswell
             match item_id.item:
                 case 170000007:
