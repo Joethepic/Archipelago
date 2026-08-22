@@ -430,9 +430,28 @@ class SMGDOL(SMGObject):
         #######################################################
         # Skip opening cutscene and go immediately to gateway #
         #######################################################
-        self.write_instruction(PPC.li(3, 0), 0x803bb3cc)
-        self.write_instruction(PPC.addi(3, 31, 0x3F8), 0x803bb3d8)
-        self.write_instruction(PPC.li(0, 4))
+        # Let powerstarlist load all galaxies (to avoid crash)
+        self.write_instruction(PPC.nop(), 0x80379248)
+
+        # Properly calculate the observatory scenario
+        self.write_instruction(PPC.li(3, 6), 0x803bbb2c)
+        self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
+
+        self.write_instruction(PPC.li(3, 2), 0x803bbb78)
+        self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+
+        # Overwrite flag type 5
+        self.write_instruction(PPC.lbz(3, 0x6, 30), 0x803b38cc)
+        self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
+        self.write_nop(1)
+
+        # TEMPORARY
+        # Set flag conditions for "SpecialGrandStar[i]"
+        address = 0x8053bb40
+        for i in range(7):
+            self.dol.write_at(address + i * 0x14 + 4, b'\x05')
+            self.dol.write_at(address + i * 0x14 + 6, i.to_bytes())
 
     def set_swing_permission(self):
         ########################
@@ -488,18 +507,20 @@ class SMGDOL(SMGObject):
         ###################################
         # Custom powerstar colour loading #
         ###################################
-        self.write_instruction(PPC.mr(31, 3), 0x8020f270)
+        self.write_pointer = 0x8020f26c
+        self.write_instruction(PPC.bl(0x80517538, self.write_pointer))
+        self.write_instruction(PPC.addi(31, 3, -0x1))
         self.write_instruction(PPC.bl(0x803f5ab8, self.write_pointer))
         self.write_instruction(PPC.mr(4, 3))
         self.write_instruction(PPC.bl(0x803b0544, self.write_pointer))
         self.write_instruction(PPC.lwz(3, 0xC, 3))
         self.write_instruction(PPC.bl(0x803b1390, self.write_pointer))
-        self.write_instruction(PPC.lis(4, -0x8000))
-        self.write_instruction(PPC.ori(4, 4, 0x18FF))
         self.write_instruction(PPC.mulli(3, 3, 0x8))
+        self.write_instruction(PPC.lis(4, -0x8000))
+        self.write_instruction(PPC.ori(4, 4, 0x1900))
         self.write_instruction(PPC.add(3, 3, 4))
         self.write_instruction(PPC.lbzx(3, 3, 31))
-        self.write_nop(1)
+        self.write_instruction(PPC.bl(0x80517584, self.write_pointer))
 
     def custom_grandstar_count(self):
         ##################################
