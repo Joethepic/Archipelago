@@ -5,6 +5,7 @@ from wiithon.formats.dol import DOL
 
 NOP = b'\x60\x00\x00\x00'
 
+
 class SMGObject(ABC):
     patcher: WiiIsoPatcher
     path: str
@@ -16,11 +17,6 @@ class SMGObject(ABC):
     def update(self, **kwargs) -> None:
         ...
 
-    """
-    @contextmanager
-    def edit_bcsv(self, path: str) -> ContextManager[T]:
-        return self.patcher.edit_as(self.path + '/' + path, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis")
-    """
 
 class SMGDOLObject(ABC):
     dol: DOL
