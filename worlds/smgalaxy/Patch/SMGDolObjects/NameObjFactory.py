@@ -50,7 +50,7 @@ class Name2reateFuncManager:
     def get_create_funcs_by_func(self, create_func: int) -> list[Name2CreateFuncElement]:
         return [element for element in self.create_funcs if element.create_func.pointing_address == create_func]
 
-    def get_name_to_create_function_elements_by_archive_name(self, archive_name: str) -> list[Name2CreateFuncElement]:
+    def get_create_funcs_by_arch_name(self, archive_name: str) -> list[Name2CreateFuncElement]:
         return [element for element in self.create_funcs if element.archive_name.string == archive_name]
 
 
