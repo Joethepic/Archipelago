@@ -50,10 +50,8 @@ class AstroDomeModels(SMGDOLObject):
             pointer_list[new_index].write_pointer()
     
     def update(self, dome_shuffle: dict[int, int], **kwargs):
-        #self.shuffle_list(self.astro_dome, shuffle)
-        #self.shuffle_list(self.astro_dome_sky, shuffle)
         self.shuffle_list(self.astro_dome_entrance, dome_shuffle)
-        #self.shuffle_list(self.astro_dome, shuffle)
+
 
 class SMGDOL(SMGObject):
     data: BytesIO
