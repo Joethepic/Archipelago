@@ -65,6 +65,7 @@ class SMGDOL(SMGObject):
     write_pointer: int
 
     def __init__(self, dol: DOL):
+        super().__init__(None)
         self.dol: DOL = dol
         self.data = BytesIO(self.dol.to_bytes())
 
