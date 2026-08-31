@@ -100,6 +100,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bl(self.custom_section_address + self.custom_section_size - extra_space, self.write_pointer))
         self.write_instruction(PPC.mr(30, 3))
 
+        self.write_instruction(self.rlwinm(3, 0, 0x1F, 0x1F, 0x1F), 0x801f39fc)
+
         # Return custom function
         self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - extra_space
         self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
