@@ -1,4 +1,3 @@
-from wiithon import WiiIsoPatcher
 from wiithon.formats.bcsv import BCSV
 
 from worlds.smgalaxy.Patch import hashtable

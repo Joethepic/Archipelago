@@ -14,7 +14,7 @@ class Name2CreateFuncElement:
         self.archive_name = archive_name_pointer
 
 
-class Name2reateFuncManager:
+class Name2CreateFuncManager:
     create_funcs: list[Name2CreateFuncElement]
 
     def __init__(self):
@@ -148,7 +148,7 @@ class Name2MakeArchiveListFuncManager:
         element_count = NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_COUNT
         element_size = NAME_TO_MAKE_ARCHIVE_LIST_FUNCTION_ELEMENT_SIZE
 
-        self.name_to_make_archive_list_function_elements = []
+        self.archive_elems = []
 
         for element_index in range(element_count):
             offset = start_address + element_size * element_index
@@ -161,16 +161,17 @@ class Name2MakeArchiveListFuncManager:
             element: Name2MakeArchiveListFuncElement = Name2MakeArchiveListFuncElement(name_pointer,
                                                                                        archive_function_pointer)
 
-            self.name_to_make_archive_list_function_elements.append(element)
+            self.archive_elems.append(element)
 
             if name_pointer.string == "MiniKoopaBattleVs3Galaxy":
                 self.extra_archive_element: Name2MakeArchiveListFuncElement = element
 
 
     def set_mini_archive_func(self, new_miniature_names: list[CharPointer]) -> None:
+        print([name.string for name in new_miniature_names])
         archive_elems: list[Name2MakeArchiveListFuncElement] = []
 
-        for element in self.name_to_make_archive_list_function_elements:
+        for element in self.archive_elems:
             if element.name_pointer.string == "MiniKoopaBattleVs3Galaxy":
                 continue
 
@@ -183,7 +184,7 @@ class Name2MakeArchiveListFuncManager:
 
 
 class NameObjFactory(SMGDOLObject):
-    create_mgr: Name2reateFuncManager
+    create_mgr: Name2CreateFuncManager
     archive_obj_mgr: Name2ArchiveManager
     archive_func_mgr: Name2MakeArchiveListFuncManager
 
@@ -192,7 +193,7 @@ class NameObjFactory(SMGDOLObject):
         self.surprised_function_address = CREATE_NAME_OBJECT_SURPRISED_GALAXY_FUNCTION_START_ADDRESS
         self.surprised_galaxy_string_address = STRING_ADDRESS_MINISURPRISEDGALAXY
 
-        self.create_mgr = Name2reateFuncManager()
+        self.create_mgr = Name2CreateFuncManager()
         self.archive_obj_mgr = Name2ArchiveManager()
         self.archive_func_mgr = Name2MakeArchiveListFuncManager()
 
@@ -215,3 +216,5 @@ class NameObjFactory(SMGDOLObject):
             to_surprised_elements.append(self.create_mgr.extra_create_element)
 
         self.create_mgr.set_galaxies(to_surprised_elements, to_miniature_elements)
+
+        self.archive_func_mgr.set_mini_archive_func([element.name for element in to_miniature_elements])

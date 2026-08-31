@@ -116,7 +116,7 @@ class Patch:
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":
             return
-        
+    
         mini_galaxy = self.dol.objects["NameObjectFactory"].create_mgr.get_create_funcs_by_name("Mini" + galaxy_name)
         surp_galaxy = self.dol.objects["NameObjectFactory"].create_mgr.get_create_funcs_by_name("Surp" + galaxy_name)
 

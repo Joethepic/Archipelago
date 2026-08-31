@@ -81,8 +81,27 @@ class SMGDOL(SMGObject):
         size, addrs = self.dol.inject_above_arena([PPC.nop() * int(self.custom_section_size/4)])
         self.custom_section_address = addrs[0]
 
+        extra_space = 0x100
+
+        self.write_pointer = self.custom_section_address + self.custom_section_size - extra_space
+        self.write_instruction(PPC.stwu(1, -0x10, 1), self.write_pointer)
+        self.write_instruction(PPC.mflr(0))
+        self.write_instruction(PPC.stw(0, 0x14, 1))
+        self.write_instruction(PPC.addi(4, 1, 8))
+        self.write_instruction(PPC.bl(0x803d41d8, self.write_pointer))
+        self.write_instruction(PPC.lwz(3, 8, 1))
+        self.write_instruction(self.rlwinm(3, 3, 0, 0x10, 0x1F))
+        self.write_instruction(PPC.lwz(0, 0x14, 1))
+        self.write_instruction(PPC.mtlr(0))
+        self.write_instruction(PPC.addi(1, 1, 0x10))
+        self.write_instruction(PPC.blr())
+
+        self.write_pointer = 0x801feedc
+        self.write_instruction(PPC.bl(self.custom_section_address + self.custom_section_size - extra_space, self.write_pointer))
+        self.write_instruction(PPC.mr(30, 3))
+
         # Return custom function
-        self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4
+        self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - extra_space
         self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
         self.write_instruction(PPC.lwz(0, 0x104, 1))
         self.write_instruction(PPC.mtlr(0))
@@ -95,6 +114,13 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.stw(0, 0x104, 1))
         self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
         self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
+
+        self.add_deathlink()
+
+    @staticmethod
+    def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
+        """rlwinm rA, rS, SH, MB, ME  - rotate rS left by SH bits, AND with mask(MB, ME), store in rA"""
+        return PPC._fmt_m(21, rS, rA, sh, mb, me)
 
     def write_instruction(self, instruction_bytes: bytes, address: int = None) -> None:
         if address is not None:
@@ -159,12 +185,8 @@ class SMGDOL(SMGObject):
         # Miniature galaxy orbit manipulation #
         #######################################
         # Get obj_arg0 from miniature galaxy
-        def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
-            """rlwinm rA, rS, SH, MB, ME  - rotate rS left by SH bits, AND with mask(MB, ME), store in rA"""
-            return PPC._fmt_m(21, rS, rA, sh, mb, me)
-
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
-        self.write_instruction(rlwinm(3, 3, 16, 0x10, 0x1F))
+        self.write_instruction(self.rlwinm(3, 3, 16, 0x10, 0x1F))
 
     def manipulate_star_loading(self):
         ################################
@@ -274,7 +296,5 @@ class SMGDOL(SMGObject):
                           dome_shuffle=dome_shuffle,
                           dome_galaxies=dome_galaxies,
                           star_requirements=star_requirements)
-
-        self.add_deathlink()
 
         self.update_instructions()
