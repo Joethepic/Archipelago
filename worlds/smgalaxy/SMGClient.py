@@ -193,7 +193,7 @@ class GalaxyContext(CommonContext):
             self.needs_recalculating = True
 
         if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
-            return
+            return "Astrogalaxy"
 
         self.last_galaxy = curr_galaxy
     
@@ -212,9 +212,10 @@ class GalaxyContext(CommonContext):
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-
-            if (star_bit_flag & (1 << local_loc.game_address)) > 0:
-                self.locations_checked.add(loc_id)
+            if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+                if (star_bit_flag & (1 << local_loc.game_address)) > 0:
+                    self.locations_checked.add(loc_id)
+                    logger.info(loc_id)
 
         await self.check_locations(self.locations_checked)
     
