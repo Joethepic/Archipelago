@@ -193,7 +193,7 @@ class GalaxyContext(CommonContext):
             self.needs_recalculating = True
 
         if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
-            return "Astrogalaxy"
+            return
 
         self.last_galaxy = curr_galaxy
     
