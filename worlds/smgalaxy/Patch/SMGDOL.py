@@ -104,7 +104,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.mr(30, 3))
 
         # Use koopa face model if obj_arg0 is 2
-        self.write_instruction(self.rlwinm(3, 0, 0x1F, 0x1F, 0x1F), 0x801f39fc)
+        self.write_instruction(self.rlwinm(3, 0, 0x1F, 0x1F, 0x1F), 0x801fe9fc)
 
         # Return custom function
         self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - extra_space
