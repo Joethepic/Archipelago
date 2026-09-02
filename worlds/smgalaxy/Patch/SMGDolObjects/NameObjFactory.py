@@ -168,7 +168,6 @@ class Name2MakeArchiveListFuncManager:
 
 
     def set_mini_archive_func(self, new_miniature_names: list[CharPointer]) -> None:
-        print([name.string for name in new_miniature_names])
         archive_elems: list[Name2MakeArchiveListFuncElement] = []
 
         for element in self.archive_elems:

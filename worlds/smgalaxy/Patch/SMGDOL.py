@@ -51,7 +51,8 @@ class AstroDomeModels(SMGDOLObject):
     
     def update(self, dome_shuffle: dict[int, int], **kwargs):
         self.shuffle_list(self.astro_dome_entrance, dome_shuffle)
-
+        self.shuffle_list(self.astro_dome, dome_shuffle)
+        self.shuffle_list(self.astro_dome_sky, dome_shuffle)
 
 class SMGDOL(SMGObject):
     data: BytesIO
@@ -73,7 +74,7 @@ class SMGDOL(SMGObject):
         self.objects = {
             "NameObjectFactory": NameObjFactory(),
             "GalaxyUnlockTable": GalaxyUnlockTable(),
-            "AstroDomeModels": AstroDomeModels()
+            #"AstroDomeModels": AstroDomeModels()
         }
 
         self.write_pointer = 0
@@ -83,6 +84,7 @@ class SMGDOL(SMGObject):
 
         extra_space = 0x100
 
+        # Read the obj_arg0 and remove the upper 16 bits for koopa face model handling
         self.write_pointer = self.custom_section_address + self.custom_section_size - extra_space
         self.write_instruction(PPC.stwu(1, -0x10, 1), self.write_pointer)
         self.write_instruction(PPC.mflr(0))
@@ -96,10 +98,12 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(1, 1, 0x10))
         self.write_instruction(PPC.blr())
 
+        # Jump to the custom function to handle koopa face model
         self.write_pointer = 0x801feedc
         self.write_instruction(PPC.bl(self.custom_section_address + self.custom_section_size - extra_space, self.write_pointer))
         self.write_instruction(PPC.mr(30, 3))
 
+        # Use koopa face model if obj_arg0 is 2
         self.write_instruction(self.rlwinm(3, 0, 0x1F, 0x1F, 0x1F), 0x801f39fc)
 
         # Return custom function
@@ -226,8 +230,7 @@ class SMGDOL(SMGObject):
         ###################################
         # Custom powerstar colour loading #
         ###################################
-        self.write_pointer = 0x8020f26c
-        self.write_instruction(PPC.bl(0x80517538, self.write_pointer))
+        self.write_instruction(PPC.stw(31, 0xC, 1), 0x8020f26c)
         self.write_instruction(PPC.addi(31, 3, -0x1))
         self.write_instruction(PPC.bl(0x803f5ab8, self.write_pointer))
         self.write_instruction(PPC.mr(4, 3))
@@ -239,7 +242,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.ori(4, 4, 0x1900))
         self.write_instruction(PPC.add(3, 3, 4))
         self.write_instruction(PPC.lbzx(3, 3, 31))
-        self.write_instruction(PPC.bl(0x80517584, self.write_pointer))
+        self.write_instruction(PPC.lwz(31, 0xC, 1))
 
     def custom_grandstar_count(self):
         ##################################
