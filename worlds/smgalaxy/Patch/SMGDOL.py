@@ -243,6 +243,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.add(3, 3, 4))
         self.write_instruction(PPC.lbzx(3, 3, 31))
         self.write_instruction(PPC.lwz(31, 0xC, 1))
+        self.write_instruction(PPC.lwz(0, 0x14, 1))
 
     def custom_grandstar_count(self):
         ##################################
