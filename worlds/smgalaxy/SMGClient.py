@@ -287,14 +287,13 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if not self.check_ingame():
+        if not await self.check_ingame():
             return
-        
+        await asyncio.sleep(WAIT_TIMER_LONG_TIMEOUT)
         lives = await self.pointers["Lives"].get_value()
-        messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"] # TODO: constant and SMG relevant
-        
+        messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"] # TODO: constant, SMG relevant, more options 
         if lives < self.lives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)):
-            message = random.nextInt(0, messages.Count)
+            message = random.randint(0, len(messages))
             await self.send_death(self.player_names[self.slot] + messages[message])
 
         self.lives = lives
