@@ -84,28 +84,6 @@ class SMGDOL(SMGObject):
 
         extra_space = 0x100
 
-        # Read the obj_arg0 and remove the upper 16 bits for koopa face model handling
-        self.write_pointer = self.custom_section_address + self.custom_section_size - extra_space
-        self.write_instruction(PPC.stwu(1, -0x10, 1), self.write_pointer)
-        self.write_instruction(PPC.mflr(0))
-        self.write_instruction(PPC.stw(0, 0x14, 1))
-        self.write_instruction(PPC.addi(4, 1, 8))
-        self.write_instruction(PPC.bl(0x803d41d8, self.write_pointer))
-        self.write_instruction(PPC.lwz(3, 8, 1))
-        self.write_instruction(self.rlwinm(3, 3, 0, 0x10, 0x1F))
-        self.write_instruction(PPC.lwz(0, 0x14, 1))
-        self.write_instruction(PPC.mtlr(0))
-        self.write_instruction(PPC.addi(1, 1, 0x10))
-        self.write_instruction(PPC.blr())
-
-        # Jump to the custom function to handle koopa face model
-        self.write_pointer = 0x801feedc
-        self.write_instruction(PPC.bl(self.custom_section_address + self.custom_section_size - extra_space, self.write_pointer))
-        self.write_instruction(PPC.mr(30, 3))
-
-        # Use koopa face model if obj_arg0 is 2
-        self.write_instruction(self.rlwinm(3, 0, 0x1F, 0x1F, 0x1F), 0x801fe9fc)
-
         # Return custom function
         self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - extra_space
         self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
@@ -193,6 +171,17 @@ class SMGDOL(SMGObject):
         # Get obj_arg0 from miniature galaxy
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
         self.write_instruction(self.rlwinm(3, 3, 16, 0x10, 0x1F))
+
+    def manipulate_arg0_loading(self):
+        self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
+        self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feedc)
+        self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801ff338)
+        self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ff4c8)
+        self.write_instruction(PPC.lhz(0, 0x8E, 29), 0x801ff8d8)
+        self.write_instruction(PPC.lhz(0, 0x8E, 29), 0x801ff940)
+        self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ff9b0)
+        self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ffa60)
+        self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801ffc44)
 
     def manipulate_star_loading(self):
         ################################
@@ -285,6 +274,7 @@ class SMGDOL(SMGObject):
         self.skip_opening()
         self.set_swing_permission()
         self.manipulate_miniature_orbit()
+        self.manipulate_arg0_loading()
         self.manipulate_star_loading()
         self.read_star_count()
         self.custom_powerstar_colour_loading()
