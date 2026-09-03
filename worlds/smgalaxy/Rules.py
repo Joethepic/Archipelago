@@ -391,6 +391,9 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Ghostly 2: Toadship Launch Star")
     world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY2BOORA),
                                                     "Ghostly 2: Pull Star Launch Star")
+
+world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY6MATTE),
+                                                    "Ghostly Secret: Stalagmite Launch Star")
     world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY3TOADS),
                                                     "Ghostly 3: Beware of Bouldergeist")
     world.get_region(regname.GHOSTLY3TOADS).connect(world.get_region(regname.GHOSTLY3ENTRY),
