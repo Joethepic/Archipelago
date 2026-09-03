@@ -18,6 +18,7 @@ from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 from .locations import SMGLocationData, location_table
 from .regions import SMGRegionData, region_list
 from .Constants.constants import *
+from .Constants.Names.item_names import *
 from .Constants.ram_constants import *
 
 import dolphin_memory_engine as dme
@@ -95,38 +96,28 @@ class StarColor(NamedTuple):
     name: str
     pointer: Pointer
 
-class StarColorEnum(IntEnum):
-    YELLOW = 0
-    BLUE = 1
-    GREEN = 2
-    RED = 3
-
 class StarColorHandler:
     pointers: dict[str, Pointer]
     star_colors: list[StarColor] = []
 
-    async def set_star_colors(self, galaxyName: str, starNum: int):
+    def __init__(self, pointers: dict[str, Pointer]):
+        self.star_colors = []
+        self.pointers = pointers
+
+    def set_star_colors(self, galaxyName: str, starNum: int):
         for star in self.star_colors:
             if star.name == galaxyName + "Colours" + str(starNum):
-                star.pointer.write_value(StarColorEnum.BLUE)
+                star.pointer.write_value(PowerStarColorEnum.BLUE)
 
-    async def set_all_star_colors(self):
+    def set_all_star_colors(self):
         self.star_colors = []
         for location in location_table.values():
-            starname = await self.get_pointer_name(location)
+            starname = self.get_pointer_name(location)
             star_color = StarColor(starname, self.pointers[starname])
             self.star_colors.append(star_color)
 
-    async def get_pointer_name(self, location):
+    def get_pointer_name(self, location: SMGLocationData):
         return location.in_game_galaxy_name + "Colours" + str(location.game_address)
-
-    def __init__(self):
-        self.star_colors = []
-        # 0 for yellow, 1 for blue, 2 for green, 3 is red
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer(None, ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
-        self.pointers = {**star_colour_pointers}
-        for pointer in self.pointers.values():
-            pointer.recalculate()
         
 class GalaxyContext(CommonContext):
     password_required: bool = False
@@ -146,6 +137,8 @@ class GalaxyContext(CommonContext):
     highest_processed_item_index: int
 
     lives: int
+
+    starcolorhandler: StarColorHandler
 
     def make_gui(self) -> type["kvui.GameManager"]:
         """
@@ -172,15 +165,24 @@ class GalaxyContext(CommonContext):
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
             [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
             value.region_offset is not None}
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer([], ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
-        
+
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): 
+                                Pointer([STATIC_VARIABLE_OFFSETS[STARCOLOUR] + value.region_offset * 2 + index], ValueType.u8, STATIC_VARIABLES_POINTER)
+                                for value in region_list.values() if value.region_offset is not None for index in range(8)}
+
         self.pointers = {**star_count_flag_pointers,
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
+                         POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
+                         GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
+                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER)}
                          #"Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+
+        # Setup the handler for managing the star colours in scenario select
+        self.starcolorhandler = StarColorHandler(star_colour_pointers)
 
     async def disconnect(self, msg: str = '') -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
@@ -249,7 +251,7 @@ class GalaxyContext(CommonContext):
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-          if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+        if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
         for location_id in self.checked_locations:
@@ -277,21 +279,21 @@ class GalaxyContext(CommonContext):
 
                 case 170000004:
                   logger.info("Power Star Received")
-                  stars = dme.read_byte(0x80001880)
-                  dme.write_byte(0x80001880, (stars + 1))
+                  powerstars = await self.pointers[POWER].get_value() + 1
+                  self.pointers[POWER].write_value(stars)
 
                 case 170000005:
                   logger.debug("Grand Star Received")
-                  stars = dme.read_byte(0x80001880)
-                  dme.write_byte(0x80001880, (stars + 1))
-                  stars = dme.read_byte(0x80001882)
-                  dme.write_byte(0x80001882, (stars + 1))
+                  powerstars = await self.pointers[POWER].get_value() + 1
+                  self.pointers[POWER].write_value(stars)
+                  grandstars = await self.pointers[GRAND].get_value() + 1
+                  self.pointers[GRAND].write_value(stars)
 
                 case 170000006:
                   # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
                   logger.debug("Green Star Received")
-                  stars = dme.read_byte(0x80001880)
-                  dme.write_byte(0x80001880, (stars + 1))
+                  powerstars = await self.pointers[POWER].get_value() + 1
+                  self.pointers[POWER].write_value(stars)
             
             self.highest_processed_item_index += 1
             #await self.pointers["Index"].write_value(self.highest_processed_item_index)
@@ -332,11 +334,11 @@ class GalaxyContext(CommonContext):
         if not await self.check_ingame():
             return
         await asyncio.sleep(WAIT_TIMER_LONG_TIMEOUT)
+
         lives = await self.pointers["Lives"].get_value()
-        messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"] # TODO: constant, SMG relevant, more options 
+
         if lives < self.lives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)):
-            message = random.randint(0, len(messages))
-            await self.send_death(self.player_names[self.slot] + messages[message])
+            await self.send_death(self.player_names[self.slot] + random.choice(DEATH_MESSAGES))
 
         self.lives = lives
 
@@ -437,9 +439,8 @@ class GalaxyContext(CommonContext):
         """Kill the player in game."""
         if not await self.check_ingame():
             return
-        
-        # TODO: constants
-        dme.write_byte(0x80001af0, 1)
+
+        self.pointers[DEATHLINK].write_value(True)
 
     async def server_auth(self, password_requested: bool = False) -> None:
         """

@@ -1,6 +1,9 @@
-from enum import IntEnum, StrEnum
+from enum import StrEnum
 from typing import NamedTuple
 
+from BaseClasses import ItemClassification
+
+from .constants import PowerStarColorEnum
 from .Names.region_names import GATEWAY
 from ..regions import region_list
 
@@ -145,3 +148,13 @@ class GalaxyUnlockTableFieldNames(StrEnum):
     OPEN_CONDITION2 = "OpenCondition2"
     POWER_STAR_REQUIREMENT = "PowerStarNum"
     RETURN_DOME = "GrandGalaxyNo"
+
+FILL_TYPE_TO_COLOUR_INDEX: dict[ItemClassification, int] = {
+    ItemClassification.filler: PowerStarColorEnum.GREEN,
+    ItemClassification.progression: PowerStarColorEnum.YELLOW,
+    ItemClassification.useful: PowerStarColorEnum.BLUE,
+    ItemClassification.trap: PowerStarColorEnum.RED,
+    ItemClassification.progression_deprioritized_skip_balancing: PowerStarColorEnum.YELLOW,
+    ItemClassification.progression_skip_balancing: PowerStarColorEnum.YELLOW,
+    ItemClassification.progression_deprioritized: PowerStarColorEnum.YELLOW
+}

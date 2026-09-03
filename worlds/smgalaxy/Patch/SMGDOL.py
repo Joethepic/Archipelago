@@ -3,56 +3,14 @@ from io import BytesIO
 from wiithon.ppc import instructions as PPC
 from wiithon.formats.dol import DOL
 
-from worlds.smgalaxy.Patch.extensions import SMGObject, SMGDOLObject, Pointer, CharPointer
+from .extensions import SMGObject, SMGDOLObject, Pointer
 from .SMGDolObjects.NameObjFactory import NameObjFactory
 from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
+from ..Constants.Names.item_names import POWER, GRAND
 from ..Constants.patch_constants import *
-
-
-class AstroDomeModels(SMGDOLObject):
-    astro_dome: list[CharPointer]
-    astro_dome_sky: list[CharPointer]
-    astro_dome_entrance: list[CharPointer]
-    astro_star_plate: list[CharPointer]
-
-    def __init__(self):
-        self.astro_dome_address: int = ASTRO_DOME_ARRAY_ADDRESS
-        self.astro_dome_sky_address: int = ASTRO_DOME_SKY_ARRAY_ADDRESS
-        self.astro_dome_entrance_address: int = ASTRO_DOME_ENTRANCE_ARRAY_ADDRESS
-        self.astro_star_plate_address: int = ASTRO_STAR_PLATE_ARRAY_ADDRESS
-
-        self.astro_dome = []
-        self.astro_dome_sky = []
-        self.astro_dome_entrance = []
-        self.astro_star_plate = []
-        
-        for index in range(6):
-            offset = index * 0x4
-            astro_dome_pointer = CharPointer(self.astro_dome_address + offset)
-            astro_dome_sky_pointer = CharPointer(self.astro_dome_sky_address + offset)
-            astro_dome_entrance_pointer = CharPointer(self.astro_dome_entrance_address + offset)
-            astro_star_plate_pointer = CharPointer(self.astro_star_plate_address + offset)
-
-            self.astro_dome.append(astro_dome_pointer)
-            self.astro_dome_sky.append(astro_dome_sky_pointer)
-            self.astro_dome_entrance.append(astro_dome_entrance_pointer)
-            self.astro_star_plate.append(astro_star_plate_pointer)
-    
-    def shuffle_list(self, pointer_list: list[CharPointer], shuffle: dict[int, int]):
-        assert len(pointer_list) == 6
-        
-        reverse_shuffle: dict[int, int] = {value: key for key, value in shuffle.items()}
-        addresses: list[int] = [pointer_list[i].pointing_address for i in range(6)]
-
-        for index, address in enumerate(addresses):
-            new_index = reverse_shuffle[index + 1] - 1
-            pointer_list[new_index].pointing_address = address
-            pointer_list[new_index].write_pointer()
-    
-    def update(self, dome_shuffle: dict[int, int], **kwargs):
-        self.shuffle_list(self.astro_dome_entrance, dome_shuffle)
-        self.shuffle_list(self.astro_dome, dome_shuffle)
-        self.shuffle_list(self.astro_dome_sky, dome_shuffle)
+from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..locations import location_table
+from ..regions import region_list, galaxies_list
 
 class SMGDOL(SMGObject):
     data: BytesIO
@@ -66,7 +24,9 @@ class SMGDOL(SMGObject):
     def __init__(self, dol: DOL):
         super().__init__(None)
         self.dol: DOL = dol
-        self.data = BytesIO(self.dol.to_bytes())
+
+        # Necessary for wiithon
+        #self.data = BytesIO(self.dol.to_bytes())
 
         Pointer.dol = self.dol
         SMGDOLObject.dol = self.dol
@@ -74,32 +34,41 @@ class SMGDOL(SMGObject):
         self.objects = {
             "NameObjectFactory": NameObjFactory(),
             "GalaxyUnlockTable": GalaxyUnlockTable(),
-            #"AstroDomeModels": AstroDomeModels()
         }
-
-        self.write_pointer = 0
 
         size, addrs = self.dol.inject_above_arena([PPC.nop() * int(self.custom_section_size/4)])
         self.custom_section_address = addrs[0]
 
-        extra_space = 0x100
+        print(f"Injected custom section at: {hex(self.custom_section_address)}")
 
-        # Return custom function
-        self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - extra_space
-        self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
-        self.write_instruction(PPC.lwz(0, 0x104, 1))
-        self.write_instruction(PPC.mtlr(0))
-        self.write_instruction(PPC.addi(1, 1, 0x100))
-        self.write_instruction(PPC.blr())
+        self.dol.write_at(STATIC_VARIABLES_POINTER, self.custom_section_address.to_bytes(4))
+
+        # Align to 4 bytes
+        variable_space = (STATIC_VARIABLE_OFFSETS["End"] + 0x3) & ~0x3
+
+        print(f"Functions starting at: {hex(self.custom_section_address + variable_space)}")
+
+        # Hook to custom function
+        self.write_pointer = 0x803995c0
+        self.write_instruction(PPC.b(self.custom_section_address + variable_space, self.write_pointer))
 
         # Setup custom function
-        self.write_instruction(PPC.stwu(1, -0x100, 1), self.custom_section_address)
+        self.write_pointer = self.custom_section_address + variable_space
+        self.write_instruction(PPC.stwu(1, -0x100, 1))
         self.write_instruction(PPC.mflr(0))
         self.write_instruction(PPC.stw(0, 0x104, 1))
         self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
         self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
 
         self.add_deathlink()
+        
+        # Return from custom function
+        self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - variable_space
+        self.write_instruction(PPC.bl(0x80517548, self.write_pointer))
+        self.write_instruction(PPC.lwz(0, 0x104, 1))
+        self.write_instruction(PPC.mtlr(0))
+        self.write_instruction(PPC.addi(1, 1, 0x100))
+        self.write_instruction(PPC.blr())
 
     @staticmethod
     def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
@@ -117,10 +86,18 @@ class SMGDOL(SMGObject):
         for _ in range(count):
             self.write_instruction(PPC.nop())
 
+    def get_upper_and_lower_unsigned(self, address: int) -> list[int, int]:
+        return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
+
+    def get_upper_and_lower_signed(self, address: int) -> list[int, int]:
+        if address & 0x0000FFFF >= 0x8000:
+            return ((address & 0xFFFF0000) >> 16) + 1, (address & 0x0000FFFF) - 0x10000
+        return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
+
     def add_deathlink(self):
-        # Load address from 0x80001af0
-        self.write_instruction(PPC.lis(31, -0x8000))
-        self.write_instruction(PPC.lbz(3, 0x1af0, 31))
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHLINK])
+        self.write_instruction(PPC.lis(31, upper))
+        self.write_instruction(PPC.lbz(3, lower, 31))
 
         # Skip the function if its zero
         self.write_instruction(PPC.cmpi(0, 3, 0))
@@ -129,7 +106,7 @@ class SMGDOL(SMGObject):
         # Kill mario and reset
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
-        self.write_instruction(PPC.stb(3, 0x1AF0, 31))
+        self.write_instruction(PPC.stb(3, lower, 31))
 
     def skip_opening(self):
         #######################################################
@@ -207,10 +184,11 @@ class SMGDOL(SMGObject):
         # Read star count from memory address #
         #######################################
         # Load upper 2 bytes of memory pointer (0x8000)
-        self.write_instruction(PPC.lis(3, -0x8000), 0x803b10fc)
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[POWER])
+        self.write_instruction(PPC.lis(3, upper), 0x803b10fc)
 
         # Load lower 2 bytes of memory pointer (0x1880), and load the byte at 0x80001880 into r3
-        self.write_instruction(PPC.lbz(3, 0x1880, 3))
+        self.write_instruction(PPC.lbz(3, lower, 3))
 
         # Skip the rest of the normal function
         self.write_instruction(PPC.b(0x803b113c, self.write_pointer))
@@ -219,6 +197,7 @@ class SMGDOL(SMGObject):
         ###################################
         # Custom powerstar colour loading #
         ###################################
+        upper, lower = self.get_upper_and_lower_unsigned(self.custom_section_address + STATIC_VARIABLE_OFFSETS[STARCOLOUR])
         self.write_instruction(PPC.stw(31, 0xC, 1), 0x8020f26c)
         self.write_instruction(PPC.addi(31, 3, -0x1))
         self.write_instruction(PPC.bl(0x803f5ab8, self.write_pointer))
@@ -227,8 +206,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0xC, 3))
         self.write_instruction(PPC.bl(0x803b1390, self.write_pointer))
         self.write_instruction(PPC.mulli(3, 3, 0x8))
-        self.write_instruction(PPC.lis(4, -0x8000))
-        self.write_instruction(PPC.ori(4, 4, 0x1900))
+        self.write_instruction(PPC.lis(4, upper))
+        self.write_instruction(PPC.ori(4, 4, lower))
         self.write_instruction(PPC.add(3, 3, 4))
         self.write_instruction(PPC.lbzx(3, 3, 31))
         self.write_instruction(PPC.lwz(31, 0xC, 1))
@@ -238,8 +217,9 @@ class SMGDOL(SMGObject):
         ##################################
         # Custom grandstar count loading #
         ##################################
-        self.write_instruction(PPC.lis(3, -0x8000), 0x803b1d08)
-        self.write_instruction(PPC.lbz(3, 0x1882, 3))
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GRAND])
+        self.write_instruction(PPC.lis(3, upper), 0x803b1d08)
+        self.write_instruction(PPC.lbz(3, lower, 3))
         self.write_instruction(PPC.addi(4, 4, -0x1))
         self.write_instruction(PPC.cmp(0, 3, 4))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
@@ -262,13 +242,25 @@ class SMGDOL(SMGObject):
         #################################################
         self.write_instruction(PPC.li(3, 1), 0x8017cd70)
 
-    def hook_to_custom_function(self):
-        ####################
-        # Custom Functions #
-        ####################
-        # Jump to custom section
-        self.write_pointer = 0x803995c0
-        self.write_instruction(PPC.b(self.custom_section_address, self.write_pointer))
+    def initialise_star_colours(self, locations: dict):
+        star_colour_address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[STARCOLOUR]
+
+        for location, data in locations.items():
+            scenario = location_table[location].game_address
+
+            if scenario == None:
+                continue
+
+            in_game_name = region_list[location_table[location].region].in_game_name
+
+            for galaxy in galaxies_list:
+                region = region_list[galaxy]
+                if in_game_name == region.in_game_name:
+                    galaxy_offset = region.region_offset * 2
+                    break
+
+            classification = ItemClassification[data["classification"]]
+            self.dol.write_at(star_colour_address + galaxy_offset + scenario, FILL_TYPE_TO_COLOUR_INDEX[classification].to_bytes())
 
     def update_instructions(self):
         self.skip_opening()
@@ -281,9 +273,8 @@ class SMGDOL(SMGObject):
         self.custom_grandstar_count()
         self.skip_wii_strap()
         self.show_bros_button()
-        self.hook_to_custom_function()
 
-    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int]):
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -292,5 +283,7 @@ class SMGDOL(SMGObject):
                           dome_shuffle=dome_shuffle,
                           dome_galaxies=dome_galaxies,
                           star_requirements=star_requirements)
+
+        self.initialise_star_colours(locations)
 
         self.update_instructions()

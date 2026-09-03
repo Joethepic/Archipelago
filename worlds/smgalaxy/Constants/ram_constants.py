@@ -1,3 +1,7 @@
+from typing import NamedTuple
+
+from .Names.item_names import POWER, GRAND
+
 # The base address of all the pointers
 GAMESYSTEM = 0x806A1228
 
@@ -28,5 +32,20 @@ SWING_PERMISSION_POINTER_LIST: list[int] = MARIO_ACTOR_POINTER_LIST + [0xEEB]
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder
 LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4, 0x30]
 
-GRANDSTAR_COUNT_ADDRESS = 0x80001882
-STAR_COLOUR_LIST_OFFSET = 0x80001900
+STATIC_VARIABLES_POINTER = 0x80004024
+STARCOLOUR = "Star Colour"
+DEATHLINK = "Deathlink"
+
+class StaticVariable(NamedTuple):
+    name: str
+    size: int
+
+variables: list[StaticVariable] = [
+    StaticVariable(POWER, 1),
+    StaticVariable(GRAND, 1),
+    StaticVariable(DEATHLINK, 1),
+    StaticVariable(STARCOLOUR, 8 * 45),
+    StaticVariable("End", 0)
+]
+
+STATIC_VARIABLE_OFFSETS: dict[str, int] = {var.name: sum(v.size for v in variables[:i]) for i, var in enumerate(variables)}

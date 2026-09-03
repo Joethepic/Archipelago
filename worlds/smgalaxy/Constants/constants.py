@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 # Client Constants
 AP_WORLD_VERSION_NAME: str = "APWorldVersion"
 CLIENT_VERSION: str = "V0.0.1"
@@ -15,6 +17,17 @@ CONNECTION_INITIAL_STATUS: str = "Dolphin emulator was not detected to be runnin
 DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY: str = "Dolphin did not load the ROM correctly. Close only the game / dolphin launcher and try again..."
 CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready to play SMG!"
 AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
+
+DEATH_MESSAGES = [
+    "got sucked into a black hole",
+    "ran into a goomba",
+    "fell into the void",
+    "got trampled by Bowser",
+    "failed to rescue Princess Peach",
+    "missed the power star",
+    "missed the grand star"
+    "flew too close to the sun"
+]
 
 WAIT_TIMER_LONG_TIMEOUT: int = 5
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
@@ -41,5 +54,11 @@ colors: dict[str, tuple[int, int, int]] = {"red": RED,
                                            "White" : WHITE,
                                            "Pink"  : PINK,
                                            "Gray"  : GRAY}
+
+class PowerStarColorEnum(IntEnum):
+    YELLOW = 0
+    BLUE = 1
+    GREEN = 2
+    RED = 3
 
 class InvalidCleanISOError(Exception): pass
