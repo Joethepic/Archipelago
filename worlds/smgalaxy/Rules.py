@@ -392,7 +392,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY2BOORA),
                                                     "Ghostly 2: Pull Star Launch Star")
 
-world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY6MATTE),
+    world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY6MATTE),
                                                     "Ghostly Secret: Stalagmite Launch Star")
     world.get_region(regname.GHOSTLY).connect(world.get_region(regname.GHOSTLY3TOADS),
                                                     "Ghostly 3: Beware of Bouldergeist")
@@ -841,7 +841,7 @@ world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY
     world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN3TOPPL),
                                                     "Dreadnought 3: Landing Sling Star")
 
-world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN6BREAK),
+    world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN6BREAK),
                                                     "Dreadnought Secret: Landing Warp Pipe")
     world.get_region(regname.DREADN3TOPPL).connect(world.get_region(regname.DREADN3METAL),
                                                     "Dreadnought 3: Caged Luma Sling Star")
