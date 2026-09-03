@@ -261,15 +261,15 @@ locDN_table: dict[str, SMGLocationData]  = {
 
 locMM_table: dict[str, SMGLocationData]  = {
     locname.MELTYMOLTENSTAR1: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations"], regname.MELTY1SINKI,
-                                              170000104, galaxyignname.MELTYMOLTEN, game_address=0),
+                                              170000104, galaxyignname.MELTY, game_address=0),
     locname.MELTYMOLTENSTAR2: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations"], regname.MELTY2CIRCL,
-                                              170000105, galaxyignname.MELTYMOLTEN, game_address=1),
+                                              170000105, galaxyignname.MELTY, game_address=1),
     locname.MELTYMOLTENSTAR3: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations"], regname.MELTY3FDINO,
-                                              170000106, galaxyignname.MELTYMOLTEN, game_address=2),
+                                              170000106, galaxyignname.MELTY, game_address=2),
     locname.MELTYMOLTENSTAR4: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations"], regname.MELTY4SINKI,
-                                              170000107, galaxyignname.MELTYMOLTEN, game_address=3),
+                                              170000107, galaxyignname.MELTY, game_address=3),
     locname.MELTYMOLTENSTAR6: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations"], regname.MELTY6LAVAS,
-                                              170000109, galaxyignname.MELTYMOLTEN, game_address=4)
+                                              170000109, galaxyignname.MELTY, game_address=4)
 }
 
 locHL_table: dict[str, SMGLocationData]  = {
@@ -295,7 +295,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     locname.DREADNOUGHTSTAR5: SMGLocationData(["Dreadnought Galaxy", "Power Star Locations", "Purple Coins"], regname.DREADN5STARS,
                                               170000102, galaxyignname.DREADNOUGHT, game_address=5),
     locname.MELTYMOLTENSTAR5: SMGLocationData(["Melty Molten Galaxy", "Power Star Locations", "Purple Coins"], regname.MELTY5VOLCA,
-                                              170000108, galaxyignname.MELTYMOLTEN, game_address=5),
+                                              170000108, galaxyignname.MELTY, game_address=5),
     locname.DEEPDARKSTAR5: SMGLocationData(["Deep Dark Galaxy", "Power Star Locations", "Purple Coins"], regname.DEEPDA5SHIPC,
                                            170000096, galaxyignname.DEEPDARK, game_address=5),
     locname.SEASLIDESTAR5: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations", "Purple Coins"], regname.SEASLI5SLIDE,
