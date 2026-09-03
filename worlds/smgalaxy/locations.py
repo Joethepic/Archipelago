@@ -209,15 +209,15 @@ locGL_table: dict[str, SMGLocationData]  = {
 #TODO: Change abbrivation
 locSS_table: dict[str, SMGLocationData]  = {
     locname.SEASLIDESTAR1: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations"], regname.SEASLI1SLIDE,
-                                           170000080, galaxyignname.SEAGLIDE, game_address=0),
+                                           170000080, galaxyignname.SEASLIDE, game_address=0),
     locname.SEASLIDESTAR2: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations"], regname.SEASLI2SLIDE,
-                                           170000081, galaxyignname.SEAGLIDE, game_address=1),
+                                           170000081, galaxyignname.SEASLIDE, game_address=1),
     locname.SEASLIDESTAR3: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations"], regname.SEASLI3LANDI,
-                                           170000082, galaxyignname.SEAGLIDE, game_address=2),
+                                           170000082, galaxyignname.SEASLIDE, game_address=2),
     locname.SEASLIDESTAR4: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations"], regname.SEASLI4SLIDE,
-                                           170000083, galaxyignname.SEAGLIDE, game_address=3),
+                                           170000083, galaxyignname.SEASLIDE, game_address=3),
     locname.SEASLIDESTAR6: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations"], regname.SEASLI6HURRY,
-                                           170000085, galaxyignname.SEAGLIDE, game_address=4)
+                                           170000085, galaxyignname.SEASLIDE, game_address=4)
 }
 
 locTT_table: dict[str, SMGLocationData]  = {
@@ -299,7 +299,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     locname.DEEPDARKSTAR5: SMGLocationData(["Deep Dark Galaxy", "Power Star Locations", "Purple Coins"], regname.DEEPDA5SHIPC,
                                            170000096, galaxyignname.DEEPDARK, game_address=5),
     locname.SEASLIDESTAR5: SMGLocationData(["Sea Slide Galaxy", "Power Star Locations", "Purple Coins"], regname.SEASLI5SLIDE,
-                                           170000084, galaxyignname.SEAGLIDE, game_address=5),
+                                           170000084, galaxyignname.SEASLIDE, game_address=5),
     locname.GOODEGGSTAR5: SMGLocationData(["Good Egg Galaxy", "Power Star Locations", "Purple Coins"], regname.GOODEGG5PEARP,
                                           170000005, galaxyignname.GOODEGG, game_address=5),
     locname.GATEWAYSTAR2: SMGLocationData([regname.GATEWAY, "Power Star Locations", "Purple Coins"], regname.GATEWAY2HOMEP,
