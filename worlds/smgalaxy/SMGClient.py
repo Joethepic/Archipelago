@@ -91,6 +91,43 @@ class GalaxyCommand(ClientCommandProcessor):
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
+class StarColor(NamedTuple):
+    name: str
+    pointer: Pointer
+
+class StarColorEnum(IntEnum):
+    YELLOW = 0
+    BLUE = 1
+    GREEN = 2
+    RED = 3
+
+class StarColorHandler:
+    pointers: dict[str, Pointer]
+    star_colors: list[StarColor] = []
+
+    async def set_star_colors(self, galaxyName: str, starNum: int):
+        for star in self.star_colors:
+            if star.name == galaxyName + "Colours" + str(starNum):
+                star.pointer.write_value(StarColorEnum.BLUE)
+
+    async def set_all_star_colors(self):
+        self.star_colors = []
+        for location in location_table.values():
+            starname = await self.get_pointer_name(location)
+            star_color = StarColor(starname, self.pointers[starname])
+            self.star_colors.append(star_color)
+
+    async def get_pointer_name(self, location):
+        return location.in_game_galaxy_name + "Colours" + str(location.game_address)
+
+    def __init__(self):
+        self.star_colors = []
+        # 0 for yellow, 1 for blue, 2 for green, 3 is red
+        star_colour_pointers = {value.in_game_name + "Colours" + str(index): Pointer(None, ValueType.u8, STAR_COLOUR_LIST_OFFSET + value.region_offset * 2 + index) for value in region_list.values() if value.region_offset is not None for index in range(8)}
+        self.pointers = {**star_colour_pointers}
+        for pointer in self.pointers.values():
+            pointer.recalculate()
+        
 class GalaxyContext(CommonContext):
     password_required: bool = False
     rom_loaded: bool = False
@@ -212,11 +249,15 @@ class GalaxyContext(CommonContext):
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-            if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
-                if (star_bit_flag & (1 << local_loc.game_address)) > 0:
-                    self.locations_checked.add(loc_id)
-                    logger.info(loc_id)
-
+          if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+            if (star_bit_flag & (1 << local_loc.game_address)) > 0:
+                self.locations_checked.add(loc_id)
+        for location_id in self.checked_locations:
+            for key, location in location_table.items():
+                if key == self.location_names.lookup_in_game(location_id):
+                    await self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
+                else: 
+                    continue
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
@@ -261,6 +302,7 @@ class GalaxyContext(CommonContext):
         
         for key, pointer in self.pointers.items():
             await pointer.recalculate()
+            await self.starcolorhandler.set_all_star_colors()
 
         self.needs_recalculating = False
     

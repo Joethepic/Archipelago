@@ -3,6 +3,7 @@ from BaseClasses import Location, Region
 from rule_builder.rules import Rule, CanReachLocation, True_
 
 from.Constants.Names import region_names as regname
+from .Constants.Names import galaxy_in_game_names as galaxyIG
 from .Constants.Names import location_names as locname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
 
