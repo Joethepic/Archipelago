@@ -840,6 +840,9 @@ world.get_region(regname.GHOSTLY2ENTRY).connect(world.get_region(regname.GHOSTLY
                                                     "Dreadnought 3: Revenge of the Topman Tribe")
     world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN3TOPPL),
                                                     "Dreadnought 3: Landing Sling Star")
+
+world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN6BREAK),
+                                                    "Dreadnought Secret: Landing Warp Pipe")
     world.get_region(regname.DREADN3TOPPL).connect(world.get_region(regname.DREADN3METAL),
                                                     "Dreadnought 3: Caged Luma Sling Star")
     world.get_region(regname.DREADN3METAL).connect(world.get_region(regname.DREADN3PULLP),
