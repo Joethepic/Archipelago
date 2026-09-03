@@ -46,6 +46,9 @@ class SMGDOL(SMGObject):
         # Align to 4 bytes
         variable_space = (STATIC_VARIABLE_OFFSETS["End"] + 0x3) & ~0x3
 
+        # Clear out the space
+        self.dol.write_at(self.custom_section_address, bytes(variable_space))
+
         print(f"Functions starting at: {hex(self.custom_section_address + variable_space)}")
 
         # Hook to custom function
