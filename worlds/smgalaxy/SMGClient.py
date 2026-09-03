@@ -304,7 +304,7 @@ class GalaxyContext(CommonContext):
         
         for key, pointer in self.pointers.items():
             await pointer.recalculate()
-            await self.starcolorhandler.set_all_star_colors()
+            self.starcolorhandler.set_all_star_colors()
 
         self.needs_recalculating = False
     
