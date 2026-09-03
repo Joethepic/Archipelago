@@ -842,7 +842,7 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Dreadnought 3: Landing Sling Star")
 
     world.get_region(regname.DREADN3LANDI).connect(world.get_region(regname.DREADN6BREAK),
-                                                    "Dreadnought Secret: Landing Warp Pipe")
+                                                    "Dreadnought Secret: Landing Green Pipe")
     world.get_region(regname.DREADN3TOPPL).connect(world.get_region(regname.DREADN3METAL),
                                                     "Dreadnought 3: Caged Luma Sling Star")
     world.get_region(regname.DREADN3METAL).connect(world.get_region(regname.DREADN3PULLP),
