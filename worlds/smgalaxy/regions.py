@@ -72,7 +72,7 @@ region_list: dict[str, SMGRegionData] = {
     regname.BOWJR2: SMGRegionData("Boss", 0x4C, galaxyIG.BOWJR2),
     regname.BOWJR3: SMGRegionData("Boss", 0x7C, galaxyIG.BOWJR3), # Dome 5
     regname.BOWSER1: SMGRegionData("Boss", 0x30, galaxyIG.BOWSER1),
-    regname.BOWSER2: SMGRegionData("Boss", 0x64, galaxyIG.BOWJR2),
+    regname.BOWSER2: SMGRegionData("Boss", 0x64, galaxyIG.BOWSER2),
     regname.BOWSER3: SMGRegionData("Goal", 0x94, galaxyIG.BOWSER3),
     regname.GOODEGG: SMGRegionData("Major", 0x4, galaxyIG.GOODEGG),
     regname.HONEYHIVE: SMGRegionData("Major", 0x8, galaxyIG.HONEYHIVE),

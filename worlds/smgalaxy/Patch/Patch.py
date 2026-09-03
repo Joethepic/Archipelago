@@ -64,6 +64,7 @@ class GalaxyShuffle:
 
 class Patch:
     seed: int
+    dol: SMGDOL
     counts: dict[str, int]
     galaxies: dict[str, str]
     mario_colours: dict[str, str]
@@ -115,14 +116,14 @@ class Patch:
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":
             return
-        
-        mini_galaxy = self.dol.objects["NameObjectFactory"].get_name_to_create_function_elements_by_name("Mini" + galaxy_name)
-        surp_galaxy = self.dol.objects["NameObjectFactory"].get_name_to_create_function_elements_by_name("Surp" + galaxy_name)
+    
+        mini_galaxy = self.dol.objects["NameObjectFactory"].create_mgr.get_create_funcs_by_name("Mini" + galaxy_name)
+        surp_galaxy = self.dol.objects["NameObjectFactory"].create_mgr.get_create_funcs_by_name("Surp" + galaxy_name)
 
         if mini_galaxy:
-            name_address = mini_galaxy[0].name_pointer.pointing_address
+            name_address = mini_galaxy[0].name.pointing_address
         elif surp_galaxy:
-            name_address = surp_galaxy[0].name_pointer.pointing_address
+            name_address = surp_galaxy[0].name.pointing_address
         else:
             raise ValueError(f"{galaxy_name} cannot be found.")
 
@@ -180,7 +181,9 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
             patcher.patch_dol(dol_patch)
 
-            patcher.build(target, lambda x: print(x))
+            print("Starting building...")
+
+            patcher.build(target)
         
 
 class SMGPlayerContainer(APPlayerContainer):

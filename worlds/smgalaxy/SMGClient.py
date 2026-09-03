@@ -179,6 +179,7 @@ class GalaxyContext(CommonContext):
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16)}
+                         #"Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
     async def disconnect(self, msg: str = '') -> None:
@@ -248,7 +249,7 @@ class GalaxyContext(CommonContext):
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-
+          if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
         for location_id in self.checked_locations:
@@ -263,7 +264,9 @@ class GalaxyContext(CommonContext):
         """Modify the items we have received to change things in game."""
         if not await self.check_ingame():
             return
-        
+        # currently errors on using pointer
+        #logger.info(self.pointers["Index"].address)
+        #self.highest_processed_item_index = await self.pointers["Index"].get_value()
         # Note: will resend items upon reconnection
         for item_id in self.items_received[self.highest_processed_item_index:]:
             # TODO: change to constants and probably a NamedTuple aswell
@@ -279,6 +282,8 @@ class GalaxyContext(CommonContext):
 
                 case 170000005:
                   logger.debug("Grand Star Received")
+                  stars = dme.read_byte(0x80001880)
+                  dme.write_byte(0x80001880, (stars + 1))
                   stars = dme.read_byte(0x80001882)
                   dme.write_byte(0x80001882, (stars + 1))
 
@@ -289,7 +294,7 @@ class GalaxyContext(CommonContext):
                   dme.write_byte(0x80001880, (stars + 1))
             
             self.highest_processed_item_index += 1
-            
+            #await self.pointers["Index"].write_value(self.highest_processed_item_index)
     async def recalculate_pointers(self) -> None:
         """Recalculate the chain of offsets for each pointer as to avoid stale memory reading."""
         if not self.needs_recalculating:
@@ -324,14 +329,13 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if not self.check_ingame():
+        if not await self.check_ingame():
             return
-        
+        await asyncio.sleep(WAIT_TIMER_LONG_TIMEOUT)
         lives = await self.pointers["Lives"].get_value()
-        messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"] # TODO: constant and SMG relevant
-        
+        messages = ["didn't see that coming", "missed their jump", "is probally blamming their controller"] # TODO: constant, SMG relevant, more options 
         if lives < self.lives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)):
-            message = random.nextInt(0, messages.Count)
+            message = random.randint(0, len(messages))
             await self.send_death(self.player_names[self.slot] + messages[message])
 
         self.lives = lives

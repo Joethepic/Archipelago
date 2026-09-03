@@ -1,4 +1,3 @@
-from wiithon import WiiIsoPatcher
 from wiithon.formats.bcsv import BCSV
 
 from worlds.smgalaxy.Patch import hashtable
@@ -47,4 +46,4 @@ class AstroDomeScenario(SMGObject):
                 print(f"Loading zone dome {scenario_no} -> dome {shuffle[scenario_no]}")
 
                 entry["ScenarioNo"] = shuffle[scenario_no]
-                entry["AstroDome"] = 1 << (reverse_shuffle[scenario_no] - 1)
+                entry["AstroDome"] = 1 << (shuffle[scenario_no] - 1)
