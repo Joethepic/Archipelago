@@ -217,14 +217,17 @@ class HideGalaxy(Choice):
     """
     Choose Galaxy visibility in domes
 
-    Visible - All galaxies will have a shadow silhouette represent the galaxy present
+    Visible - All galaxies will have a shadow silhouette represent the galaxy present and show star count required to open
 
-    Hide Minors - Minor Galaxies will appear as question mark blocks until opened for the first time
+    Hide Minors - Minor Galaxies will appear as question mark blocks until opened for the first time. Majors will still
+        show a galaxy silhouette but minors will not show the star count required to open them.
 
-    Hide All - All Galaxies will appear as question mark blocks until opened for the first time
+    Hide All - All Galaxies will appear as question mark blocks until opened for the first time. Neither will show how
+        many stars are required to open the galaxy.
     """
     display_name = "Hide Galaxy"
     internal_name = "hide_galaxy"
+    default = 1
     option_Visible = 0
     option_Hide_Minors = 1
     option_Hide_All = 2
