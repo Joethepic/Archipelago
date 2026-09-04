@@ -75,8 +75,7 @@ class GalaxyUnlockTable(SMGDOLObject):
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.NAME] = entry.name
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0] = entry.open_condition0
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1] = entry.open_condition1
-            self.table.entries[entry.entry_index][
-                GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
+            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME] = entry.return_dome
 
         bcsv_bytes = self.table.export_bcsv(str_fmt="shift-jis")

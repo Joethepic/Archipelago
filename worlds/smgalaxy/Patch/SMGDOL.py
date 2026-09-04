@@ -3,9 +3,11 @@ from io import BytesIO
 from wiithon.ppc import instructions as PPC
 from wiithon.formats.dol import DOL
 
+
 from .extensions import SMGObject, SMGDOLObject, Pointer
 from .SMGDolObjects.NameObjFactory import NameObjFactory
 from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
+from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND
 from ..Constants.patch_constants import *
 from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
@@ -34,6 +36,7 @@ class SMGDOL(SMGObject):
         self.objects = {
             "NameObjectFactory": NameObjFactory(),
             "GalaxyUnlockTable": GalaxyUnlockTable(),
+            "GameEventFlagTable": GameEventFlagTable()
         }
 
         size, addrs = self.dol.inject_above_arena([PPC.nop() * int(self.custom_section_size/4)])

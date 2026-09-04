@@ -41,6 +41,9 @@ class Pointer:
     def write_pointer(self):
         self.dol.write_at(self.base_address, int.to_bytes(self.pointing_address, 4, "big"))
 
+    def zero(self):
+        self.dol.write_at(self.base_address, bytes(4))
+        self.pointing_address = 0
 
 class CharPointer(Pointer):
     string: str | None
@@ -54,6 +57,10 @@ class CharPointer(Pointer):
 
         raw = self.dol.read_until_null_at(self.pointing_address)
         self.string = raw.decode("shift-jis")
+
+    def zero(self):
+        super().zero()
+        self.string = None
 
     def write_string(self) -> None:
         self.dol.write_at(self.pointing_address, self.string.encode("shift-jis") + b'\0')
