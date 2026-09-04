@@ -198,7 +198,7 @@ class GalaxyContext(CommonContext):
         Args:
             msg (str): Error message to send to the client.
         """
-        super().disconnect()
+        await super().disconnect()
         dme.un_hook()
 
         if msg:
