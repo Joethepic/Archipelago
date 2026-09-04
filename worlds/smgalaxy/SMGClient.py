@@ -258,15 +258,17 @@ class GalaxyContext(CommonContext):
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-        if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+    
             if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                 self.locations_checked.add(loc_id)
+
         for location_id in self.checked_locations:
             for key, location in location_table.items():
-                if key == self.location_names.lookup_in_game(location_id):
-                    await self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
-                else: 
+                if key != self.location_names.lookup_in_game(location_id):
                     continue
+                
+                await self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
+                    
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
@@ -345,7 +347,7 @@ class GalaxyContext(CommonContext):
 
         lives = await self.pointers["Lives"].get_value()
 
-        if lives < self.lives and time.time() >= float(self.last_death_link + (WAIT_TIMER_LONG_TIMEOUT * 3)):
+        if lives < self.lives and time.time() >= float(self.last_death_link + DEATH_LINK_TIMEOUT):
             await self.send_death(self.player_names[self.slot] + random.choice(DEATH_MESSAGES))
 
         self.lives = lives
