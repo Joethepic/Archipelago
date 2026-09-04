@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from .Names.item_names import POWER, GRAND
+from .Names.item_names import POWER, GRAND, GREEN
 
 # The base address of all the pointers
 GAMESYSTEM = 0x806A1228
@@ -43,6 +43,7 @@ class StaticVariable(NamedTuple):
 variables: list[StaticVariable] = [
     StaticVariable(POWER, 1),
     StaticVariable(GRAND, 1),
+    StaticVariable(GREEN, 1),
     StaticVariable(DEATHLINK, 1),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable("End", 0)

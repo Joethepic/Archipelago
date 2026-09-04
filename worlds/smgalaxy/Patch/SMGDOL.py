@@ -8,7 +8,7 @@ from .extensions import SMGObject, SMGDOLObject, Pointer
 from .SMGDolObjects.NameObjFactory import NameObjFactory
 from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
-from ..Constants.Names.item_names import POWER, GRAND
+from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
 from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import location_table
@@ -247,6 +247,11 @@ class SMGDOL(SMGObject):
         # Show the bros button to select Mario or Luigi #
         #################################################
         self.write_instruction(PPC.li(3, 1), 0x8017cd70)
+
+    def custom_green_star_count(self):
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREEN])
+        self.write_instruction(PPC.lis(3, upper), 0x803ccaa0)
+        self.write_instruction(PPC.lbz(3, lower, 3))
 
     def initialise_star_colours(self, locations: dict):
         star_colour_address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[STARCOLOUR]
