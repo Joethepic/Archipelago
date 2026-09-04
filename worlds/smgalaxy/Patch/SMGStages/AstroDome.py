@@ -28,9 +28,9 @@ class AstroDomes(SMGObject):
                                       if data.type == "Special"]
         self.gateway: str = region_list[GATEWAY].in_game_name
 
-    def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], show_galaxies: int,  **kwargs):
+    def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], show_galaxies: int, **kwargs):
         for index in range(1, 7):
-            self.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index], show_galaxies: int)
+            self.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index], show_galaxies)
 
     def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int, show_galaxies: int):
         """
