@@ -20,7 +20,7 @@ class FlagType(IntEnum):
 class GameEventFlagTableEntry:
     def __init__(self, flag_name_pointer: CharPointer, flag_type: FlagType, dont_save: bool,
                  condition1: int, condition2: int, condition3: CharPointer, condition4: CharPointer):
-        self.flag_name_pointer: CharPointer = flag_name_pointer,
+        self.flag_name_pointer: CharPointer = flag_name_pointer
         self.flag_type: FlagType = flag_type
         self.dont_save: bool = dont_save
         self.condition1: int = condition1
@@ -47,10 +47,10 @@ class GameEventFlagTable(SMGDOLObject):
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
         element_count = GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT
         element_size = GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE
-
+        
         for element_index in range(element_count):
             offset = start_address + element_size * element_index
-
+            
             flag_name_pointer = CharPointer(offset + 0x0)
             flag_type = FlagType(int.from_bytes(self.dol.read_at(offset + 0x4, 1)))
             dont_save = int.from_bytes(self.dol.read_at(offset + 0x5, 1))
@@ -58,7 +58,7 @@ class GameEventFlagTable(SMGDOLObject):
             condition2 = int.from_bytes(self.dol.read_at(offset + 0x7, 1))
             condition3 = CharPointer(offset + 0xC)
             condition4 = CharPointer(offset + 0x10)
-
+            
             entry = GameEventFlagTableEntry(flag_name_pointer, flag_type, dont_save, condition1, condition2, condition3, condition4)
             self.entries.append(entry)
 
@@ -100,9 +100,11 @@ class GameEventFlagTable(SMGDOLObject):
         raise ValueError(f"{flag_name} could not be found in the GameEventFlagTable.")
 
     def update(self, **kwargs) -> None:
-        # Set all "Appear" flags to require 0 power stars
+        assert len(self.entries) == GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT
+        
         for entry in self.entries:
-            if not entry.flag_name_pointer.string.startswith("Appear"):
+            flag_name = entry.flag_name_pointer.string
+            if not flag_name.startswith("Appear"):
                 continue
 
             entry.flag_type = FlagType.PowerStarCount
@@ -112,16 +114,14 @@ class GameEventFlagTable(SMGDOLObject):
             entry.condition4.zero()
 
         # Write all the entry values
-        assert len(self.entries) == GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT
-
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
         element_size = GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE
 
         for entry_index, entry in enumerate(self.entries):
             offset = start_address + element_size * entry_index
             entry.flag_name_pointer.write_pointer()
-            self.dol.write_at(offset + 0x4, entry.dont_save.to_bytes())
-            self.dol.write_at(offset + 0x5, entry.flag_type.to_bytes())
+            self.dol.write_at(offset + 0x4, entry.flag_type.to_bytes())
+            self.dol.write_at(offset + 0x5, entry.dont_save.to_bytes())
             self.dol.write_at(offset + 0x6, entry.condition1.to_bytes())
             self.dol.write_at(offset + 0x7, entry.condition2.to_bytes())
             entry.condition3.write_pointer()
