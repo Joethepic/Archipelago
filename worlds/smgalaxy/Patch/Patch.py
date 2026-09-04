@@ -84,7 +84,7 @@ class Patch:
         # Options
         self.mario_colours: dict[str, str] = output['Options']['mario_colors']
         self.dome_shuffle: dict[str, str] = output['Options']['dome_shuffle']
-        self.show_galaxies: int = output['Options']['hide_galaxies']
+        self.show_galaxies: int = output['Options']['hide_galaxy']
 
         self.old_galaxies: list = list(self.galaxies.keys())
         self.new_galaxies: list = list(self.galaxies.values())
