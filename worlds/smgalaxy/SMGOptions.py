@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict, Any
 
-import Options
-from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict
+
+from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup
 
 class GalaxyShuffle(OptionSet):
     """
@@ -213,6 +213,21 @@ class MarioColors(OptionDict):
         "Gloves": "White"
     }
 
+class HideGalaxy(Choice):
+    """
+    Choose Galaxy visibility in domes
+
+    Visible - All galaxies will have a shadow silhouette represent the galaxy present
+
+    Hide Minors - Minor Galaxies will appear as question mark blocks until opened for the first time
+
+    Hide All - All Galaxies will appear as question mark blocks until opened for the first time
+    """
+    display_name = "Hide Galaxy"
+    internal_name = "hide_galaxy"
+    option_Visible = 0
+    option_Hide_Minors = 1
+    option_Hide_All = 2
 
 # this defines all the options.
 @dataclass
@@ -229,18 +244,19 @@ class SMGOptions(PerGameCommonOptions):
     dome_shuffle: ShuffleDomes
     galaxy_shuffle: GalaxyShuffle
     galaxy_shuffle_type: GalaxyShuffleType
+    hide_galaxy: HideGalaxy
 
 option_groups = [
-    Options.OptionGroup("Extra Locations", [
+    OptionGroup("Extra Locations", [
         EnablePurpleCoinStars,
     ]),
-    Options.OptionGroup("Access Options", [
+    OptionGroup("Access Options", [
         StarstoFinish,
         ShuffleDomes,
         GalaxyShuffle,
         GalaxyShuffleType
     ]),
-    Options.OptionGroup("Dome Offsets", [
+    OptionGroup("Dome Offsets", [
        Dome1Offsets,
        Dome2Offsets,
        Dome3Offsets,
@@ -248,8 +264,9 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
-    Options.OptionGroup("Cosmetics", [
-        MarioColors
+    OptionGroup("Cosmetics", [
+        MarioColors,
+        HideGalaxy,
     ]),
 ]
 

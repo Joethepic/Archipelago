@@ -8,7 +8,7 @@ from worlds.LauncherComponents import Component, SuffixIdentifier, Type, compone
 import typing
 import logging
 
-from . import items, regions, Rules, web_world, Options
+from . import items, regions, Rules, web_world, SMGOptions
 from .Constants.Names import region_names as regname, item_names as itemname, location_names as locname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
@@ -37,8 +37,8 @@ class SMGWorld(World):
     web = web_world.SMGWebWorld()
     
     #option definitions
-    options_dataclass = Options.SMGOptions
-    options: Options.SMGOptions
+    options_dataclass = SMGOptions.SMGOptions
+    options: SMGOptions.SMGOptions
     settings: ClassVar[SuperMarioGalaxy]
 
     item_name_to_id: ClassVar[dict[str, int]] = ITEM_NAME_TO_ID

@@ -11,7 +11,7 @@ from wiithon import WiiIsoPatcher
 from wiithon.formats.rarc import Rarc
 
 from ...Constants.patch_constants import *
-from ...Options import MarioColors
+from ...SMGOptions import MarioColors
 from ..extensions import SMGObject
 from ...Constants.constants import *
 

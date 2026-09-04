@@ -5,7 +5,7 @@ from entrance_rando import disconnect_entrance_for_randomization
 import logging
 
 from .Constants.Names import region_names as regname, galaxy_in_game_names as galaxyIG
-from .Options import SMGOptions
+from .SMGOptions import SMGOptions
 from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
 
 if TYPE_CHECKING:
