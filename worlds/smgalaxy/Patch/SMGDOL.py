@@ -285,7 +285,14 @@ class SMGDOL(SMGObject):
         self.skip_wii_strap()
         self.show_bros_button()
 
-    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict):
+    def show_galaxy_star_counter(self):
+        self.write_instruction(PPC.cmpi(0, 3, 4), 0x801ff4cc)
+
+    def hide_galaxy_star_counter(self):
+        self.write_pointer = 0x801ff4cc
+        self.write_instruction(PPC.b(self.write_pointer + 85 * 0x4, self.write_pointer))
+
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -298,3 +305,8 @@ class SMGDOL(SMGObject):
         self.initialise_star_colours(locations)
 
         self.update_instructions()
+
+        if show_galaxies == 0:
+            self.show_galaxy_star_counter()
+        elif show_galaxies == 2:
+            self.hide_galaxy_star_counter()

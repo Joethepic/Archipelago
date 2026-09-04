@@ -32,7 +32,7 @@ class AstroDomes(SMGObject):
         for index in range(1, 7):
             self.update_dome([galaxy for galaxy in galaxy_shuffle if galaxy.dome_index == index], index, dome_shuffle[index])
 
-    def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int):
+    def update_dome(self, new_galaxies: list[GalaxyDestination], dome_index: int, interior_dome_index: int, show_galaxies: int):
         """
         Update the dome with new galaxies. The dome to update is determined by the dome index (from 1 to 6). The list of new galaxies
         is expected to all have type "dome" and contain all the galaxies that should be in the dome. The dome index of the new galaxies
@@ -58,7 +58,10 @@ class AstroDomes(SMGObject):
     
                     # Store the galaxy type in the lower bits
                     if galaxy.name in self.major_galaxy_list:
-                        obj_arg0 += 0
+                        if show_galaxies == 2:
+                            obj_arg0 += 1
+                        else:
+                            obj_arg0 += 0
                     elif galaxy.name in self.minor_galaxy_list or galaxy.name in self.special_galaxy_list:
                         obj_arg0 += 1
     
@@ -67,7 +70,10 @@ class AstroDomes(SMGObject):
                         elif galaxy.name in self.special_galaxy_list:
                             self.surprised_galaxy.create_luma_miniature("Mini" + galaxy.name)
                     elif galaxy.name in self.boss_galaxy_list:
-                        obj_arg0 += 2
+                        if show_galaxies == 2:
+                            obj_arg0 += 1
+                        else:
+                            obj_arg0 += 2
 
                     entry["Obj_arg0"] = obj_arg0
 
