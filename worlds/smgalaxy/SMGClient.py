@@ -184,7 +184,8 @@ class GalaxyContext(CommonContext):
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER)}
+                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         GREEN: Pointer([STATIC_VARIABLE_OFFSETS[GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER)}
                          #"Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
