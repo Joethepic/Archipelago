@@ -128,6 +128,14 @@ class GameEventFlagTable(SMGDOLObject):
                 entry.condition2 = 0
                 entry.condition3.zero()
                 entry.condition4.zero()
+            
+            # Always spawn the green star launcher
+            elif flag_name == "SpecialStarGreenAll":
+                entry.flag_type = FlagType.PowerStarCount
+                entry.condition1 = 0
+                entry.condition2 = 0
+                entry.condition3.zero()
+                entry.condition4.zero()
 
         # Write all the entry values
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
