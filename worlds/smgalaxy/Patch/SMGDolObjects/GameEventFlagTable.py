@@ -42,6 +42,8 @@ class GameEventFlagTable(SMGDOLObject):
     entries: list[GameEventFlagTableEntry]
 
     def __init__(self):
+        self.entries = []
+
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
         element_count = GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT
         element_size = GAME_EVENT_FLAG_TABLE_ELEMENT_SIZE
