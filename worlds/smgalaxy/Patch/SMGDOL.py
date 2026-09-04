@@ -105,9 +105,9 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lis(31, upper))
         self.write_instruction(PPC.lbz(3, lower, 31))
 
-        # Skip the function if its zero
-        self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(4, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        # Skip the function if its less than 1
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
 
         # Kill mario and reset
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
