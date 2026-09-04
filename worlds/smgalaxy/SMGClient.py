@@ -267,7 +267,7 @@ class GalaxyContext(CommonContext):
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
                 
-                await self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
+                self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
                     
         await self.check_locations(self.locations_checked)
     
