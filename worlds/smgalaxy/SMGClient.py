@@ -290,22 +290,22 @@ class GalaxyContext(CommonContext):
                 case 170000004:
                     logger.info("Power Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(max(245, powerstars))
+                    self.pointers[POWER].write_value(min(245, powerstars))
 
                 case 170000005:
                     logger.debug("Grand Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(powerstars)
+                    self.pointers[POWER].write_value(min(245, powerstars))
                     grandstars = await self.pointers[GRAND].get_value() + 1
-                    self.pointers[GRAND].write_value(max(7, grandstars))
+                    self.pointers[GRAND].write_value(min(7, grandstars))
 
                 case 170000006:
                     # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
                     logger.debug("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(powerstars)
+                    self.pointers[POWER].write_value(min(245, powerstars))
                     greenstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[GREEN].write_value(max(3, greenstars))
+                    self.pointers[GREEN].write_value(min(3, greenstars))
             
             self.highest_processed_item_index += 1
             #await self.pointers["Index"].write_value(self.highest_processed_item_index)
