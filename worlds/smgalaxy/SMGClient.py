@@ -304,6 +304,8 @@ class GalaxyContext(CommonContext):
                     logger.debug("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(powerstars)
+                    greenstars = await self.pointers[POWER].get_value() + 1
+                    self.pointers[GREEN].write_value(greenstars)
             
             self.highest_processed_item_index += 1
             #await self.pointers["Index"].write_value(self.highest_processed_item_index)
