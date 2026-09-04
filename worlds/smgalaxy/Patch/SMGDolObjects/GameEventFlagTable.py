@@ -1,4 +1,4 @@
-from enum import Flag, IntEnum
+from enum import IntEnum
 
 from ..extensions import SMGDOLObject, CharPointer
 from ...Constants.patch_constants import *
@@ -100,7 +100,7 @@ class GameEventFlagTable(SMGDOLObject):
         raise ValueError(f"{flag_name} could not be found in the GameEventFlagTable.")
 
     def update(self, **kwargs) -> None:
-        # Set all "Appear" flags to require 1 power star
+        # Set all "Appear" flags to require 0 power stars
         for entry in self.entries:
             if not entry.flag_name_pointer.string.startswith("Appear"):
                 continue
