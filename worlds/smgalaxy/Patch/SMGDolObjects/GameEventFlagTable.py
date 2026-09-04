@@ -104,14 +104,30 @@ class GameEventFlagTable(SMGDOLObject):
         
         for entry in self.entries:
             flag_name = entry.flag_name_pointer.string
-            if not flag_name.startswith("Appear"):
-                continue
+            match flag_name:
+                # Turn off appear requirements
+                case flag_name.startswith("Appear"):
+                    entry.flag_type = FlagType.PowerStarCount
+                    entry.condition1 = 0
+                    entry.condition2 = 0
+                    entry.condition3.zero()
+                    entry.condition4.zero()
 
-            entry.flag_type = FlagType.PowerStarCount
-            entry.condition1 = 0
-            entry.condition2 = 0
-            entry.condition3.zero()
-            entry.condition4.zero()
+                # Turn off normal comet spawns
+                case flag_name.startswith("NormalComet"):
+                    entry.flag_type = FlagType.PowerStarCount
+                    entry.condition1 = 255
+                    entry.condition2 = 0
+                    entry.condition3.zero()
+                    entry.condition4.zero()
+    
+                # Turn on comet luma
+                case "EventCometStarter":
+                    entry.flag_type = FlagType.PowerStarCount
+                    entry.condition1 = 0
+                    entry.condition2 = 0
+                    entry.condition3.zero()
+                    entry.condition4.zero()
 
         # Write all the entry values
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
