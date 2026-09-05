@@ -65,7 +65,7 @@ class Pointer:
             str: The value at the address.
         """
         if self.address == -1:
-            raise ValueError("Address of pointer is not initialised")
+            raise ValueError(f"Address of pointer is not initialised.\nOffsets: {self.offsets}\nType: {self.value_type}\nBase address: {hex(self.base)}")
 
         value = dme.read_bytes(self.address, self.value_type.value.size)
         unpack_val = struct.unpack(self.value_type.value.format, value)[0]

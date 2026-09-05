@@ -30,7 +30,7 @@ MARIO_ACTOR_POINTER_LIST: list[int] = [0x24, 0xAC, 0x10, 0x50, 0xC]
 SWING_PERMISSION_POINTER_LIST: list[int] = MARIO_ACTOR_POINTER_LIST + [0xEEB]
 
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder
-LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4, 0x30]
+LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x30]
 
 STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
