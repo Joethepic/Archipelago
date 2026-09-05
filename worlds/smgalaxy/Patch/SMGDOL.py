@@ -10,7 +10,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import location_table
 from ..regions import region_list, galaxies_list
 
@@ -292,7 +292,10 @@ class SMGDOL(SMGObject):
         self.write_pointer = 0x801ff4cc
         self.write_instruction(PPC.b(self.write_pointer + 85 * 0x4, self.write_pointer))
 
-    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int):
+    def write_slot_name(self, slot_name: str):
+        self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
+
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int, slot_name: str):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -310,3 +313,5 @@ class SMGDOL(SMGObject):
             self.show_galaxy_star_counter()
         elif show_galaxies == 2:
             self.hide_galaxy_star_counter()
+
+        self.write_slot_name(slot_name)
