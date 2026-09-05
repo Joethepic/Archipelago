@@ -88,9 +88,9 @@ class SMGDOL(SMGObject):
         self.dol.write_at(self.write_pointer, instruction_bytes)
         self.write_pointer += 4
 
-    def write_nop(self, count: int) -> None:
+    def write_nop(self, count: int, address: int = None) -> None:
         for _ in range(count):
-            self.write_instruction(PPC.nop())
+            self.write_instruction(PPC.nop(), address)
 
     def get_upper_and_lower_unsigned(self, address: int) -> list[int, int]:
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
@@ -170,20 +170,27 @@ class SMGDOL(SMGObject):
         ################################
         # Scenario select star loading #
         ################################
-        # Keep loading regular stars even if they're not available yet
-        self.write_instruction(PPC.li(3, 1), 0x8037d9ec)
+        # Calculate normal scenario count to be equal to the scenario count
+        self.write_instruction(PPC.stw(3, 0, 29), 0x8037da1c)
+        self.write_nop(2)
 
-        # Calculate all secret/comet stars, including possibly normally unavailable ones
-        self.write_instruction(PPC.li(3, 1), 0x8037da44)
+        # Calculate special scenario count to be equal to the total count minus normal count
+        self.write_instruction(PPC.stw(0, 0x0, 28), 0x8037da70)
+        self.write_nop(1)
+        self.write_instruction(PPC.li(3, 0))
 
-        # Show secret/comet stars as calculated above
-        self.write_instruction(PPC.li(3, 1), 0x8037db54)
+        # Appear the normal star as collected if actually collected
+        self.write_instruction(PPC.addi(3, 30, 1), 0x8037daf8)
+        self.write_instruction(PPC.bl(0x803cc8e0, self.write_pointer))
+        self.write_instruction(PPC.mr(6, 3))
 
-        # Set visibility to 1 (not collected) if appearing as collected has failed (ensuring it shows up even if not available)
-        self.write_instruction(PPC.li(6, 1), 0x8037db18)
+        # Appear the special star as collected if actually collected
+        self.write_instruction(PPC.mr(6, 3), 0x8037db5c)
+        self.write_nop(1, 0x8037db68)
+        self.write_nop(1, 0x8037db74)
 
-        # Always show up and appear correctly as collected/not collected
-        self.write_instruction(PPC.li(6, 1), 0x8037db74)
+        # Skip showing the "New" tag
+        self.write_instruction(PPC.li(3, 1), 0x8037cbf4)
 
     def read_star_count(self):
         #######################################
