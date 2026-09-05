@@ -35,6 +35,8 @@ LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4, 0x30
 STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
 DEATHLINK = "Deathlink"
+LAST_RECV_INDEX = "Last Item Received Idx"
+SLOTNAME = "Slot Name"
 
 class StaticVariable(NamedTuple):
     name: str
@@ -45,6 +47,7 @@ variables: list[StaticVariable] = [
     StaticVariable(GRAND, 1),
     StaticVariable(GREEN, 1),
     StaticVariable(DEATHLINK, 1),
+    StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable("End", 0)
 ]

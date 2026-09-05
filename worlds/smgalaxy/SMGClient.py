@@ -36,6 +36,7 @@ class ValueType(Enum):
     s16 = TypeTuple(">h", 2)
     s32 = TypeTuple(">i", 4)
     string32 = TypeTuple(">32s", 32)
+    string64 = TypeTuple(">64s", 64)
 
 class Pointer:
     address: int
@@ -68,7 +69,7 @@ class Pointer:
 
         value = dme.read_bytes(self.address, self.value_type.value.size)
         unpack_val = struct.unpack(self.value_type.value.format, value)[0]
-        if self.value_type == ValueType.string32:
+        if self.value_type == ValueType.string32 or self.value_type == ValueType.string64:
             unpack_val = unpack_val.decode("ascii").split("\x00")[0]
         return unpack_val
 
@@ -185,8 +186,10 @@ class GalaxyContext(CommonContext):
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
-                         GREEN: Pointer([STATIC_VARIABLE_OFFSETS[GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER)}
-                         #"Index": Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)}
+                         GREEN: Pointer([STATIC_VARIABLE_OFFSETS[GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
+                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
+                         LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
+        }
                          #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
 
         # Setup the handler for managing the star colours in scenario select
@@ -276,10 +279,8 @@ class GalaxyContext(CommonContext):
         """Modify the items we have received to change things in game."""
         if not await self.check_ingame():
             return
-        # currently errors on using pointer
-        #logger.info(self.pointers["Index"].address)
-        #self.highest_processed_item_index = await self.pointers["Index"].get_value()
-        # Note: will resend items upon reconnection
+
+        self.highest_processed_item_index = await self.pointers[LAST_RECV_INDEX].get_value()
         for item_id in self.items_received[self.highest_processed_item_index:]:
             # TODO: change to constants and probably a NamedTuple aswell
             match item_id.item:
@@ -384,7 +385,7 @@ class GalaxyContext(CommonContext):
                     return
 
                 if not self.auth:
-                    await self.get_username()
+                    self.auth = await self.pointers[SLOTNAME].get_value()
                     
                 # Inform the player we are ready and waiting for them to connect.
                 if not self.rom_loaded:
