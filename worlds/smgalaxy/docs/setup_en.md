@@ -1,10 +1,10 @@
-# Luigi's Mansion Multiworld Setup Guide
+# Super Mario Galaxy Multiworld Setup Guide
 
 ## Required Software
 
 - [Archipelago Multiworld Suite](https://github.com/ArchipelagoMW/Archipelago/releases). 
 - [Dolphin Gamecube/Wii Emulator](https://dolphin-emu.org/)
-- Your American ISO file, probably named `Suprr Mario Galaxy (NTSC-U).iso`. Support for other versions is planned in the distant future
+- Your American ISO file, probably named `Super Mario Galaxy (NTSC-U).iso`. Support for other versions is planned in the distant future
 
 ## Installation Procedures
 
@@ -29,18 +29,26 @@ Run the emulator at least once to make sure it is working.
 
 ### What is a config file and why do I need one?
 
-Your config file contains a set of configuration options which provide the generator with information about how it
+Your config (YAML) file contains a set of configuration options which provide the generator with information about how it
 should generate your game. Each player of a multiworld will provide their own config file. This setup allows each player
 to enjoy an experience customized for their taste, and different players in the same multiworld can all have different
 options.
 
 ### Where do I get a config file?
+You have a few options on how to make your YAML config file. 
 
-Run the ArchipelagoLauncher.exe from your Archipelago install and click `Generate Template Options`.
-This will produce a `/Players/Templates` folder in your Archipelago install, which contains default config files for 
-every game in your `custom_worlds` and `lib/worlds` folder. You can manually edit the config file using a text editor of your choice.
+The easiest way is to open the Options Creator in the Archipelago Launcher. Run the ArchipelagoLauncher.exe from your 
+Archipelago install and open the Options Creator. On the left side is a list of all the games you have in your 
+`custom_worlds` and all the core games. Until a future update comes, you will have to scroll through the games to find 
+the one you would like to play. After you select it, the options for that game will appear in the right side of the screen. 
+After filling in your options, you will be able to export the file to use for yourself or give to the host.
 
-Alternately, the [Player Settings](../player-settings) page on the website allows you to configure
+Your second option is also through the Archipelago Launcher. Run the ArchipelagoLauncher.exe from your Archipelago 
+install and click `Generate Template Options`. This will produce a `/Players/Templates` folder in your Archipelago 
+install, which contains default config files for every game in your `custom_worlds` and `lib/worlds` folder. 
+You can manually edit the config file using a text editor of your choice.
+
+Alternately, the [Player Settings](../player-settings) page on the website (if this game is present there) allows you to configure
 your personal settings and export a config file from them.
 
 ### Verifying your config file
@@ -69,7 +77,7 @@ to continue later.
    - You ***must*** use a brand new save file, not a New Game Plus file
 8. In the server page, there will be a port number. Copy this port number into the top of your SMGClient if it did not populate on its own. 
    - The field should read `archipelago.gg:<port number>`
-9. Once you have loaded into the game, click the `Connect` button at the top of the LMClient. You are now connected and ready to play!
+9. Once you have loaded into the game, click the `Connect` button at the top of the SMGClient. You are now connected and ready to play!
    - The client takes around 10 seconds to finish connecting
    - Unfortunately, due to the nature of some checks, you must be connected to a server while playing. Please keep a link to the webpage on hand
 10. To rejoin the room later, you need to open the webpage, open the SMG Client through the Archipelago Launcher, and open the patched ISO with Dolphin.
