@@ -309,8 +309,9 @@ class GalaxyContext(CommonContext):
                     self.pointers[GREEN].write_value(min(3, greenstars))
             
             self.highest_processed_item_index += 1
-            self.pointers[LAST_RECV_INDEX].write_value(self.highest_processed_item_index)
-            #await self.pointers["Index"].write_value(self.highest_processed_item_index)
+
+        self.pointers[LAST_RECV_INDEX].write_value(self.highest_processed_item_index)
+            
     async def recalculate_pointers(self) -> None:
         """Recalculate the chain of offsets for each pointer as to avoid stale memory reading."""
         if not self.needs_recalculating:
