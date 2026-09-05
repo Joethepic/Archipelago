@@ -372,7 +372,9 @@ class GalaxyContext(CommonContext):
             # If DME is not already hooked or connected in any way
             if not dme.is_hooked() and not await self.try_hook():
                 return
-                
+
+            await self.recalculate_pointers()
+                            
             if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                 #checks the id of the game as a string
                 romgameid: bytes = dme.read_bytes(0x80000000,6)
@@ -398,8 +400,8 @@ class GalaxyContext(CommonContext):
                     await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                     return
 
-            await self.recalculate_pointers()
             self.lives = await self.pointers["Lives"].get_value()
+
             # Currently verified connected to AP and dolphin is properly loaded
             await self.last_visited_galaxy()
             await self.smg_locs_checker()
