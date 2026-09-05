@@ -20,6 +20,7 @@ from .SMGStages.AstroGalaxy import AstroGalaxy
 from ..regions import region_list
 from ..SMGSettings import get_base_rom_path
 from ..Constants.constants import GAME_NAME
+from ..Constants.Names import region_names as regname
 
 class GalaxyDestination(NamedTuple):
     name: str
@@ -56,10 +57,40 @@ class GalaxyShuffle:
             elif location.startswith("Gateway"):
                 new_galaxy = GalaxyDestination(galaxy, "gateway", None, None, None)
 
-            else:
-                luma_name: str = location.replace("Hungry Luma", "Galaxy").replace("Launch Star", "Galaxy")
-                new_galaxy = GalaxyDestination(galaxy, "luma", None, None, region_list[luma_name].in_game_name)
-            
+            elif "Hungry Luma" in location:
+                luma_name: str = location.replace("Hungry Luma", "Galaxy")
+
+                if luma_name == regname.SWEETSWEET:
+                    dome_index = 0
+                elif luma_name == regname.SLINGPOD:
+                    dome_index = 1
+                elif luma_name == regname.DRIPDROP:
+                    dome_index = 2
+                elif luma_name == regname.BOOBONE:
+                    dome_index = 3
+                elif luma_name == regname.SNOWCAP:
+                    dome_index = 4
+                elif luma_name == regname.SANDSPIRAL:
+                    dome_index = 5
+                elif luma_name == regname.BIGMOUTH:
+                    dome_index = 6
+
+                new_galaxy = GalaxyDestination(galaxy, "luma", dome_index, None, region_list[luma_name].in_game_name)
+
+            elif "Launch Star" in location:
+                luma_name: str = location.replace("Launch Star", "Galaxy")
+
+                if luma_name == regname.ROLLINGGIZ:
+                    orbit_index = 0
+                elif luma_name == regname.LOOPDEESWOOP:
+                    orbit_index = 1
+                elif luma_name == regname.BUBBLEBLAST:
+                    orbit_index = 2
+                elif luma_name == regname.FINALE:
+                    orbit_index = 3
+
+                new_galaxy = GalaxyDestination(galaxy, "luma", None, orbit_index, region_list[luma_name].in_game_name)
+
             self.galaxy_destinations.append(new_galaxy)
 
 class Patch:
@@ -208,8 +239,3 @@ class SMGPlayerContainer(APPlayerContainer):
     def write_contents(self, opened_zipfile: zipfile.ZipFile) -> None:
         opened_zipfile.writestr("patch.json", json.dumps(self.output_data, indent=4, default=convert_to_base_types))
         super().write_contents(opened_zipfile)
-
-if __name__ == "__main__":
-    patch_path = r"C:/Users/sebas/Documents/GitHub/Archipelago/output/AP_91073106683428351458_P1_Player1.apsmg"
-    
-    #SuperMarioGalaxyRandomiser.patch(patch_path)

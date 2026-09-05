@@ -10,7 +10,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import STARCOLOUR, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import location_table
 from ..regions import region_list, galaxies_list
 
@@ -280,6 +280,16 @@ class SMGDOL(SMGObject):
             classification = ItemClassification[data["classification"]]
             self.dol.write_at(star_colour_address + galaxy_offset + scenario, FILL_TYPE_TO_COLOUR_INDEX[classification].to_bytes())
 
+    def show_green_galaxies(self):
+        self.write_pointer = 0x80248888
+        self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
+
+    def overwrite_all_greens_launch_star(self):
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREEN])
+        self.write_instruction(PPC.lis(3, upper), 0x803cd988)
+        self.write_instruction(PPC.lbz(3, lower, 3))
+        self.write_instruction(PPC.blr())
+
     def update_instructions(self):
         self.skip_opening()
         self.set_swing_permission()
@@ -291,6 +301,8 @@ class SMGDOL(SMGObject):
         self.custom_grandstar_count()
         self.skip_wii_strap()
         self.show_bros_button()
+        self.show_green_galaxies()
+        self.overwrite_all_greens_launch_star()
 
     def show_galaxy_star_counter(self):
         self.write_instruction(PPC.cmpi(0, 3, 4), 0x801ff4cc)
@@ -298,6 +310,32 @@ class SMGDOL(SMGObject):
     def hide_galaxy_star_counter(self):
         self.write_pointer = 0x801ff4cc
         self.write_instruction(PPC.b(self.write_pointer + 85 * 0x4, self.write_pointer))
+
+    def update_green_galaxies(self, green_galaxies: list[GalaxyDestination]):
+        assert len(green_galaxies) == 3
+
+        # Create the string pool in the allocated section
+        strings: list[str] = ["AstroGalaxy_TicoCommon000"] + [galaxy.name for galaxy in green_galaxies] + ["PeachCastleFinalGalaxy", "unknown"]
+
+        string_offsets: list[int] = [0]
+        for string in strings[:-1]:
+            string_offsets.append(len(string) + 1)
+
+        offset = self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY]
+        for string, string_offset in zip(strings, string_offsets):
+            offset += string_offset
+            self.dol.write_at(offset, string.encode('utf-8'))
+
+        # Write instructions to load from the new string pool instead
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY])
+        self.write_instruction(PPC.lis(31, upper), 0x802935c8)
+        self.write_instruction(PPC.addi(31, 31, lower), 0x802935d8)
+
+        self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:2])), 0x80293664) # Green Galaxy 1
+        self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:3])), 0x80293670) # Green Galaxy 2
+        self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:4])), 0x8029367c) # Green Galaxy 3
+        self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:5])), 0x80293688) # Grand Finale
+        self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:6])), 0x802936d0) # unknown (literally)
 
     def write_slot_name(self, slot_name: str):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
@@ -320,5 +358,7 @@ class SMGDOL(SMGObject):
             self.show_galaxy_star_counter()
         elif show_galaxies == 2:
             self.hide_galaxy_star_counter()
+
+        self.update_green_galaxies([galaxy for galaxy in luma_galaxies if galaxy.orbit_index != None])
 
         self.write_slot_name(slot_name)
