@@ -235,8 +235,7 @@ class GalaxyContext(CommonContext):
             for key, location in location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
-                
-                self.starcolorhandler.set_star_colors(location.in_game_galaxy_name, location.game_address)
+                self.pointers[location.in_game_name].write_value(1)
                     
         await self.check_locations(self.locations_checked)
     
