@@ -179,13 +179,30 @@ class SMGDOL(SMGObject):
         self.write_nop(1)
         self.write_instruction(PPC.li(3, 0))
 
-        # Appear the normal star as collected if actually collected
+        # Calculate if star is collected
         self.write_instruction(PPC.addi(3, 30, 1), 0x8037daf8)
         self.write_instruction(PPC.bl(0x803cc8e0, self.write_pointer))
-        self.write_instruction(PPC.mr(6, 3))
 
-        # Appear the special star as collected if actually collected
-        self.write_instruction(PPC.mr(6, 3), 0x8037db5c)
+        hide = False
+        if hide:
+            # Appear the normal star as collected if actually collected
+            self.write_instruction(PPC.mr(6, 3))
+            self.write_nop(1)
+        else:
+            # Appear the normal star as "uncollected" only if collected
+            self.write_instruction(PPC.cntlzw(6, 3))
+            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
+        self.write_instruction(PPC.b(self.write_pointer + 5 * 0x4, self.write_pointer))
+
+        self.write_pointer = 0x8037db58
+        if hide:
+            # Appear the special star as collected if actually collected
+            self.write_instruction(PPC.mr(6, 3))
+            self.write_nop(1)
+        else:
+            # Appear the special star as "uncollected" only if collected
+            self.write_instruction(PPC.cntlzw(6, 3))
+            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
         self.write_nop(1, 0x8037db68)
         self.write_nop(1, 0x8037db74)
 

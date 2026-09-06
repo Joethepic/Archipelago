@@ -40,9 +40,11 @@ class GameEventFlagTableEntry:
 
 class GameEventFlagTable(SMGDOLObject):
     entries: list[GameEventFlagTableEntry]
+    galaxy_names: list[CharPointer]
 
     def __init__(self):
         self.entries = []
+        self.galaxy_names = []
 
         start_address = GAME_EVENT_FLAG_TABLE_START_ADDRESS
         element_count = GAME_EVENT_FLAG_TABLE_ELEMENT_COUNT
@@ -61,6 +63,9 @@ class GameEventFlagTable(SMGDOLObject):
             
             entry = GameEventFlagTableEntry(flag_name_pointer, flag_type, dont_save, condition1, condition2, condition3, condition4)
             self.entries.append(entry)
+
+            if flag_type == FlagType.Type_6:
+                self.galaxy_names.append(flag_name_pointer)
 
     def set_entry(self, flag_name: str, flag_type: FlagType = None, dont_save: bool = None,
                   condition1: int = None, condition2: int = None,
