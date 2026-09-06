@@ -7,7 +7,6 @@ from gclib.j3d import BDL
 
 from PIL.Image import Image
 
-from wiithon import WiiIsoPatcher
 from wiithon.formats.rarc import Rarc
 
 from ...Constants.patch_constants import *
