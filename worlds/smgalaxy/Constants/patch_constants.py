@@ -17,7 +17,6 @@ SURPRISED_GALAXY_PATH = "/ObjectData/MiniSurprisedGalaxy.arc"
 ASTRO_DOME_PATH = "/StageData/AstroDome.arc"
 ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
 ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
-POWER_STAR_PATH = "/ObjectData/PowerStar.arc"
 
 # ASTRODOMEENTRANCES
 class Domes(StrEnum):
