@@ -232,6 +232,17 @@ class HideGalaxy(Choice):
     option_Hide_Minors = 1
     option_Hide_All = 2
 
+class StarColors(Toggle):
+    """
+    If this option is enabled, each star in the Star Select screen will be colored according to the classification of
+    the item on that star location. After it has been collected, the star will be clear
+
+    If the option is disabled, all stars will start clear and become colored according to item classification after
+    clearing the stage.
+    """
+    display_name = "Star Colors"
+    internal_name = "star_colors"
+
 # this defines all the options.
 @dataclass
 class SMGOptions(PerGameCommonOptions):
@@ -248,6 +259,7 @@ class SMGOptions(PerGameCommonOptions):
     galaxy_shuffle: GalaxyShuffle
     galaxy_shuffle_type: GalaxyShuffleType
     hide_galaxy: HideGalaxy
+    star_colors: StarColors
 
 option_groups = [
     OptionGroup("Extra Locations", [
@@ -269,6 +281,7 @@ option_groups = [
     ]),
     OptionGroup("Cosmetics", [
         MarioColors,
+        StarColors,
         HideGalaxy,
     ]),
 ]
