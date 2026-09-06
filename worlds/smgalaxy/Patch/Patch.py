@@ -14,6 +14,7 @@ from worlds.smgalaxy.Patch.extensions import SMGObject
 from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
+from .SMGObjects.PowerStar import PowerStar
 from .SMGStages.AstroDome import AstroDomes
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
@@ -128,7 +129,8 @@ class Patch:
             "AstroGalaxy": AstroGalaxy(),
             "AstroDomeScenario": AstroDomeScenario(),
             "AstroDomes": AstroDomes(),
-            "AstroDomeEntrances": AstroDomeEntrances()
+            "AstroDomeEntrances": AstroDomeEntrances(),
+            "PowerStar": PowerStar()
         }
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
