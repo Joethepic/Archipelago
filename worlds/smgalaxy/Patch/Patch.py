@@ -117,6 +117,7 @@ class Patch:
         self.mario_colours: dict[str, str] = output['Options']['mario_colors']
         self.dome_shuffle: dict[str, str] = output['Options']['dome_shuffle']
         self.show_galaxies: int = output['Options']['hide_galaxy']
+        self.star_colours: int = output['Options']['star_colors']
 
         self.old_galaxies: list = list(self.galaxies.keys())
         self.new_galaxies: list = list(self.galaxies.values())
@@ -151,7 +152,8 @@ class Patch:
                         star_requirements=star_requirements,
                         locations=self.locations,
                         show_galaxies=self.show_galaxies,
-                        slot_name=self.slot_name)
+                        slot_name=self.slot_name,
+                        hide_star_colours=self.star_colours)
 
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":

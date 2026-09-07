@@ -166,7 +166,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ffa60)
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801ffc44)
 
-    def manipulate_star_loading(self):
+    def manipulate_star_loading(self, hide: bool):
         ################################
         # Scenario select star loading #
         ################################
@@ -183,7 +183,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(3, 30, 1), 0x8037daf8)
         self.write_instruction(PPC.bl(0x803cc8e0, self.write_pointer))
 
-        hide = False
         if hide:
             # Appear the normal star as collected if actually collected
             self.write_instruction(PPC.mr(6, 3))
@@ -312,7 +311,6 @@ class SMGDOL(SMGObject):
         self.set_swing_permission()
         self.manipulate_miniature_orbit()
         self.manipulate_arg0_loading()
-        self.manipulate_star_loading()
         self.read_star_count()
         self.custom_powerstar_colour_loading()
         self.custom_grandstar_count()
@@ -357,7 +355,7 @@ class SMGDOL(SMGObject):
     def write_slot_name(self, slot_name: str):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
 
-    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int, slot_name: str):
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -375,6 +373,8 @@ class SMGDOL(SMGObject):
             self.show_galaxy_star_counter()
         elif show_galaxies == 2:
             self.hide_galaxy_star_counter()
+
+        self.manipulate_star_loading(hide_star_colours)
 
         self.update_green_galaxies([galaxy for galaxy in luma_galaxies if galaxy.orbit_index != None])
 
