@@ -136,7 +136,7 @@ class GalaxyContext(CommonContext):
 
         # Create pointer dictionary for all the galaxy star flags
         star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
-            [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u16) for value in region_list.values() if
+            [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u8) for value in region_list.values() if
             value.region_offset is not None}
 
         star_colour_pointers = {value.in_game_name + "Colours" + str(index): 
@@ -231,12 +231,6 @@ class GalaxyContext(CommonContext):
                 if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                     self.locations_checked.add(loc_id)
 
-        for location_id in self.checked_locations:
-            for key, location in location_table.items():
-                if key != self.location_names.lookup_in_game(location_id):
-                    continue
-                dme.write_byte(hex(self.pointers[region_data.in_game_name].address) + hex(8) + hex(location.game_address), 1)
-                    
         await self.check_locations(self.locations_checked)
     
     async def smg_recv_items(self) -> None:
