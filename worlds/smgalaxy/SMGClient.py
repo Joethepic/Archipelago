@@ -20,7 +20,7 @@ from .regions import SMGRegionData, region_list
 from .Constants.constants import *
 from .Constants.Names.item_names import *
 from .Constants.ram_constants import *
-from StarColor import *
+from .StarColor import *
 import dolphin_memory_engine as dme
 
 class TypeTuple(NamedTuple):
