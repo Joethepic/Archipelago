@@ -19,9 +19,9 @@ class Gateway:
         self.bdl_entry = self.arc_file.get_file(GATEWAY_BDL_NAME)
 
     def create_miniature(self):
-        # Scale the BDL to the desired size
         bdl = BDL(BytesIO(self.bdl_entry.data))
 
+        # Scale the BDL to the desired size
         for joint in bdl.jnt1.joints:
             scale = 3.14
             joint.bounding_sphere_radius *= scale
@@ -40,13 +40,16 @@ class Gateway:
             chunk.save()
         bdl.save()
 
-        self.arc_file.replace_file(GATEWAY_BDL_NAME, bdl.data.getvalue())
-
         name: str = MINIATURE_GATEWAY_NAME.lower()
-        self.arc_file.get_node('').name = name
-        self.arc_file.get_file(GATEWAY_BDL_NAME).name = name + ".bdl"
+        self.arc_file.get_node('.').name = name
+        self.arc_file.replace_file(GATEWAY_BDL_NAME, bdl.data.getvalue(), name + ".bdl")
+        self.arc_file.remove_file("astrochildroom.kcl")
+        self.arc_file.remove_file("astrochildroom.pa")
+        self.arc_file.remove_file("collisionversion")
+        self.arc_file.remove_file("revival.brk")
 
         new_file_path = OBJECT_DATA_PATH + MINIATURE_GATEWAY_NAME + ".arc"
 
         print(f"Creating {MINIATURE_GATEWAY_NAME}.arc")
+
         self.patcher.add_file(new_file_path, self.arc_file.get_bytes())
