@@ -235,7 +235,7 @@ class GalaxyContext(CommonContext):
             for key, location in location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
-                self.pointers[location.in_game_name].write_value(1)
+                dme.write_byte(hex(self.pointers[region_data.in_game_name].address) + hex(8) + hex(location.game_address), 1)
                     
         await self.check_locations(self.locations_checked)
     
