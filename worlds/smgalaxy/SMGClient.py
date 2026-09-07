@@ -10,8 +10,8 @@ import random
 
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-from .Constants.ram_constants import *
 from .Constants.constants import *
+from .Constants.ram_constants import *
 from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .regions import SMGRegionData, region_list
