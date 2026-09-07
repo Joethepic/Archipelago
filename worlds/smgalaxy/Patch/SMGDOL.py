@@ -183,7 +183,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(3, 30, 1), 0x8037daf8)
         self.write_instruction(PPC.bl(0x803cc8e0, self.write_pointer))
 
-        if hide:
+        if not hide:
             # Appear the normal star as collected if actually collected
             self.write_instruction(PPC.mr(6, 3))
             self.write_nop(1)
@@ -194,7 +194,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.b(self.write_pointer + 5 * 0x4, self.write_pointer))
 
         self.write_pointer = 0x8037db58
-        if hide:
+        if not hide:
             # Appear the special star as collected if actually collected
             self.write_instruction(PPC.mr(6, 3))
             self.write_nop(1)
