@@ -201,10 +201,12 @@ class MarioColors(OptionDict):
 
     The following predetermined colors are available:
     "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
+
+    Putting Random with any color will set all 4 pieces to a random color
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
-    valid_keys = ["Hat", "Overalls", "Shoes", "Gloves"]
+    valid_keys = ["Hat", "Overalls", "Shoes", "Gloves", "Random"]
     valid_values = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"]
     default = {
         "Hat": "Red",
