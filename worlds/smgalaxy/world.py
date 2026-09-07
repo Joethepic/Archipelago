@@ -60,6 +60,14 @@ class SMGWorld(World):
     def generate_early(self) -> None:
         self.galaxy_counts = self.get_galaxy_counts()
 
+        if "Random" in self.options.mario_colors.value.keys():
+            self.options.mario_colors.value = {
+                "Hat": self.random.choice(sorted(self.options.mario_colors.valid_values)),
+                "Overalls": self.random.choice(sorted(self.options.mario_colors.valid_values)),
+                "Shoes": self.random.choice(sorted(self.options.mario_colors.valid_values)),
+                "Gloves": self.random.choice(sorted(self.options.mario_colors.valid_values))
+            }
+
     def create_regions(self):
         regions.create_regions(self)
 
