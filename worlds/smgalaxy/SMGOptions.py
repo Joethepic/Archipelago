@@ -202,7 +202,8 @@ class MarioColors(OptionDict):
     The following predetermined colors are available:
     "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
 
-    Putting Random with any color will set all 4 pieces to a random color
+    Putting Random with any color will set all 4 pieces to a random color. If a piece of clothing is missing from the option,
+    a random color will be chosen for it.
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
