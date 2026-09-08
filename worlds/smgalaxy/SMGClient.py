@@ -10,8 +10,9 @@ import random
 
 import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-from .Constants.constants import *
 from .Constants.ram_constants import *
+from .Constants.constants import *
+from .Constants.Names import item_names as itemname
 from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .regions import SMGRegionData, region_list
@@ -87,7 +88,7 @@ class GalaxyContext(CommonContext):
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
-                         GREEN: Pointer([STATIC_VARIABLE_OFFSETS[GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
+                         itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
                          LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
         }
@@ -200,7 +201,7 @@ class GalaxyContext(CommonContext):
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
                     greenstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[GREEN].write_value(min(3, greenstars))
+                    self.pointers[itemname.GREEN].write_value(min(3, greenstars))
             
             self.highest_processed_item_index += 1
 
