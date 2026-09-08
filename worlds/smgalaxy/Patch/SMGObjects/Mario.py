@@ -1,13 +1,13 @@
 from io import BytesIO
 
 from gclib import texture_utils
+from gclib.yaz0_yay0 import Yaz0
 from gclib.gx_enums import ImageFormat
 from gclib.j3d import BDL
 
 from PIL.Image import Image
 
 from wiithon.formats.rarc import Rarc
-from wiithon.formats.yaz0 import Yaz0
 
 from ...Constants.patch_constants import *
 from ...SMGOptions import MarioColors
@@ -133,20 +133,17 @@ class Mario(SMGObject):
 
     def __init__(self):
         super().__init__(MARIO_PATH)
-        
-        compressed_bytes = self.patcher.read_file(self.path)
-        uncompressed_bytes = Yaz0.uncompress(compressed_bytes, len(compressed_bytes))
-        
-        self.arc_file: Rarc = Rarc.read(BytesIO(uncompressed_bytes))
-
+        compressed_bytes: BytesIO = BytesIO(self.patcher.read_file(self.path))
+        self.arc_file: Rarc = Rarc.read(Yaz0.decompress(compressed_bytes))
         self.bdl = BDL(BytesIO(self.arc_file.get_file("mario.bdl").data))
 
         self.colours = MarioColours(self)
 
     def update(self, mario_colours: dict[str, str], **kwargs):
         self.update_colours(mario_colours)
-        
-        self.patcher.replace_file(self.path, Yaz0.compress(self.arc_file.get_bytes()))
+        mario_bytes: BytesIO = BytesIO()
+        self.arc_file.write(mario_bytes)
+        self.patcher.replace_file(self.path, Yaz0.compress(mario_bytes).getvalue())
     
     def update_colours(self, items: dict[str, str]) -> None:
         for mario_part, colour in items.items():
