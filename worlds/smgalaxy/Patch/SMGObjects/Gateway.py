@@ -1,10 +1,10 @@
 from io import BytesIO
 
 from gclib.j3d import BDL
-from gclib.yaz0_yay0 import Yaz0
 
 from wiithon import WiiIsoPatcher
 from wiithon.formats.rarc import Rarc, RarcFileEntry
+from wiithon.formats.yaz0 import Yaz0
 
 from ...Constants.patch_constants import *
 
@@ -15,7 +15,11 @@ class Gateway:
 
     def __init__(self, patcher: WiiIsoPatcher):
         self.patcher = patcher
-        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(patcher.read_file(GATEWAY_PATH))))
+
+        compressed_bytes = patcher.read_file(GATEWAY_PATH)
+        uncompressed_bytes = Yaz0.uncompress(compressed_bytes, len(compressed_bytes))
+
+        self.arc_file = Rarc.read(BytesIO(uncompressed_bytes))
         self.bdl_entry = self.arc_file.get_file(GATEWAY_BDL_NAME)
 
     def create_miniature(self):
@@ -52,4 +56,4 @@ class Gateway:
 
         print(f"Creating {MINIATURE_GATEWAY_NAME}.arc")
 
-        self.patcher.add_file(new_file_path, self.arc_file.get_bytes())
+        self.patcher.add_file(new_file_path, Yaz0.compress(self.arc_file.get_bytes()))

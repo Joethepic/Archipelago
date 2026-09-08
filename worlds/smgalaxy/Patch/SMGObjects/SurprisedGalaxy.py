@@ -1,10 +1,10 @@
 from io import BytesIO
 
 from gclib.j3d import BDL
-from gclib.yaz0_yay0 import Yaz0
 
 from wiithon import WiiIsoPatcher
 from wiithon.formats.rarc import Rarc, RarcFileEntry
+from wiithon.formats.yaz0 import Yaz0
 
 from ...Constants.patch_constants import OBJECT_DATA_PATH, SURPRISED_GALAXY_PATH
 
@@ -21,8 +21,11 @@ class SurprisedGalaxy:
 
     def __init__(self, patcher: WiiIsoPatcher):
         self.patcher = patcher
-        
-        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(self.patcher.read_file(SURPRISED_GALAXY_PATH))))
+
+        compressed_bytes = patcher.read_file(self.path)
+        uncompressed_bytes = Yaz0.uncompress(compressed_bytes, len(compressed_bytes))
+
+        self.arc_file = Rarc.read(BytesIO(uncompressed_bytes))
 
         self.bdl_entry = self.arc_file.get_file(self.bdl_base_name)
         self.btk_entry = self.arc_file.get_file(self.btk_base_name)
@@ -63,4 +66,4 @@ class SurprisedGalaxy:
         print(f"Creating {luma_galaxy_name}.arc")
 
         new_file_path = OBJECT_DATA_PATH + luma_galaxy_name + '.arc'
-        self.patcher.add_file(new_file_path, self.arc_file.get_bytes())
+        self.patcher.add_file(new_file_path, Yaz0.compress(self.arc_file.get_bytes()))

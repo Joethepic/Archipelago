@@ -1,8 +1,7 @@
 from io import BytesIO
 
-from gclib.yaz0_yay0 import Yaz0
-
 from wiithon.formats.rarc import Rarc
+from wiithon.formats.yaz0 import Yaz0
 
 from ...Constants.patch_constants import *
 from ..extensions import SMGObject
@@ -15,7 +14,11 @@ class AstroDomeEntrance(SMGObject):
     def __init__(self, dome_name: str, index: int):
         super().__init__(ASTRO_DOME_ENTRANCE_PATH.format(dome_name))
 
-        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(self.patcher.read_file(self.path))))
+        compressed_bytes = self.patcher.read_file(self.path)
+        uncompressed_bytes = Yaz0.uncompress(compressed_bytes, len(compressed_bytes))
+
+        self.arc_file = Rarc.read(BytesIO(uncompressed_bytes))
+
         self.name = dome_name
         self.index = index
 
@@ -28,7 +31,7 @@ class AstroDomeEntrance(SMGObject):
         self.arc_file.get_node("astrodomeentrance" + self.name.lower()).name = "astrodomeentrance" + new_dome_name.lower()
         self.arc_file.get_file("astrodomeentrance" + self.name.lower() + ".bdl").name = "astrodomeentrance" + new_dome_name.lower() + ".bdl"
 
-        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), self.arc_file.get_bytes())
+        self.patcher.replace_file(ASTRO_DOME_ENTRANCE_PATH.format(new_dome_name), Yaz0.compress(self.arc_file.get_bytes()))
 
 class AstroDomeEntrances(SMGObject):
     entrances: list[AstroDomeEntrance]
