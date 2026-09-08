@@ -15,7 +15,7 @@ from .Constants.constants import *
 from .Constants.Names import item_names as itemname
 from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
-from .regions import SMGRegionData, region_list
+from .regions import SMGRegionData, region_list, galaxies_list
 from .smg_helpers import *
 import dolphin_memory_engine as dme
 
@@ -29,6 +29,7 @@ class GalaxyCommand(ClientCommandProcessor):
         """Toggle deathlink from client. Overrides default setting."""
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
+
 class GalaxyContext(CommonContext):
     password_required: bool = False
     rom_loaded: bool = False
@@ -167,9 +168,15 @@ class GalaxyContext(CommonContext):
             if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
                 if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                     self.locations_checked.add(loc_id)
-
         await self.check_locations(self.locations_checked)
-    
+    async def check_collect(self):
+        for location_id in self.checked_locations:
+            for key, location in location_table.items():
+                if key != self.location_names.lookup_in_game(location_id):
+                    continue
+                value = await self.pointers[location.in_game_galaxy_name].get_value()
+                value |= (1 << location.game_address)
+                self.pointers[location.in_game_galaxy_name].write_value(value)
     async def smg_recv_items(self) -> None:
         """Modify the items we have received to change things in game."""
         if not await self.check_ingame():
@@ -304,7 +311,7 @@ class GalaxyContext(CommonContext):
             await self.smg_locs_checker()
             await self.smg_recv_items()
             await self.check_death()
-            
+            await self.check_collect()
         except Exception as dmeEx:
             await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
