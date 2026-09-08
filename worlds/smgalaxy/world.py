@@ -67,6 +67,9 @@ class SMGWorld(World):
                 "Shoes": self.random.choice(sorted(self.options.mario_colors.valid_values)),
                 "Gloves": self.random.choice(sorted(self.options.mario_colors.valid_values))
             }
+        for key in self.options.mario_colors.valid_keys:
+            if key not in self.options.mario_colors.value.keys():
+                self.options.mario_colors.value.update({key: self.random.choice(sorted(self.options.mario_colors.valid_values))})
 
     def create_regions(self):
         regions.create_regions(self)
