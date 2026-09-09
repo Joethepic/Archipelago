@@ -1,10 +1,10 @@
 from io import BytesIO
 
 from gclib.j3d import BDL
-from gclib.yaz0_yay0 import Yaz0
 
 from wiithon import WiiIsoPatcher
 from wiithon.formats.rarc import Rarc, RarcFileEntry
+from wiithon.formats.yaz0 import Yaz0
 
 from ...Constants.patch_constants import OBJECT_DATA_PATH, SURPRISED_GALAXY_PATH
 
@@ -21,27 +21,31 @@ class SurprisedGalaxy:
 
     def __init__(self, patcher: WiiIsoPatcher):
         self.patcher = patcher
-        
-        self.arc_file = Rarc.read(Yaz0.decompress(BytesIO(self.patcher.read_file(SURPRISED_GALAXY_PATH))))
+
+        compressed_bytes = patcher.read_file(SURPRISED_GALAXY_PATH)
+        uncompressed_bytes = Yaz0.read(BytesIO(compressed_bytes)).data
+        self.arc_file = Rarc.read(BytesIO(uncompressed_bytes))
 
         self.bdl_entry = self.arc_file.get_file(self.bdl_base_name)
         self.btk_entry = self.arc_file.get_file(self.btk_base_name)
     
     def scale_joints(self, bdl: BDL):
-        if not self.scaled:
-            self.scaled = True
-            for joint in bdl.jnt1.joints:
-                scale = 3.14
-                joint.bounding_sphere_radius *= scale
-                joint.scale.x *= scale
-                joint.scale.y *= scale
-                joint.scale.z *= scale
-                joint.bounding_box_min.x *= scale
-                joint.bounding_box_min.y *= scale
-                joint.bounding_box_min.z *= scale
-                joint.bounding_box_max.x *= scale
-                joint.bounding_box_max.y *= scale
-                joint.bounding_box_max.z *= scale
+        if self.scaled:
+            return
+        
+        self.scaled = True
+        for joint in bdl.jnt1.joints:
+            scale = 3.14
+            joint.bounding_sphere_radius *= scale
+            joint.scale.x *= scale
+            joint.scale.y *= scale
+            joint.scale.z *= scale
+            joint.bounding_box_min.x *= scale
+            joint.bounding_box_min.y *= scale
+            joint.bounding_box_min.z *= scale
+            joint.bounding_box_max.x *= scale
+            joint.bounding_box_max.y *= scale
+            joint.bounding_box_max.z *= scale
 
     def create_luma_miniature(self, luma_galaxy_name: str):
         name: str = luma_galaxy_name.lower()
