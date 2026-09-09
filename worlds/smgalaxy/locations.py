@@ -1,9 +1,8 @@
 from typing import Dict, NamedTuple, Optional, Set, Any
 from BaseClasses import Location, Region
-from rule_builder.rules import Rule, CanReachLocation, True_
+from rule_builder.rules import Rule
 
 from.Constants.Names import region_names as regname
-from .Constants.Names import galaxy_in_game_names as galaxyIG
 from .Constants.Names import location_names as locname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
 
@@ -32,8 +31,7 @@ locGE_table: dict[str, SMGLocationData] = {
     locname.GOODEGGSTAR3: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG3KBOSS, 17000002,
                                           galaxyignname.GOODEGG,game_address=2),
     locname.GOODEGGSTAR6: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG6LUIGI, 17000003,
-                                          galaxyignname.GOODEGG,
-                                          CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2),game_address=3),
+                                          galaxyignname.GOODEGG,game_address=3),
     locname.GOODEGGSTAR4: SMGLocationData(["Good Egg Galaxy", "Power Star Locations"], regname.GOODEGG4DINOP, 17000004,
                                           galaxyignname.GOODEGG,game_address=4),
 }
@@ -46,8 +44,7 @@ locHH_table: dict[str, SMGLocationData]  = {
     locname.HONEYHIVESTAR3: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI3BUGAB, 17000008,
                                             galaxyignname.HONEYHIVE, game_address=2),
     locname.HONEYHIVESTAR6: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI6LUIGI, 17000009,
-                                            galaxyignname.HONEYHIVE,
-                                          CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=3),
+                                            galaxyignname.HONEYHIVE, game_address=3),
     locname.HONEYHIVESTAR4: SMGLocationData(["Honeyhive Galaxy", "Power Star Locations"], regname.HONEYHI4UNDER, 170000010,
                                             galaxyignname.HONEYHIVE, game_address=4)
 }
@@ -124,7 +121,7 @@ locBR_table: dict[str, SMGLocationData]  = {
                                              170000040, galaxyignname.BATTLEROCK, game_address=4),
     locname.BATTLEROCKSTAR7: SMGLocationData(["Battlerock Galaxy", "Power Star Locations"], regname.BATTLE7LUIGI,
                                              170000042,
-                                                  galaxyignname.BATTLEROCK, CanReachLocation(locname.GHOSTLYSTAR1,parent_region_name=regname.GHOSTLY1CORR2), game_address=6)
+                                                  galaxyignname.BATTLEROCK, game_address=6)
 }
 #TODO: note change abbreviation same as buoy base
 locBB_table: dict[str, SMGLocationData]  = {
