@@ -110,7 +110,7 @@ BUBBLAS1LNORTE = "Bubble Blast: Northeast Fence Section"
 BUBBLAS1LSOUTE = "Bubble Blast: Southeast Fence Section"
 BUBBLAS1LSOUTW = "Bubble Blast: Southwest Fence Section"
 BUBBLAS1LLONGF = "Bubble Blast: Electric Corridor"
-GRANDFINALE = "Grand Finale: The Star Festival"
+#GRANDFINALE = "Grand Finale: The Star Festival"
 
 ## Terrace Galaxies
 ### Good Egg
@@ -476,7 +476,6 @@ GOLDLE4FOUNC = "Gold Leaf Comet: Small Fountain Cliff"
 GOLDLE4WATRP = "Gold Leaf Comet: Waterfall Platform"
 GOLDLE4BIGTR = "Gold Leaf Comet: Beneath the Big Tree"
 GOLDLE4POUND = "Gold Leaf Comet: Wooden Circle Cliff"
-GOLDLE4CLIFF = "Gold Leaf Comet: Clifftop"
 GOLDLE4BOULD = "Gold Leaf Comet: Boulder Room"
 GOLDLE4FLOAT = "Gold Leaf Comet: Floating Blocks"
 GOLDLE4TOWER = "Gold Leaf Comet: Floating Tower"
