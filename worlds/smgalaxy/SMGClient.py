@@ -205,11 +205,10 @@ class GalaxyContext(CommonContext):
                     self.pointers[GRAND].write_value(min(7, grandstars))
 
                 case 170000006:
-                    # TODO: FIGURE OUT HOW TO GIVE GREEN STARS IN GAME
-                    logger.debug("Green Star Received")
+                    logger.info("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
-                    greenstars = await self.pointers[POWER].get_value() + 1
+                    greenstars = await self.pointers[itemname.GREEN].get_value() + 1
                     self.pointers[itemname.GREEN].write_value(min(3, greenstars))
             
             self.highest_processed_item_index += 1
@@ -314,7 +313,7 @@ class GalaxyContext(CommonContext):
             await self.smg_recv_items()
             await self.check_death()
             await self.check_collect()
-            
+
         except Exception as dmeEx:
             await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
