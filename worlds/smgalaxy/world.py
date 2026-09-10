@@ -241,7 +241,7 @@ class SMGWorld(World):
                 for region in region_list:
                     if region == galaxy:
                         for location in location_table.values():
-                            if location.location_groups[0] == galaxy:
+                            if location.galaxy_name == galaxy:
                                 er_hint_data.update({location.code: slot[0]})
             hint_data[self.player] = er_hint_data
 
