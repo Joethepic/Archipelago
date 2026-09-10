@@ -129,8 +129,9 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Honeyhive 1: Bee Mario Takes Flight")
     world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1SIDEP))
     world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1WATRP))
-    world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1SMLHI)) # TODO: check by boots
-    world.get_region(regname.HONEYHI1LANDI).connect(world.get_region(regname.HONEYHI1BOULR)) # TODO: check by boots
+    world.get_region(regname.HONEYHI1SIDEP).connect(world.get_region(regname.HONEYHI1SMLHI))
+    world.get_region(regname.HONEYHI1SMLHI).connect(world.get_region(regname.HONEYHI1BOULR),
+                                                    "Honeyhive 1: Small Hill Pipe")
     world.get_region(regname.HONEYHI1POUND).connect(world.get_region(regname.HONEYHI1FOUNC))
     world.get_region(regname.HONEYHI1WATRP).connect(world.get_region(regname.HONEYHI1WATRT))
     world.get_region(regname.HONEYHI1WATRT).connect(world.get_region(regname.HONEYHI1POUND))
@@ -169,16 +170,18 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.HONEYHIVE).connect(world.get_region(regname.HONEYHI3LANDI),
                                                     "Honeyhive 3: Big Bad Bugaboom")
     world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3SIDEP))
+    world.get_region(regname.HONEYHI3SIDEP).connect(world.get_region(regname.HONEYHI3SMLHI))
     world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3WATRP))
     world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3POUND))
-    world.get_region(regname.HONEYHI3LANDI).connect(world.get_region(regname.HONEYHI3BOULR)) # TODO: check by boots
+    world.get_region(regname.HONEYHI3SMLHI).connect(world.get_region(regname.HONEYHI3BOULR),
+                                                    "Honeyhive 3: Small Hill Pipe")
     world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI3FOUNC))
     world.get_region(regname.HONEYHI3WATRP).connect(world.get_region(regname.HONEYHI3WATRT))
     world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI6LUIGI))
     world.get_region(regname.HONEYHI3POUND).connect(world.get_region(regname.HONEYHI3BIGTR))
     world.get_region(regname.HONEYHI3WATRT).connect(world.get_region(regname.HONEYHI3UNDER))
     world.get_region(regname.HONEYHI3UNDER).connect(world.get_region(regname.HONEYHI3SMLHI),
-                                                    "Hineyhive 3: Undercliff Return Pipe")
+                                                    "Honeyhive 3: Undercliff Return Pipe")
     world.get_region(regname.HONEYHI3WATRT).connect(world.get_region(regname.HONEYHI3BUGLA),
                                                     "Honeyhive 3: Waterfall Tunnel Launch Star")
     world.get_region(regname.HONEYHI3BIGTR).connect(world.get_region(regname.HONEYHI3LANDI),
@@ -665,7 +668,6 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Gold Leaf Comet: Cosmic Mario Forest Race")
     world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4POUND))
     world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4FOUNC))
-    world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4BOULD)) # TODO: check by boots
     world.get_region(regname.GOLDLE4POUND).connect(world.get_region(regname.GOLDLE4BIGTR))
     world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4SMLHI))
     world.get_region(regname.GOLDLE4LANDI).connect(world.get_region(regname.GOLDLE4WATRP))
@@ -676,8 +678,6 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Gold Leaf Purple Coins: Purple Coins in the Woods")
     world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5POUND))
     world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5FOUNC))
-    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5CLIFF)) # TODO: check by boots
-    world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5BOULD)) # TODO: check by boots
     world.get_region(regname.GOLDLE5POUND).connect(world.get_region(regname.GOLDLE5BIGTR))
     world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5SMLHI))
     world.get_region(regname.GOLDLE5LANDI).connect(world.get_region(regname.GOLDLE5WATRP))
@@ -918,9 +918,10 @@ def set_rules(world: "SMGWorld", player: int):
                                                     "Melty Molten 3: UFO Sling Star")
     world.get_region(regname.MELTY3LAVA1).connect(world.get_region(regname.MELTY3LAVA2),
                                                     "Melty Molten 3: First Lava Ball Launch Star")
-    world.get_region(regname.MELTY3LAVA2).connect(world.get_region(regname.MELTY3LAVPL),
+    world.get_region(regname.MELTY3LAVA2).connect(world.get_region(regname.MELTY3SPINN),
                                                     "Melty Molten 3: Second Lava Ball Launch Star")
-    world.get_region(regname.MELTY3LAVA2).connect(world.get_region(regname.MELTY3SPINN)) # TODO: check by boots
+    world.get_region(regname.MELTY3SPINN).connect(world.get_region(regname.MELTY3LAVPL),
+                                                  "Melty Molten 3: Spinning Platforms Launch Star")
     world.get_region(regname.MELTY3LAVPL).connect(world.get_region(regname.MELTY3FDINO),
                                                     "Melty Molten 3: Lava Platforms Launch Star")
     world.get_region(regname.MELTY).connect(world.get_region(regname.MELTY4VOLCA),
