@@ -91,7 +91,7 @@ locbosses_table: dict[str, SMGLocationData]  = {
                                               170000029, galaxyignname.BOWSER2, game_address=0),
     locname.DARKMATTERPLANTSTAR1: SMGLocationData([regname.BOWSER2, "Power Star Locations", "Boss Star"], regname.DARKMAT1BOSSA,
                                                   170000030, galaxyignname.BOWJR3, game_address=0),
-    locname.GALAXYREACTORSTAR1: SMGLocationData([], regname.GALREAC1BOSS,
+    locname.GALAXYREACTORSTAR1: SMGLocationData([""], regname.GALREAC1BOSS,
                                                 None, galaxyignname.BOWSER3, game_address=0)
 }
 
