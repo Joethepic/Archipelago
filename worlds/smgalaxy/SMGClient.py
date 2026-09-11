@@ -204,7 +204,7 @@ class GalaxyContext(CommonContext):
                     self.pointers["Lives"].write_value(self.lives)
 
                 case 170000004:
-                    logger.info("Power Star Received")
+                    logger.debug("Power Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
 
@@ -216,7 +216,7 @@ class GalaxyContext(CommonContext):
                     self.pointers[GRAND].write_value(min(7, grandstars))
 
                 case 170000006:
-                    logger.info("Green Star Received")
+                    logger.debug("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
                     greenstars = await self.pointers[itemname.GREEN].get_value() + 1
