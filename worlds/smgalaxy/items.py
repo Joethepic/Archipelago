@@ -27,8 +27,6 @@ item_table: dict[str, SMGItemData] = {
   itemname.GREEN: SMGItemData(["Green Stars", "Power Stars"], 170000006, IC.progression),
   
   #This is not going to be used in v1 as disccused "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
-  "Peach": SMGItemData(["Victory"], None, IC.progression)
-
 }
 
 filler_item_table: dict [str, SMGItemData] = {

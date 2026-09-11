@@ -8,11 +8,12 @@ from typing import NamedTuple, Optional
 import copy
 import random
 
-import Utils
+import NetUtils, Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
+from .Constants.Names import galaxy_in_game_names as galaxyignname
 from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
 
 from .regions import SMGRegionData, region_list
@@ -158,26 +159,36 @@ class GalaxyContext(CommonContext):
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
-            local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
+            local_loc: SMGLocationData = all_location_table[self.location_names.lookup_in_game(loc_id)]
             region_data: SMGRegionData = region_list[local_loc.region]
 
             if local_loc.game_address is None:
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-            if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+            if await self.current_galaxy() == galaxyignname.DOME or await self.current_galaxy() == galaxyignname.OBSERVATORY:
                 if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                     self.locations_checked.add(loc_id)
         await self.check_locations(self.locations_checked)
 
     async def check_collect(self):
         for location_id in self.checked_locations:
-            for key, location in location_table.items():
+            for key, location in all_location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
                 value = await self.pointers[location.in_game_galaxy_name].get_value()
                 value |= (1 << location.game_address)
                 self.pointers[location.in_game_galaxy_name].write_value(value)
+
+    async def check_goal(self):
+        if await self.current_galaxy() == galaxyignname.EPILOGUE:
+            if not self.finished_game:
+                self.finished_game = True
+                logger.info("Goal being sent")
+                await self.send_msgs([{
+                    "cmd": "StatusUpdate",
+                    "status": NetUtils.ClientStatus.CLIENT_GOAL,
+                }])
 
     async def smg_recv_items(self) -> None:
         """Modify the items we have received to change things in game."""
@@ -313,6 +324,7 @@ class GalaxyContext(CommonContext):
             await self.smg_recv_items()
             await self.check_death()
             await self.check_collect()
+            await self.check_goal()
 
         except Exception as dmeEx:
             await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))

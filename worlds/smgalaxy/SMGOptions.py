@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 
-from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup
+from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
+    DeathLinkMixin
+
 
 class GalaxyShuffle(OptionSet):
     """
@@ -248,7 +250,7 @@ class StarColors(Toggle):
 
 # this defines all the options.
 @dataclass
-class SMGOptions(PerGameCommonOptions):
+class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     enable_purple_coin_stars: EnablePurpleCoinStars
     stars_to_finish: StarstoFinish
     mario_colors: MarioColors

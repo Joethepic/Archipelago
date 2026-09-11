@@ -11,7 +11,7 @@ from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
 from ..Constants.ram_constants import STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
-from ..locations import location_table
+from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
 class SMGDOL(SMGObject):
@@ -280,12 +280,12 @@ class SMGDOL(SMGObject):
         star_colour_address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[STARCOLOUR]
 
         for location, data in locations.items():
-            scenario = location_table[location].game_address
+            scenario = all_location_table[location].game_address
 
             if scenario == None:
                 continue
 
-            in_game_name = region_list[location_table[location].region].in_game_name
+            in_game_name = region_list[all_location_table[location].region].in_game_name
 
             for galaxy in galaxies_list:
                 region = region_list[galaxy]
