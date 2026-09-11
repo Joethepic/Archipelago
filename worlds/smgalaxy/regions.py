@@ -4,7 +4,7 @@ from BaseClasses import Region, Entrance, MultiWorld
 from entrance_rando import disconnect_entrance_for_randomization
 import logging
 
-from items import SMGItem
+from .items import SMGItem
 from .Constants.Names import region_names as regname, galaxy_in_game_names as galaxyIG, location_names as locname
 from .SMGOptions import SMGOptions
 from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
