@@ -8,7 +8,7 @@ from typing import NamedTuple, Optional
 import copy
 import random
 
-import Utils
+import NetUtils, Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
 from .Constants.ram_constants import *
 from .Constants.constants import *
@@ -168,6 +168,14 @@ class GalaxyContext(CommonContext):
             if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
                 if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                     self.locations_checked.add(loc_id)
+            if await self.current_galaxy() == "EpilogueDemoStage":
+                if not self.finished_game:
+                    self.finished_game = True
+                    logger.info("Goal being sent")
+                    await self.send_msgs([{
+                        "cmd": "StatusUpdate",
+                        "status": NetUtils.ClientStatus.CLIENT_GOAL,
+                    }])
         await self.check_locations(self.locations_checked)
 
     async def check_collect(self):
