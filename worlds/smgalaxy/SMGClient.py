@@ -158,7 +158,7 @@ class GalaxyContext(CommonContext):
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
-            local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
+            local_loc: SMGLocationData = all_location_table[self.location_names.lookup_in_game(loc_id)]
             region_data: SMGRegionData = region_list[local_loc.region]
 
             if local_loc.game_address is None:
@@ -172,7 +172,7 @@ class GalaxyContext(CommonContext):
 
     async def check_collect(self):
         for location_id in self.checked_locations:
-            for key, location in location_table.items():
+            for key, location in all_location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
                 value = await self.pointers[location.in_game_galaxy_name].get_value()

@@ -4,7 +4,8 @@ from BaseClasses import Region, Entrance, MultiWorld
 from entrance_rando import disconnect_entrance_for_randomization
 import logging
 
-from .Constants.Names import region_names as regname, galaxy_in_game_names as galaxyIG
+from items import SMGItem
+from .Constants.Names import region_names as regname, galaxy_in_game_names as galaxyIG, location_names as locname
 from .SMGOptions import SMGOptions
 from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
 
@@ -648,6 +649,8 @@ def create_regions(world: "SMGWorld"):
 
     if world.options.stars_to_finish.value > 103 >= len(list(world.get_locations()))-1:
         world.options.stars_to_finish.value = len(list(world.get_locations()))-1
+
+    world.get_region(regname.GALREAC1BOSS).add_event(locname.GALAXYREACTORSTAR1, "Peach")
 
 def connect_regions(world: "SMGWorld", player: int, source: str, target: str, name: str, rule=None):
     sourceRegion = world.get_region(source)
