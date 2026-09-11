@@ -10,8 +10,8 @@ class SMGLocation(Location):
     game: str = "Super Mario Galaxy"
 
     def __init__(self, player: int, name: str, parent: Region):
-        super(SMGLocation, self).__init__(player, name, address=location_table[name].code, parent=parent)
-        self.code = location_table[name].code
+        super(SMGLocation, self).__init__(player, name, address=all_location_table[name].code, parent=parent)
+        self.code = all_location_table[name].code
 
 class SMGLocationData(NamedTuple):
     location_groups: list[str] # type of randomization option table and group []
@@ -92,6 +92,9 @@ locbosses_table: dict[str, SMGLocationData]  = {
                                               170000029, regname.BOWJR3, galaxyignname.BOWSER2, game_address=0),
     locname.DARKMATTERPLANTSTAR1: SMGLocationData([regname.BOWSER2, "Power Star Locations", "Boss Star"], regname.DARKMAT1BOSSA,
                                                   170000030, regname.BOWSER2, galaxyignname.BOWJR3, game_address=0),
+}
+
+goal_table: dict[str, SMGLocationData] = {
     locname.GALAXYREACTORSTAR1: SMGLocationData([""], regname.GALREAC1BOSS,
                                                 None, regname.BOWSER3, galaxyignname.BOWSER3, game_address=0)
 }
@@ -328,22 +331,22 @@ base_stars_locations = {**locGE_table, **locHH_table,
                    **locDD_table, **locDN_table, **locMM_table,
                    **locHL_table, **locspecialstages_table, **locbosses_table}
 
-location_table = { **locGE_table, **locHH_table, 
-                   **locSJ_table, **locBR_table, **locBB_table, 
-                   **locGG_table, **locFF_table, **locDDune_table, **locG_table, 
-                   **locGL_table, **locSS_table, **locTT_table, 
-                   **locDD_table, **locDN_table, **locMM_table, 
-                   **locHL_table, **locspecialstages_table, **locbosses_table, 
-                   **locPC_table,
-}
+all_location_table = {**locGE_table, **locHH_table,
+                      **locSJ_table, **locBR_table, **locBB_table,
+                      **locGG_table, **locFF_table, **locDDune_table, **locG_table,
+                      **locGL_table, **locSS_table, **locTT_table,
+                      **locDD_table, **locDN_table, **locMM_table,
+                      **locHL_table, **locspecialstages_table, **locbosses_table,
+                      **locPC_table, **goal_table
+                      }
 
 LOCATION_NAME_TO_ID: dict[str, int] =  {
-    name: data.code for name, data in location_table.items() if data.code is not None}
+    name: data.code for name, data in all_location_table.items() if data.code is not None}
 
 def get_location_names_per_category() -> Dict[str, Set[str]]:
     categories: Dict[str, Set[str]] = {}
 
-    for name, data in location_table.items():
+    for name, data in all_location_table.items():
         for category in data.location_groups:
             categories.setdefault(category, set()).add(name)
 
