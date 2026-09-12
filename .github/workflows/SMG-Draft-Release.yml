@@ -1,0 +1,99 @@
+name: SMG-Release-World
+on:
+  push:
+    branches:
+      - galaxy
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Required tag to create the pre-draft."
+        required: true
+
+jobs:
+  install-deps:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+        python-version: [ "3.11", "3.12", "3.13" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compute Artifact libzip
+        id: libzip
+        shell: bash
+        run: |
+          os_name="${{ matrix.os }}"
+          os_name="${os_name%%-*}"
+          if [ "$os_name" = "ubuntu" ]; then os_name="linux"; fi
+          py_ver="${{ matrix.python-version }}"
+          py_ver="${py_ver//./-}"
+          echo "name=lib-${os_name}${py_ver}" >> "$GITHUB_OUTPUT"
+      - name: Create Lib Folder
+        run: mkdir ${{ steps.libzip.outputs.name }}
+      - name: Install Dependencies
+        run: pip install -r ${{github.workspace}}/worlds/smgalaxy/requirements.txt --target ./${{ steps.libzip.outputs.name }} --verbose
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.libzip.outputs.name }}
+          path: ./${{ steps.libzip.outputs.name }}/**
+
+  # Fuzz goes here when ready
+
+  package:
+    needs: [install-deps]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Dependencies Build-AP
+        run: python ${{github.workspace}}/ModuleUpdate.py -y -f
+
+      - name: Build AP-World
+        run: python ${{github.workspace}}/Launcher.py "Build APWorlds" "Super Mario Galaxy"
+        shell: pwsh 
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apworld
+          path: ${{github.workspace}}/build/apworlds/smgalaxy.apworld
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [package]
+    permissions:
+      contents: write
+    steps:
+      - name: Create Local Artifact Folder
+        run: mkdir tmp-artifacts
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: apworld
+          path: tmp-artifacts
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lib-*
+          path: tmp-libs
+
+      - name: Zip Lib Folders
+        shell: bash
+        run: |
+          for dir in tmp-libs/*/; do
+            libzip="$(basename "$dir")"
+            (cd "$dir" && zip -r "../../tmp-artifacts/${libzip}.zip" .)
+          done
+
+      - name: Create Manual Release
+        uses: softprops/action-gh-release@v2.3.2
+        with:
+          draft: true
+          prerelease: false
+          name: Super Mario Galaxy AP ${{ inputs.tag == '' && github.ref_name || inputs.tag }}
+          files: |
+            tmp-artifacts/*
