@@ -10,6 +10,7 @@ import random
 
 import NetUtils, Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
