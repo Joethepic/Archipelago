@@ -14,7 +14,7 @@ from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
-from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
+from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
 
 from .regions import SMGRegionData, region_list
 from .smg_helpers import *

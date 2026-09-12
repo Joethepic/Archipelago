@@ -16,7 +16,7 @@ from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMG
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
-from .Patch.Patch import SMGPlayerContainer
+from .Patch.SMGPlayerContainer import SMGPlayerContainer
 
 def runClient(*args):
     from .SMGClient import launch
