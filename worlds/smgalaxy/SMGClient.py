@@ -10,7 +10,7 @@ import random
 
 import NetUtils, Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
-from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
+
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
@@ -436,6 +436,8 @@ def launch(*launch_args: str):
     parser = get_base_parser()
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
+
+    from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
 
     if args.apsmg_file:
         output_directory = Path(args.apsmg_file).parent
