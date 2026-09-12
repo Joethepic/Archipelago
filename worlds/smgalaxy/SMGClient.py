@@ -424,11 +424,7 @@ async def _main(connect, password):
 def launch(*launch_args: str):
     import colorama, os
 
-    # Handle import requirement updates before anything else.
-    import ModuleUpdate
-    local_dir = str(os.path.dirname(__file__))
-    smg_reqs = os.path.join(local_dir, 'requirements.txt')
-    ModuleUpdate.requirements_files.update([smg_reqs])
+
 
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
