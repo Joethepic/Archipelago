@@ -14,7 +14,6 @@ from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
-from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
 
 from .regions import SMGRegionData, region_list
 from .smg_helpers import *
@@ -422,7 +421,14 @@ async def _main(connect, password):
     
 # launches/starts everything we need
 def launch(*launch_args: str):
-    import colorama
+    import colorama, os
+
+    # Handle import requirement updates before anything else.
+    import ModuleUpdate
+    local_dir = os.path.dirname(__file__)
+    smg_reqs = os.path.join(local_dir, 'requirements.txt')
+    ModuleUpdate.requirements_files.update(smg_reqs)
+
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
     

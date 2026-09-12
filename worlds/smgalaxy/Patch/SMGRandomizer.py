@@ -5,8 +5,8 @@ import zipfile, json
 import ModuleUpdate
 local_dir = os.path.dirname(__file__)
 smg_reqs = os.path.join(local_dir, 'requirements.txt')
-print(smg_reqs)
 ModuleUpdate.requirements_files.update(smg_reqs)
+ModuleUpdate.update(True, True)
 
 from wiithon import WiiIsoPatcher
 from wiithon.formats.dol import DOL
