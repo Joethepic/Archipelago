@@ -174,9 +174,9 @@ locFF_table: dict[str, SMGLocationData]  = {
     locname.FREEZEFLAMESTAR3: SMGLocationData(["Freezeflame Galaxy", "Power Star Locations"], regname.FREFLA3ICEFI,
                                               170000063, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=2),
     locname.FREEZEFLAMESTAR6: SMGLocationData(["Freezeflame Galaxy", "Power Star Locations"], regname.FREFLA6BACK3,
-                                              170000064, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=3),
+                                              170000064, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=5),
     locname.FREEZEFLAMESTAR4: SMGLocationData(["Freezeflame Galaxy", "Power Star Locations"], regname.FREFLA4ICEFI,
-                                              170000065, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=4)
+                                              170000065, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=3)
 }
 
 locDDune_table: dict[str, SMGLocationData]  = {
@@ -313,7 +313,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     locname.BEACHBOWLSTAR5: SMGLocationData(["Beach Bowl Galaxy", "Power Star Locations", "Purple Coins"], regname.BEACH5LANDI,
                                             170000047, regname.BEACHBOWL, galaxyignname.BEACHBOWL, game_address=5),
     locname.FREEZEFLAMESTAR5: SMGLocationData(["Freezeflame Galaxy", "Power Star Locations", "Purple Coins"], regname.FREFLA5MOUNB,
-                                              170000066, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=5),
+                                              170000066, regname.FREEZEFLAME, galaxyignname.FREEZEFLAME, game_address=4),
     locname.GHOSTLYSTAR5: SMGLocationData([regname.GHOSTLY, "Power Star Locations", "Purple Coins"], regname.GHOSTLY5PCOIN,
                                           170000053, regname.GHOSTLY, galaxyignname.GHOSTLY, game_address=5),
     locname.GOLDLEAFSTAR5: SMGLocationData(["Gold Leaf Galaxy", "Power Star Locations", "Purple Coins"], regname.GOLDLE5CANNO,

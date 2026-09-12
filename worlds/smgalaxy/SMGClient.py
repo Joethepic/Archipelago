@@ -10,6 +10,7 @@ import random
 
 import NetUtils, Utils
 from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
@@ -423,11 +424,7 @@ async def _main(connect, password):
 def launch(*launch_args: str):
     import colorama, os
 
-    # Handle import requirement updates before anything else.
-    import ModuleUpdate
-    local_dir = os.path.dirname(__file__)
-    smg_reqs = os.path.join(local_dir, 'requirements.txt')
-    ModuleUpdate.requirements_files.update(smg_reqs)
+
 
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
@@ -435,6 +432,8 @@ def launch(*launch_args: str):
     parser = get_base_parser()
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
+
+    from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
 
     if args.apsmg_file:
         output_directory = Path(args.apsmg_file).parent
