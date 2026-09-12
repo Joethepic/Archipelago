@@ -426,7 +426,7 @@ def launch(*launch_args: str):
 
     # Handle import requirement updates before anything else.
     import ModuleUpdate
-    local_dir = os.path.dirname(__file__)
+    local_dir = str(os.path.dirname(__file__))
     smg_reqs = os.path.join(local_dir, 'requirements.txt')
     ModuleUpdate.requirements_files.update(smg_reqs)
 
