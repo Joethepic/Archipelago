@@ -428,7 +428,7 @@ def launch(*launch_args: str):
     import ModuleUpdate
     local_dir = str(os.path.dirname(__file__))
     smg_reqs = os.path.join(local_dir, 'requirements.txt')
-    ModuleUpdate.requirements_files.update(smg_reqs)
+    ModuleUpdate.requirements_files.update([smg_reqs])
 
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
