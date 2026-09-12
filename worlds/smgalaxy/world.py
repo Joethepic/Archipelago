@@ -9,14 +9,14 @@ import typing
 import logging
 
 from . import items, regions, Rules, web_world, SMGOptions
-from .Constants.Names import region_names as regname, item_names as itemname
+from .Constants.Names import region_names as regname, item_names as itemname, location_names as locname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table
-from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category
+from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
-from .SMGPlayerContainer import SMGPlayerContainer
+from .Patch.Patch import SMGPlayerContainer
 
 def runClient(*args):
     from .SMGClient import launch
@@ -230,7 +230,6 @@ class SMGWorld(World):
 
         player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
         player_container.write()
-
     def extend_hint_information(self, hint_data: typing.Dict[int, typing.Dict[int, str]]):
         if self.topology_present:
             er_hint_data = {}
