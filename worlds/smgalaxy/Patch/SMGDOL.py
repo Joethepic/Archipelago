@@ -296,10 +296,6 @@ class SMGDOL(SMGObject):
             classification = ItemClassification[data["classification"]]
             self.dol.write_at(star_colour_address + galaxy_offset + scenario, FILL_TYPE_TO_COLOUR_INDEX[classification].to_bytes())
 
-    def show_green_galaxies(self):
-        self.write_pointer = 0x80248888
-        self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
-
     def overwrite_all_greens_launch_star(self):
         upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREEN])
         self.write_instruction(PPC.lis(3, upper), 0x803cd988)
@@ -316,7 +312,6 @@ class SMGDOL(SMGObject):
         self.custom_grandstar_count()
         self.skip_wii_strap()
         self.show_bros_button()
-        self.show_green_galaxies()
         self.overwrite_all_greens_launch_star()
 
     def show_galaxy_star_counter(self):
