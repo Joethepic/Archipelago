@@ -424,8 +424,6 @@ async def _main(connect, password):
 def launch(*launch_args: str):
     import colorama, os
 
-
-
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
     
@@ -433,14 +431,20 @@ def launch(*launch_args: str):
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
 
-    from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
+    try:
+        from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
+        if args.apsmg_file:
+            output_directory = Path(args.apsmg_file).parent
+            iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
+            iso_path = os.path.join(output_directory, iso_name + '.iso')
 
-    if args.apsmg_file:
-        output_directory = Path(args.apsmg_file).parent
-        iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
-        iso_path = os.path.join(output_directory, iso_name + '.iso')
-
-        SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+            SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+    except Exception as patchEx:
+        client_msg: str = (f"An unknown error occurred while trying to patch a file for {CLIENT_NAME}.\n" +
+            f"Additional details:\n{str(patchEx)}")
+        logger.error(client_msg)
+        Utils.messagebox(f"Patch Client Issue {CLIENT_NAME}", client_msg, True)
+        raise patchEx
 
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
