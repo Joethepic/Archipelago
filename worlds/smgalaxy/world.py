@@ -49,6 +49,7 @@ class SMGWorld(World):
     required_client_version = (0, 6, 6)
 
     hint_blacklist = {"B: Bowser's Galaxy Reactor", "Peach"}
+    ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
