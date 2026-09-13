@@ -83,7 +83,7 @@ SEASLIDESTAR3 = "Sea Slide 3: The Silver Stars of Sea Slide"
 SEASLIDESTAR4 = "Sea Slide Comet: Underwater Cosmic Mario Race"
 SEASLIDESTAR6 = "Sea Slide Secret: Hurry, He's Hungry"
 
-TOYTIMESTAR1 = "Toy Time 1: Heavy Metal Mecha Bowser"
+TOYTIMESTAR1 = "Toy Time 1: Heavy Metal Mecha-Bowser"
 TOYTIMESTAR2 = "Toy Time 2: Mario (or Luigi) Meets Mario"
 TOYTIMESTAR3 = "Toy Time 3: Bouncing Down Cake Lane"
 TOYTIMESTAR6 = "Toy Time Secret: The Flipswitch Chain"
