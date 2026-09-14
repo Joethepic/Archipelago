@@ -342,7 +342,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:5])), 0x80293688) # Grand Finale
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:6])), 0x802936d0) # unknown (literally)
 
-        self.override_green_name_check(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY] + string_offsets[4])
+        self.override_green_name_check(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY] + sum(string_offsets[:5]))
 
     def override_green_name_check(self, string_address: int):
         # Return true unless name is "PeachCastleFinalGalaxy"
