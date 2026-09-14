@@ -76,11 +76,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(1, 1, 0x100))
         self.write_instruction(PPC.blr())
 
-    @staticmethod
-    def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
-        """rlwinm rA, rS, SH, MB, ME  - rotate rS left by SH bits, AND with mask(MB, ME), store in rA"""
-        return PPC._fmt_m(21, rS, rA, sh, mb, me)
-
     def write_instruction(self, instruction_bytes: bytes, address: int = None) -> None:
         if address is not None:
             self.write_pointer = address
@@ -153,7 +148,7 @@ class SMGDOL(SMGObject):
         #######################################
         # Get obj_arg0 from miniature galaxy
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
-        self.write_instruction(self.rlwinm(3, 3, 16, 0x10, 0x1F))
+        self.write_instruction(PPC.rlwinm(3, 3, 16, 0x10, 0x1F))
 
     def manipulate_arg0_loading(self):
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
@@ -190,7 +185,7 @@ class SMGDOL(SMGObject):
         else:
             # Appear the normal star as "uncollected" only if collected
             self.write_instruction(PPC.cntlzw(6, 3))
-            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
+            self.write_instruction(PPC.rlwinm(6, 6, 27, 0x1F, 0x1F))
         self.write_instruction(PPC.b(self.write_pointer + 5 * 0x4, self.write_pointer))
 
         self.write_pointer = 0x8037db58
@@ -201,7 +196,7 @@ class SMGDOL(SMGObject):
         else:
             # Appear the special star as "uncollected" only if collected
             self.write_instruction(PPC.cntlzw(6, 3))
-            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
+            self.write_instruction(PPC.rlwinm(6, 6, 27, 0x1F, 0x1F))
         self.write_nop(1, 0x8037db68)
         self.write_nop(1, 0x8037db74)
 
