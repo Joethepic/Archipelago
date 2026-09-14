@@ -303,7 +303,7 @@ locPC_table: dict[str, SMGLocationData]  = {
     locname.GOODEGGSTAR5: SMGLocationData(["Good Egg Galaxy", "Power Star Locations", "Purple Coins"], regname.GOODEGG5PEARP,
                                           170000005, regname.GOODEGG, galaxyignname.GOODEGG, game_address=4),
     locname.GATEWAYSTAR2: SMGLocationData([regname.GATEWAY, "Power Star Locations", "Purple Coins"], regname.GATEWAY2HOMEP,
-                                          170000020, regname.GATEWAY, galaxyignname.GATEWAY, game_address=2),
+                                          170000020, regname.GATEWAY, galaxyignname.GATEWAY, game_address=1),
     locname.BATTLEROCKSTAR5: SMGLocationData(["Battlerock Galaxy", "Power Star Locations", "Purple Coins"], regname.BATTLE5AUTOS,
                                              17000121, regname.BATTLEROCK, galaxyignname.BATTLEROCK, game_address=4),
     locname.SPACEJUNKSTAR5: SMGLocationData(["Space Junk Galaxy", "Power Star Locations", "Purple Coins"], regname.SPACJUN5PURPL,
