@@ -25,12 +25,12 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
     def patch(self, target: str) -> None:
         vanilla_rom_path = get_base_rom_path()
-        self._update_deps()
 
         try:
             self.create_iso(vanilla_rom_path, target) # Does not have hash verification, will want ot add
         except ImportError as ex:
             self._client_logger.warning("Error while trying to import third party dependencies. Details: " + str(ex))
+            self._update_deps()
             self.create_iso(vanilla_rom_path, target)
 
     def _update_deps(self):
