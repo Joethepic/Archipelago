@@ -89,9 +89,9 @@ locbosses_table: dict[str, SMGLocationData]  = {
     locname.AIRSHIPARMADASTAR1: SMGLocationData([regname.AIRARM1BATTL, "Power Star Locations", "Boss Star"], regname.AIRARM1BATTL,
                                                 170000028, regname.BOWJR2, galaxyignname.BOWJR2, game_address=0),
     locname.LAVAREACTORSTAR1: SMGLocationData([regname.BOWJR3, "Power Star Locations", "Boss Star"], regname.LAVREALAVA2,
-                                              170000029, regname.BOWJR3, galaxyignname.BOWSER2, game_address=0),
+                                              170000029, regname.BOWJR3, galaxyignname.BOWJR3, game_address=0),
     locname.DARKMATTERPLANTSTAR1: SMGLocationData([regname.BOWSER2, "Power Star Locations", "Boss Star"], regname.DARKMAT1BOSSA,
-                                                  170000030, regname.BOWSER2, galaxyignname.BOWJR3, game_address=0),
+                                                  170000030, regname.BOWSER2, galaxyignname.BOWSER2, game_address=0),
 }
 
 goal_table: dict[str, SMGLocationData] = {
