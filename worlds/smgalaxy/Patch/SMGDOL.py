@@ -347,6 +347,18 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:5])), 0x80293688) # Grand Finale
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:6])), 0x802936d0) # unknown (literally)
 
+        self.override_green_name_check(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY] + string_offsets[4])
+
+    def override_green_name_check(self, string_address: int):
+        # Return true unless name is "PeachCastleFinalGalaxy"
+        upper, lower = self.get_upper_and_lower_signed(string_address)
+        self.write_instruction(PPC.lis(3, upper), 0x803af64c)
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.mr(4, 6))
+        self.write_instruction(PPC.bl(0x803fd4a0, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+
     def write_slot_name(self, slot_name: str):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
 
