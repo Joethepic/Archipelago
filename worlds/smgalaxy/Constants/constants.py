@@ -19,14 +19,14 @@ CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready
 AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
 
 DEATH_MESSAGES = [
-    "got sucked into a black hole",
-    "ran into a goomba",
-    "fell into the void",
-    "got trampled by Bowser",
-    "failed to rescue Princess Peach",
-    "missed the power star",
-    "missed the grand star"
-    "flew too close to the sun"
+    " got sucked into a black hole",
+    " ran into a goomba",
+    " fell into the void",
+    " got trampled by Bowser",
+    " failed to rescue Princess Peach",
+    " missed the power star",
+    " missed the grand star"
+    " flew too close to the sun"
 ]
 
 WAIT_TIMER_LONG_TIMEOUT: int = 5
