@@ -79,3 +79,4 @@ class AstroDomes(SMGObject):
 
                 if entry["name"].startswith("AstroDome"):
                     entry["Obj_arg0"] = interior_dome_index
+                    entry["pos_y"] = -625.0
