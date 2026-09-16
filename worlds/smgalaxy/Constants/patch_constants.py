@@ -155,7 +155,7 @@ class GalaxyUnlockTableFieldNames(StrEnum):
     RETURN_DOME = "GrandGalaxyNo"
 
 FILL_TYPE_TO_COLOUR_INDEX: dict[ItemClassification, int] = {
-    ItemClassification.filler: PowerStarColorEnum.RED,
+    ItemClassification.filler: PowerStarColorEnum.GREEN,
     ItemClassification.progression: PowerStarColorEnum.YELLOW,
     ItemClassification.useful: PowerStarColorEnum.BLUE,
     ItemClassification.trap: PowerStarColorEnum.RED,
