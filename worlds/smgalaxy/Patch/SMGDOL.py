@@ -297,8 +297,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lbz(3, lower, 3))
         self.write_instruction(PPC.blr())
 
-    def skip_grandstar_return_cutscene(self):
-        self.write_instruction(PPC.li(0, 0), 0x8020ecf4)
+    def skip_return_demos(self):
+        self.write_instruction(PPC.li(3, 0), 0x803bac74)
 
     def show_luma_with_dome(self):
         self.write_instruction(PPC.lwz(3, 0x1EC, 3), 0x80291c1c)
@@ -315,7 +315,7 @@ class SMGDOL(SMGObject):
         self.skip_wii_strap()
         self.show_bros_button()
         self.overwrite_all_greens_launch_star()
-        self.skip_grandstar_return_cutscene()
+        self.skip_return_demos()
         self.show_luma_with_dome()
 
     def show_galaxy_star_counter(self):
