@@ -42,6 +42,6 @@ class AstroGalaxy(SMGObject):
 
                     entry["name"] = new_entry_name
 
-        edit_objinfo(self.path + COMMON_PATH + FILE_NAME)
-        edit_objinfo(self.path + LAYERA_PATH + FILE_NAME)
-        edit_objinfo(self.path + LAYERB_PATH + FILE_NAME)
+        edit_objinfo(self.path + COMMON_PATH + OBJINFO_FILE_NAME)
+        edit_objinfo(self.path + LAYERA_PATH + OBJINFO_FILE_NAME)
+        edit_objinfo(self.path + LAYERB_PATH + OBJINFO_FILE_NAME)

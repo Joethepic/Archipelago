@@ -38,7 +38,9 @@ OLD_GLOVES_COLOUR = (153, 153, 153)
 
 # ASTRODOME
 PLACEMENT_PATH = "/jmp/placement/"
-FILE_NAME = "objinfo"
+START_PATH = "/jmp/start/"
+OBJINFO_FILE_NAME = "objinfo"
+STARTINFO_FILE_NAME = "startinfo"
 
 class ObjInfoFieldNames(StrEnum):
     NAME = "name"
