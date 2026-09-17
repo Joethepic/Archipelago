@@ -126,13 +126,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
         self.write_nop(1)
 
-        # TEMPORARY
-        # Set flag conditions for "SpecialGrandStar[i]"
-        address = 0x8053bb40
-        for i in range(7):
-            self.dol.write_at(address + i * 0x14 + 4, b'\x05')
-            self.dol.write_at(address + i * 0x14 + 6, i.to_bytes())
-
     def set_swing_permission(self):
         ########################
         # Set swing permission #
