@@ -117,9 +117,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.nop(), 0x80379248)
 
         # Properly calculate the observatory scenario
-        self.write_instruction(PPC.li(3, 6), 0x803bbb2c)
-        self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
-
         self.write_instruction(PPC.li(3, 2), 0x803bbb78)
         self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 1))
