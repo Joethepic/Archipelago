@@ -319,11 +319,10 @@ class SMGDOL(SMGObject):
         self.show_luma_with_dome()
 
     def show_galaxy_star_counter(self):
-        self.write_instruction(PPC.cmpi(0, 3, 4), 0x801ff4cc)
+        self.write_instruction(PPC.li(0, 0), 0x801ff4cc)
 
     def hide_galaxy_star_counter(self):
-        self.write_pointer = 0x801ff4cc
-        self.write_instruction(PPC.b(self.write_pointer + 85 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(0, 1), 0x801ff4cc)
 
     def update_green_galaxies(self, green_galaxies: list[GalaxyDestination]):
         assert len(green_galaxies) == 3

@@ -112,6 +112,9 @@ ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 COMMON_PATH: str = "/jmp/placement/common/" #TODO add stage name root folder once wiithon fixes it.
 LAYERA_PATH: str = "/jmp/placement/layera/"
 LAYERB_PATH: str = "/jmp/placement/layerb/"
+LAYERE_PATH: str = "/jmp/placement/layere/"
+LAYERF_PATH: str = "/jmp/placement/layerf/"
+LAYERG_PATH: str = "/jmp/placement/layerg/"
 
 # SMGDOL
 GATEWAY_IN_GAME: str = region_list[GATEWAY].in_game_name
