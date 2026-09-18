@@ -69,8 +69,7 @@ class SMGDOL(SMGObject):
         self.setup_register()
 
         # Custom functions to run every frame
-        self.is_mario_dead()
-        self.has_player_no_control()
+        self.is_dead__has_no_control()
         self.add_deathlink()
         
         # Return from custom function
@@ -105,17 +104,14 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lis(31, upper))
         self.write_instruction(PPC.addi(31, 31, lower))
 
-    def is_mario_dead(self):
-        self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
-        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
-
-    def has_player_no_control(self):
+    def is_dead__has_no_control(self):
         # Does mario exist
         self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 30 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 31 * 0x4, self.write_pointer))
 
         # Is mario dead
+        self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
         self.write_instruction(PPC.cntlzw(3, 3))
         self.write_instruction(PPC.srwi(3, 3, 5))
