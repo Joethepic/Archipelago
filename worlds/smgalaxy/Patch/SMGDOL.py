@@ -107,17 +107,17 @@ class SMGDOL(SMGObject):
 
     def is_mario_dead(self):
         self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
-        self.write_instruction(PPC.stb(3, ISDEAD, 31))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
 
     def has_player_no_control(self):
         self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
         self.write_instruction(PPC.lwz(3, 0x230, 3))
         self.write_instruction(PPC.bl(0x802e98b8))
-        self.write_instruction(PPC.stb(3, HASNOCONTROL, 31))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL], 31))
 
     def add_deathlink(self):
         # Get the value
-        self.write_instruction(PPC.lwz(3, DEATHLINK, 31))
+        self.write_instruction(PPC.lwz(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
 
         # Skip the function if its less than 1
         self.write_instruction(PPC.cmpi(0, 3, 1))
@@ -125,7 +125,7 @@ class SMGDOL(SMGObject):
 
         # Subtract the timer by one
         self.write_instruction(PPC.addi(3, 3, -1))
-        self.write_instruction(PPC.stw(3, DEATHLINK, 31))
+        self.write_instruction(PPC.stw(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
 
         # Only kill if value is 1
         self.write_instruction(PPC.cmpi(0, 3, 1))
