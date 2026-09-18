@@ -33,6 +33,8 @@ class Patch:
         self.galaxies: dict[str, str] = output['Galaxies']
         self.locations: dict = output['Locations']
         self.slot_name: str = output["Name"]
+        #self.luma_starbit_counts: list[int] = output['name']
+        self.luma_starbit_counts = None
 
         # Options
         self.mario_colours: dict[str, str] = output['Options']['mario_colors']
@@ -75,7 +77,8 @@ class Patch:
                         locations=self.locations,
                         show_galaxies=self.show_galaxies,
                         slot_name=self.slot_name,
-                        hide_star_colours=self.star_colours)
+                        hide_star_colours=self.star_colours,
+                        starbit_counts=self.luma_starbit_counts)
 
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":

@@ -22,6 +22,9 @@ STAR_BIT_FLAG_OFFSET: int = 0x8
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> GameDataPlayerStatus
 ONEUP_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x4]
 
+# GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> GameDataPlayerStatus
+STARBITS_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x8, 0x8]
+
 # RAM address for getting the Mario actor object.
 # GameSystem -> GameSystemSceneController -> Scene -> SceneObjHolder -> MarioHolder -> MarioActor
 MARIO_ACTOR_POINTER_LIST: list[int] = [0x24, 0xAC, 0x10, 0x50, 0xC]
@@ -35,6 +38,7 @@ LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x30]
 STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
 GREENGALAXY = "Green Galaxies"
+LUMAGALAXY = "Luma Galaxies"
 DEATHLINK = "Deathlink"
 LAST_RECV_INDEX = "Last Item Received Idx"
 SLOTNAME = "Slot Name"
@@ -51,6 +55,7 @@ variables: list[StaticVariable] = [
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable(GREENGALAXY, 5 * 32),
+    StaticVariable(LUMAGALAXY, 7 * (30 + 2)),
     StaticVariable("End", 0)
 ]
 

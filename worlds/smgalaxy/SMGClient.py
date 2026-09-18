@@ -87,6 +87,7 @@ class GalaxyContext(CommonContext):
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
+                         "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
