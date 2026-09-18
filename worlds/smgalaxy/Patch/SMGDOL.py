@@ -10,7 +10,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import HASNOCONTROL, LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
@@ -70,6 +70,7 @@ class SMGDOL(SMGObject):
 
         # Custom functions to run every frame
         self.is_mario_dead()
+        self.has_player_no_control()
         self.add_deathlink()
         
         # Return from custom function
@@ -107,6 +108,12 @@ class SMGDOL(SMGObject):
     def is_mario_dead(self):
         self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
         self.write_instruction(PPC.stb(3, ISDEAD, 31))
+
+    def has_player_no_control(self):
+        self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
+        self.write_instruction(PPC.lwz(3, 0x230, 3))
+        self.write_instruction(PPC.bl(0x802e98b8))
+        self.write_instruction(PPC.stb(3, HASNOCONTROL, 31))
 
     def add_deathlink(self):
         # Get the value

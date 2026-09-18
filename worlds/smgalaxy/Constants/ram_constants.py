@@ -13,6 +13,10 @@ CURRENT_SCENE_POINTER_LIST: list[int] = [0x24, 0x0] # 32 chars
 # GameSystem -> GameSystemSceneController -> SceneControlInfo
 CURRENT_GALAXY_POINTER_LIST: list[int] = [0x24, 0x20] # 32 chars
 
+# Gets the current scenario number. Defaults to -1 when none selected (e.g. scenario select)
+# GameSystem -> GameSystemSceneController -> SceneControlInfo
+CURRENT_SCENARIO_POINTER_LIST: list[int] = [0x24, 0x40]
+
 # RAM Address offset to the start of all Galaxy struct address pointers
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> GameDataAllGalaxyStorage
 GALAXY_DATA_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0xC, 0x8]
@@ -40,6 +44,7 @@ STARCOLOUR = "Star Colour"
 GREENGALAXY = "Green Galaxies"
 LUMAGALAXY = "Luma Galaxies"
 ISDEAD = "Is mario dead"
+HASNOCONTROL = "Can mario move"
 DEATHLINK = "Deathlink"
 LAST_RECV_INDEX = "Last Item Received Idx"
 SLOTNAME = "Slot Name"
@@ -54,6 +59,8 @@ variables: list[StaticVariable] = [
     StaticVariable(GRAND, 1),
     StaticVariable(GREEN, 1),
     StaticVariable(ISDEAD, 1),
+    StaticVariable(HASNOCONTROL, 1),
+    StaticVariable('', 3),
     StaticVariable(DEATHLINK, 4),
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
