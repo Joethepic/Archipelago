@@ -38,7 +38,9 @@ OLD_GLOVES_COLOUR = (153, 153, 153)
 
 # ASTRODOME
 PLACEMENT_PATH = "/jmp/placement/"
-FILE_NAME = "objinfo"
+START_PATH = "/jmp/start/"
+OBJINFO_FILE_NAME = "objinfo"
+STARTINFO_FILE_NAME = "startinfo"
 
 class ObjInfoFieldNames(StrEnum):
     NAME = "name"
@@ -110,6 +112,9 @@ ASTRO_DOME_ENTRANCE_NAME: str = "AstroDomeEntrance"
 COMMON_PATH: str = "/jmp/placement/common/" #TODO add stage name root folder once wiithon fixes it.
 LAYERA_PATH: str = "/jmp/placement/layera/"
 LAYERB_PATH: str = "/jmp/placement/layerb/"
+LAYERE_PATH: str = "/jmp/placement/layere/"
+LAYERF_PATH: str = "/jmp/placement/layerf/"
+LAYERG_PATH: str = "/jmp/placement/layerg/"
 
 # SMGDOL
 GATEWAY_IN_GAME: str = region_list[GATEWAY].in_game_name
@@ -155,7 +160,7 @@ class GalaxyUnlockTableFieldNames(StrEnum):
     RETURN_DOME = "GrandGalaxyNo"
 
 FILL_TYPE_TO_COLOUR_INDEX: dict[ItemClassification, int] = {
-    ItemClassification.filler: PowerStarColorEnum.RED,
+    ItemClassification.filler: PowerStarColorEnum.GREEN,
     ItemClassification.progression: PowerStarColorEnum.YELLOW,
     ItemClassification.useful: PowerStarColorEnum.BLUE,
     ItemClassification.trap: PowerStarColorEnum.RED,

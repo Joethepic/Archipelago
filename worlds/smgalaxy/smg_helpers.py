@@ -7,7 +7,7 @@ from .Constants.ram_constants import GAMESYSTEM
 
 import dolphin_memory_engine as dme
 
-from .locations import SMGLocationData, location_table
+from .locations import SMGLocationData, all_location_table
 
 
 class TypeTuple(NamedTuple):
@@ -98,7 +98,7 @@ class StarColorHandler:
             return
 
         self.star_colors = []
-        for location in location_table.values():
+        for location in all_location_table.values():
             starname = self.get_pointer_name(location)
             star_color = StarColor(starname, self.pointers[starname])
             self.star_colors.append(star_color)

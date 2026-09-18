@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 
-from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup
+from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
+    DeathLinkMixin
+
 
 class GalaxyShuffle(OptionSet):
     """
@@ -203,7 +205,9 @@ class MarioColors(OptionDict):
     "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "Brown", "White", "Pink", "Gray"
 
     Putting Random with any color will set all 4 pieces to a random color. If a piece of clothing is missing from the option,
-    a random color will be chosen for it.
+    a random color will be chosen for it. (example Random: Green)
+    If a given piece of clothing does not have a valid value or is not included at all, one will be chosen for you.
+    Invalid colors other than the ones above will turn into a random color.
     """
     display_name = "Mario Colors"
     internal_name = "mario_colors"
@@ -248,7 +252,7 @@ class StarColors(Toggle):
 
 # this defines all the options.
 @dataclass
-class SMGOptions(PerGameCommonOptions):
+class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     enable_purple_coin_stars: EnablePurpleCoinStars
     stars_to_finish: StarstoFinish
     mario_colors: MarioColors
@@ -282,6 +286,9 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
+#    OptionGroup("Observatory Luma Behavior", [
+
+#    ]),
     OptionGroup("Cosmetics", [
         MarioColors,
         StarColors,

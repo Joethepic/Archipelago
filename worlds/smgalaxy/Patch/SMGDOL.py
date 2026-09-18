@@ -10,8 +10,8 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
-from ..locations import location_table
+from ..Constants.ram_constants import LUMAGALAXY, STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
 class SMGDOL(SMGObject):
@@ -76,11 +76,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(1, 1, 0x100))
         self.write_instruction(PPC.blr())
 
-    @staticmethod
-    def rlwinm(rA: int, rS: int, sh: int, mb: int, me: int) -> bytes:
-        """rlwinm rA, rS, SH, MB, ME  - rotate rS left by SH bits, AND with mask(MB, ME), store in rA"""
-        return PPC._fmt_m(21, rS, rA, sh, mb, me)
-
     def write_instruction(self, instruction_bytes: bytes, address: int = None) -> None:
         if address is not None:
             self.write_pointer = address
@@ -122,9 +117,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.nop(), 0x80379248)
 
         # Properly calculate the observatory scenario
-        self.write_instruction(PPC.li(3, 6), 0x803bbb2c)
-        self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
-
         self.write_instruction(PPC.li(3, 2), 0x803bbb78)
         self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 1))
@@ -133,13 +125,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lbz(3, 0x6, 30), 0x803b38cc)
         self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
         self.write_nop(1)
-
-        # TEMPORARY
-        # Set flag conditions for "SpecialGrandStar[i]"
-        address = 0x8053bb40
-        for i in range(7):
-            self.dol.write_at(address + i * 0x14 + 4, b'\x05')
-            self.dol.write_at(address + i * 0x14 + 6, i.to_bytes())
 
     def set_swing_permission(self):
         ########################
@@ -153,7 +138,7 @@ class SMGDOL(SMGObject):
         #######################################
         # Get obj_arg0 from miniature galaxy
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
-        self.write_instruction(self.rlwinm(3, 3, 16, 0x10, 0x1F))
+        self.write_instruction(PPC.rlwinm(3, 3, 16, 0x10, 0x1F))
 
     def manipulate_arg0_loading(self):
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
@@ -190,7 +175,7 @@ class SMGDOL(SMGObject):
         else:
             # Appear the normal star as "uncollected" only if collected
             self.write_instruction(PPC.cntlzw(6, 3))
-            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
+            self.write_instruction(PPC.rlwinm(6, 6, 27, 0x1F, 0x1F))
         self.write_instruction(PPC.b(self.write_pointer + 5 * 0x4, self.write_pointer))
 
         self.write_pointer = 0x8037db58
@@ -201,7 +186,7 @@ class SMGDOL(SMGObject):
         else:
             # Appear the special star as "uncollected" only if collected
             self.write_instruction(PPC.cntlzw(6, 3))
-            self.write_instruction(self.rlwinm(6, 6, 27, 0x1F, 0x1F))
+            self.write_instruction(PPC.rlwinm(6, 6, 27, 0x1F, 0x1F))
         self.write_nop(1, 0x8037db68)
         self.write_nop(1, 0x8037db74)
 
@@ -280,12 +265,12 @@ class SMGDOL(SMGObject):
         star_colour_address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[STARCOLOUR]
 
         for location, data in locations.items():
-            scenario = location_table[location].game_address
+            scenario = all_location_table[location].game_address
 
             if scenario == None:
                 continue
 
-            in_game_name = region_list[location_table[location].region].in_game_name
+            in_game_name = region_list[all_location_table[location].region].in_game_name
 
             for galaxy in galaxies_list:
                 region = region_list[galaxy]
@@ -296,15 +281,18 @@ class SMGDOL(SMGObject):
             classification = ItemClassification[data["classification"]]
             self.dol.write_at(star_colour_address + galaxy_offset + scenario, FILL_TYPE_TO_COLOUR_INDEX[classification].to_bytes())
 
-    def show_green_galaxies(self):
-        self.write_pointer = 0x80248888
-        self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
-
     def overwrite_all_greens_launch_star(self):
         upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREEN])
         self.write_instruction(PPC.lis(3, upper), 0x803cd988)
         self.write_instruction(PPC.lbz(3, lower, 3))
         self.write_instruction(PPC.blr())
+
+    def skip_return_demos(self):
+        self.write_instruction(PPC.li(3, 0), 0x803bac74)
+
+    def show_luma_with_dome(self):
+        self.write_instruction(PPC.lwz(3, 0x1EC, 3), 0x80291c1c)
+        self.write_instruction(PPC.b(0x803af884, self.write_pointer))
 
     def update_instructions(self):
         self.skip_opening()
@@ -316,15 +304,35 @@ class SMGDOL(SMGObject):
         self.custom_grandstar_count()
         self.skip_wii_strap()
         self.show_bros_button()
-        self.show_green_galaxies()
         self.overwrite_all_greens_launch_star()
+        self.skip_return_demos()
+        self.show_luma_with_dome()
 
     def show_galaxy_star_counter(self):
-        self.write_instruction(PPC.cmpi(0, 3, 4), 0x801ff4cc)
+        self.write_instruction(PPC.li(0, 0), 0x801ff4c8)
 
     def hide_galaxy_star_counter(self):
-        self.write_pointer = 0x801ff4cc
-        self.write_instruction(PPC.b(self.write_pointer + 85 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(0, 1), 0x801ff4c8)
+
+    def update_luma_galaxies(self, luma_galaxies: list[GalaxyDestination], starbit_counts: list[int]):
+        assert len(luma_galaxies) == 7
+
+        for galaxy, starbit_count, i in zip(luma_galaxies, starbit_counts, range(7)):
+            address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[LUMAGALAXY] + i * 0x20
+            self.dol.write_at(address, galaxy.name.encode('utf-8'))
+            self.dol.write_at(address + 30, int.to_bytes(starbit_count, 2))
+        
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[LUMAGALAXY])
+        # Overwrite getting galaxy name (and starbit count) from index
+        self.write_instruction(PPC.lis(4, upper), 0x803b2dec)
+        self.write_instruction(PPC.addi(4, 4, lower))
+        self.write_instruction(PPC.slwi(3, 3, 5))
+        self.write_instruction(PPC.add(3, 3, 4))
+        self.write_instruction(PPC.lhz(4, 30, 3))
+        self.write_instruction(PPC.blr())
+
+        # Use the extra return for starbits
+        self.write_instruction(PPC.mr(3, 4), 0x80291c50)
 
     def update_green_galaxies(self, green_galaxies: list[GalaxyDestination]):
         assert len(green_galaxies) == 3
@@ -352,10 +360,23 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:5])), 0x80293688) # Grand Finale
         self.write_instruction(PPC.addi(0, 31, sum(string_offsets[:6])), 0x802936d0) # unknown (literally)
 
+        self.override_green_name_check(self.custom_section_address + STATIC_VARIABLE_OFFSETS[GREENGALAXY] + sum(string_offsets[:5]))
+
+    def override_green_name_check(self, string_address: int):
+        # Return true unless name is "PeachCastleFinalGalaxy"
+        upper, lower = self.get_upper_and_lower_signed(string_address)
+        self.write_instruction(PPC.lis(3, upper), 0x803af64c)
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.mr(4, 6))
+        self.write_instruction(PPC.bl(0x803fd4a0, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+
     def write_slot_name(self, slot_name: str):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
 
-    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int], locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool):
+    def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int],
+               locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool, starbit_counts: list[int]):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -376,6 +397,7 @@ class SMGDOL(SMGObject):
 
         self.manipulate_star_loading(hide_star_colours)
 
+        #self.update_luma_galaxies([galaxy for galaxy in luma_galaxies if galaxy.dome_index != None], starbit_counts)
         self.update_green_galaxies([galaxy for galaxy in luma_galaxies if galaxy.orbit_index != None])
 
         self.write_slot_name(slot_name)

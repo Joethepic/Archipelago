@@ -44,7 +44,7 @@ PURPLE = (128,  0,128)
 BLACK = (0, 0, 0)
 BROWN = (165, 42, 42)
 GRAY = (128,128,128)
-colors: dict[str, tuple[int, int, int]] = {"red": RED,
+colors: dict[str, tuple[int, int, int]] = {"Red": RED,
                                            "Orange": ORANGE,
                                            "Yellow": YELLOW,
                                            "Green" : GREEN,

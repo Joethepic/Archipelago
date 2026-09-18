@@ -12,11 +12,11 @@ from . import items, regions, Rules, web_world, SMGOptions
 from .Constants.Names import region_names as regname, item_names as itemname, location_names as locname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
-from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, location_table
+from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
-from .Patch.Patch import SMGPlayerContainer
+from .Patch.SMGPlayerContainer import SMGPlayerContainer
 
 def runClient(*args):
     from .SMGClient import launch
@@ -49,6 +49,7 @@ class SMGWorld(World):
     required_client_version = (0, 6, 6)
 
     hint_blacklist = {"B: Bowser's Galaxy Reactor", "Peach"}
+    ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
@@ -71,6 +72,8 @@ class SMGWorld(World):
             if key == "Random":
                 continue
             if key not in self.options.mario_colors.value.keys():
+                self.options.mario_colors.value.update({key: self.random.choice(sorted(self.options.mario_colors.valid_values))})
+            if not self.options.mario_colors.value[key] in self.options.mario_colors.valid_values:
                 self.options.mario_colors.value.update({key: self.random.choice(sorted(self.options.mario_colors.valid_values))})
 
     def create_regions(self):
@@ -135,8 +138,6 @@ class SMGWorld(World):
         local_pool: list[SMGItem] = []
         local_pool += [self.create_item(itemname.GREEN) for i in range(3)]
         local_pool += [self.create_item(itemname.GRAND) for i in range(7)]
-        self.get_location(locname.GALAXYREACTORSTAR1).place_locked_item(self.create_item("Peach"))
-        self.get_location(locname.GALAXYREACTORSTAR1).address = None
         
         # make sure we don't create more stars than locations, somehow
         local_pool += [self.create_item(itemname.POWER) for i in range(self.options.stars_to_finish.value)]
@@ -240,8 +241,8 @@ class SMGWorld(World):
                 logging.info(slot)
                 for region in region_list:
                     if region == galaxy:
-                        for location in location_table.values():
-                            if location.region == galaxy:
+                        for location in all_location_table.values():
+                            if location.galaxy_name == galaxy:
                                 er_hint_data.update({location.code: slot[0]})
             hint_data[self.player] = er_hint_data
 

@@ -1,3 +1,35 @@
+import dataclasses
+import reprlib
+
+# BEHOLD THE GCLIB MONKEY PATCHES REQUIRED TO WORK
+# If _recursive_repr is missing, alias the public one from reprlib
+if not hasattr(dataclasses, '_recursive_repr'):
+    dataclasses._recursive_repr = reprlib.recursive_repr
+
+import gclib.bunfoe as bunfoe
+import typing
+
+def _safe_issubclass(cls, class_or_tuple):
+    if not isinstance(cls, type):
+        # Resolve ForwardRef, GenericAlias, or anything else
+        if isinstance(cls, typing.ForwardRef):
+            try:
+                cls = cls._evaluate(vars(bunfoe), None, None)
+            except Exception:
+                return False
+        elif isinstance(cls, str):
+            cls = getattr(bunfoe, cls, None)
+        else:
+            # Could be a GenericAlias like list[int] — check origin
+            origin = getattr(cls, '__origin__', None)
+            if origin is not None:
+                cls = origin
+        if not isinstance(cls, type):
+            return False
+    return issubclass(cls, class_or_tuple)
+
+bunfoe.issubclass = _safe_issubclass
+
 from io import BytesIO
 
 from gclib import texture_utils

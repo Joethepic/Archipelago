@@ -41,7 +41,8 @@ class AstroDomes(SMGObject):
         of the dome should look like in correspondance with the given index.
         """
         # Get the objinfo path of the dome corresponding to the dome index.
-        OBJINFO_PATH = PLACEMENT_PATH + index_to_layer[dome_index] + '/' + FILE_NAME
+        OBJINFO_PATH = PLACEMENT_PATH + index_to_layer[dome_index] + '/' + OBJINFO_FILE_NAME
+        STARTINFO_PATH = START_PATH + index_to_layer[dome_index] + '/' + STARTINFO_FILE_NAME
 
         galaxy_index = 0
         with self.patcher.edit_as(self.path + '/' + OBJINFO_PATH, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
@@ -79,3 +80,9 @@ class AstroDomes(SMGObject):
 
                 if entry["name"].startswith("AstroDome"):
                     entry["Obj_arg0"] = interior_dome_index
+                    entry["pos_y"] = -625.0
+
+        with self.patcher.edit_as(self.path + '/' + STARTINFO_PATH, BCSV, field_names=hashtable.hash_to_name, str_fmt="shift-jis") as bcsv:
+            for entry in bcsv.entries:
+                if entry["name"] == "Mario":
+                    entry["pos_y"] = -625.0

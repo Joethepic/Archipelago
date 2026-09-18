@@ -1,4 +1,3 @@
-from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
@@ -8,16 +7,24 @@ from typing import NamedTuple, Optional
 import copy
 import random
 
-import Utils
-from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+import NetUtils, Utils
+from CommonClient import ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
-from worlds.smgalaxy.Patch.Patch import SuperMarioGalaxyRandomiser
+from .Constants.Names import galaxy_in_game_names as galaxyignname
 
 from .regions import SMGRegionData, region_list
 from .smg_helpers import *
 import dolphin_memory_engine as dme
+
+TRACKER_LOADED = False
+try:
+    from worlds.tracker.TrackerClient import TrackerGameContext as CommonContext
+    TRACKER_LOADED = True
+except ModuleNotFoundError:
+    from CommonClient import CommonContext
 
 class GalaxyCommand(ClientCommandProcessor):
     def _cmd_dolphin(self) -> None:
@@ -86,6 +93,7 @@ class GalaxyContext(CommonContext):
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
+                         "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
@@ -98,17 +106,10 @@ class GalaxyContext(CommonContext):
         # Setup the handler for managing the star colours in scenario select
         self.starcolorhandler = StarColorHandler(star_colour_pointers)
 
-    async def disconnect(self, msg: str = '') -> None:
-        """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
-        
-        Args:
-            msg (str): Error message to send to the client.
-        """
+    async def disconnect(self, allow_autoreconnect: bool = False) -> None:
+        """Disconnect from the server, unhook from Dolphin Memory Engine and set flags."""
         await super().disconnect()
         dme.un_hook()
-
-        if msg:
-            logger.error(msg)
 
         self.set_dolphin_status(CONNECTION_LOST_STATUS)
         
@@ -158,26 +159,36 @@ class GalaxyContext(CommonContext):
         local_missing_locs = copy.deepcopy(self.missing_locations) # Deepcopy to prevent list changing while iterating.
 
         for loc_id in local_missing_locs:
-            local_loc: SMGLocationData = location_table[self.location_names.lookup_in_game(loc_id)]
+            local_loc: SMGLocationData = all_location_table[self.location_names.lookup_in_game(loc_id)]
             region_data: SMGRegionData = region_list[local_loc.region]
 
             if local_loc.game_address is None:
                 continue
 
             star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-            if await self.current_galaxy() == "AstroDome" or await self.current_galaxy() == "AstroGalaxy":
+            if await self.current_galaxy() == galaxyignname.DOME or await self.current_galaxy() == galaxyignname.OBSERVATORY:
                 if (star_bit_flag & (1 << local_loc.game_address)) > 0:
                     self.locations_checked.add(loc_id)
         await self.check_locations(self.locations_checked)
 
     async def check_collect(self):
         for location_id in self.checked_locations:
-            for key, location in location_table.items():
+            for key, location in all_location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
                 value = await self.pointers[location.in_game_galaxy_name].get_value()
                 value |= (1 << location.game_address)
                 self.pointers[location.in_game_galaxy_name].write_value(value)
+
+    async def check_goal(self):
+        if await self.current_galaxy() == galaxyignname.EPILOGUE:
+            if not self.finished_game:
+                self.finished_game = True
+                logger.info("Goal being sent")
+                await self.send_msgs([{
+                    "cmd": "StatusUpdate",
+                    "status": NetUtils.ClientStatus.CLIENT_GOAL,
+                }])
 
     async def smg_recv_items(self) -> None:
         """Modify the items we have received to change things in game."""
@@ -193,7 +204,7 @@ class GalaxyContext(CommonContext):
                     self.pointers["Lives"].write_value(self.lives)
 
                 case 170000004:
-                    logger.info("Power Star Received")
+                    logger.debug("Power Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
 
@@ -205,7 +216,7 @@ class GalaxyContext(CommonContext):
                     self.pointers[GRAND].write_value(min(7, grandstars))
 
                 case 170000006:
-                    logger.info("Green Star Received")
+                    logger.debug("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
                     greenstars = await self.pointers[itemname.GREEN].get_value() + 1
@@ -257,8 +268,7 @@ class GalaxyContext(CommonContext):
         lives = await self.pointers["Lives"].get_value()
 
         if lives < self.lives and time.time() >= float(self.last_death_link + DEATH_LINK_TIMEOUT):
-            await self.send_death(self.player_names[self.slot] + random.choice(DEATH_MESSAGES))
-
+            await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
         self.lives = lives
 
     def set_dolphin_status(self, status: str) -> None:
@@ -313,9 +323,11 @@ class GalaxyContext(CommonContext):
             await self.smg_recv_items()
             await self.check_death()
             await self.check_collect()
+            await self.check_goal()
 
         except Exception as dmeEx:
-            await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
+            logger.error("Unable to connect to SMG. Details: " + str(dmeEx))
+            await self.disconnect()
             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
     async def dolphin_loop(self) -> None:
@@ -355,7 +367,8 @@ class GalaxyContext(CommonContext):
             data (dict): The data associated with the DeathLink event.
         """
         super().on_deathlink(data)
-        Utils.async_start(self.kill_player(), "SMG - Kill Player")
+        if data["source"] != self.player_names[self.slot]:
+            Utils.async_start(self.kill_player(), "SMG - Kill Player")
 
     async def kill_player(self) -> None:
         """Kill the player in game."""
@@ -387,6 +400,9 @@ async def _main(connect, password):
         ctx = GalaxyContext(connect, password)
         ctx.server_task = asyncio.create_task(server_loop(ctx), name="SMG - ServerLoop")
 
+        if TRACKER_LOADED:
+            ctx.run_generator()
+
         if gui_enabled:
             ctx.run_gui()
 
@@ -410,7 +426,8 @@ async def _main(connect, password):
     
 # launches/starts everything we need
 def launch(*launch_args: str):
-    import colorama
+    import colorama, os
+
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
     
@@ -418,12 +435,20 @@ def launch(*launch_args: str):
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
 
-    if args.apsmg_file:
-        output_directory = Path(args.apsmg_file).parent
-        iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
-        iso_path = os.path.join(output_directory, iso_name + '.iso')
+    try:
+        from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
+        if args.apsmg_file:
+            output_directory = Path(args.apsmg_file).parent
+            iso_name = ''.join(os.path.basename(args.apsmg_file).split('.')[:-1])
+            iso_path = os.path.join(output_directory, iso_name + '.iso')
 
-        SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+            SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
+    except Exception as patchEx:
+        client_msg: str = (f"An unknown error occurred while trying to patch a file for {CLIENT_NAME}.\n" +
+            f"Additional details:\n{str(patchEx)}")
+        logger.error(client_msg)
+        Utils.messagebox(f"Patch Client Issue {CLIENT_NAME}", client_msg, True)
+        raise patchEx
 
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
