@@ -1,4 +1,3 @@
-from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
@@ -9,7 +8,7 @@ import copy
 import random
 
 import NetUtils, Utils
-from CommonClient import CommonContext, ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
+from CommonClient import ClientCommandProcessor, logger, server_loop, gui_enabled, get_base_parser
 
 from .Constants.ram_constants import *
 from .Constants.constants import *
@@ -19,6 +18,13 @@ from .Constants.Names import galaxy_in_game_names as galaxyignname
 from .regions import SMGRegionData, region_list
 from .smg_helpers import *
 import dolphin_memory_engine as dme
+
+TRACKER_LOADED = False
+try:
+    from worlds.tracker.TrackerClient import TrackerGameContext as CommonContext
+    TRACKER_LOADED = True
+except ModuleNotFoundError:
+    from CommonClient import CommonContext
 
 class GalaxyCommand(ClientCommandProcessor):
     def _cmd_dolphin(self) -> None:
@@ -393,6 +399,9 @@ async def _main(connect, password):
     try:
         ctx = GalaxyContext(connect, password)
         ctx.server_task = asyncio.create_task(server_loop(ctx), name="SMG - ServerLoop")
+
+        if TRACKER_LOADED:
+            ctx.run_generator()
 
         if gui_enabled:
             ctx.run_gui()
