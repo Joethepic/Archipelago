@@ -110,9 +110,53 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
 
     def has_player_no_control(self):
+        # Does mario exist
+        self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 30 * 0x4, self.write_pointer))
+
+        # Is mario dead
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 25 * 0x4, self.write_pointer))
+
+        # Is mario in bind
+        self.write_instruction(PPC.bl(0x803f2910, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 20 * 0x4, self.write_pointer))
+
+        # Is mario in a demo
+        self.write_instruction(PPC.bl(0x803c9e84, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 15 * 0x4, self.write_pointer))
+
+        # Is powerstar get demo active
+        self.write_instruction(PPC.bl(0x803ca2bc, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 10 * 0x4, self.write_pointer))
+
+        # Is input disable
         self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
         self.write_instruction(PPC.lwz(3, 0x230, 3))
         self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
+
+        self.write_instruction(PPC.li(3, 0))
+        self.write_instruction(PPC.b(self.write_instruction + 2 * 0x4, self.write_pointer))
+
+        self.write_instruction(PPC.li(3, 1))
+
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL], 31))
 
     def add_deathlink(self):
