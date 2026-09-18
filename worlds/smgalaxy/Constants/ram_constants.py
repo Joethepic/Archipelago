@@ -60,7 +60,8 @@ variables: list[StaticVariable] = [
     StaticVariable(GREEN, 1),
     StaticVariable(ISDEAD, 1),
     StaticVariable(HASNOCONTROL, 1),
-    StaticVariable('', 3),
+    StaticVariable("Pause", 1)
+    StaticVariable('', 2),
     StaticVariable(DEATHLINK, 4),
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),

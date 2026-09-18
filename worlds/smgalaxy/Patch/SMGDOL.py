@@ -69,6 +69,7 @@ class SMGDOL(SMGObject):
         self.setup_register()
 
         # Custom functions to run every frame
+        self.can_pause()
         self.is_dead__has_no_control()
         self.add_deathlink()
         
@@ -103,6 +104,10 @@ class SMGDOL(SMGObject):
         upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS["Start"])
         self.write_instruction(PPC.lis(31, upper))
         self.write_instruction(PPC.addi(31, 31, lower))
+
+    def can_pause(self):
+        self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS["Pause"], 31))
 
     def is_dead__has_no_control(self):
         # Does mario exist
