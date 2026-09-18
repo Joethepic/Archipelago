@@ -103,7 +103,7 @@ class SMGDOL(SMGObject):
     def setup_register(self):
         upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS["Start"])
         self.write_instruction(PPC.lis(31, upper))
-        self.write_instruction(PPC.addi(31, lower, 31))
+        self.write_instruction(PPC.addi(31, 31, lower))
 
     def is_mario_dead(self):
         self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
