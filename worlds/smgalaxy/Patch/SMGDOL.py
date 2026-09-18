@@ -92,10 +92,10 @@ class SMGDOL(SMGObject):
         for _ in range(count):
             self.write_instruction(PPC.nop(), address)
 
-    def get_upper_and_lower_unsigned(self, address: int) -> list[int, int]:
+    def get_upper_and_lower_unsigned(self, address: int) -> tuple[int, int]:
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
 
-    def get_upper_and_lower_signed(self, address: int) -> list[int, int]:
+    def get_upper_and_lower_signed(self, address: int) -> tuple[int, int]:
         if address & 0x0000FFFF >= 0x8000:
             return ((address & 0xFFFF0000) >> 16) + 1, (address & 0x0000FFFF) - 0x10000
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
