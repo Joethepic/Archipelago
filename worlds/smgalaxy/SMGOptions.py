@@ -286,6 +286,9 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
+    OptionGroup("Observatory Luma Behavior", [
+
+    ]),
     OptionGroup("Cosmetics", [
         MarioColors,
         StarColors,
