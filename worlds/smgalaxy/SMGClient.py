@@ -269,8 +269,6 @@ class GalaxyContext(CommonContext):
 
         if lives < self.lives and time.time() >= float(self.last_death_link + DEATH_LINK_TIMEOUT):
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
-            self.last_death_link = time.time()
-
         self.lives = lives
 
     def set_dolphin_status(self, status: str) -> None:
@@ -369,7 +367,8 @@ class GalaxyContext(CommonContext):
             data (dict): The data associated with the DeathLink event.
         """
         super().on_deathlink(data)
-        Utils.async_start(self.kill_player(), "SMG - Kill Player")
+        if data["source"] != self.player_names[self.slot]:
+            Utils.async_start(self.kill_player(), "SMG - Kill Player")
 
     async def kill_player(self) -> None:
         """Kill the player in game."""
