@@ -39,6 +39,7 @@ STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
 GREENGALAXY = "Green Galaxies"
 LUMAGALAXY = "Luma Galaxies"
+ISDEAD = "Is mario dead"
 DEATHLINK = "Deathlink"
 LAST_RECV_INDEX = "Last Item Received Idx"
 SLOTNAME = "Slot Name"
@@ -48,10 +49,12 @@ class StaticVariable(NamedTuple):
     size: int
 
 variables: list[StaticVariable] = [
+    StaticVariable("Start", 0),
     StaticVariable(POWER, 1),
     StaticVariable(GRAND, 1),
     StaticVariable(GREEN, 1),
-    StaticVariable(DEATHLINK, 1),
+    StaticVariable(ISDEAD, 1),
+    StaticVariable(DEATHLINK, 4),
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable(GREENGALAXY, 5 * 32),

@@ -92,11 +92,13 @@ class GalaxyContext(CommonContext):
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
+                         "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.u32, STATIC_VARIABLES_POINTER),
                          itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
                          LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
@@ -150,7 +152,7 @@ class GalaxyContext(CommonContext):
             return
 
         self.last_galaxy = curr_galaxy
-    
+
     async def smg_locs_checker(self) -> None:
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         if not await self.check_ingame():

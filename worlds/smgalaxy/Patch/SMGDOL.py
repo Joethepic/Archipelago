@@ -10,7 +10,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import LUMAGALAXY, STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
@@ -66,6 +66,10 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
         self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
 
+        self.setup_register()
+
+        # Custom functions to run every frame
+        self.is_mario_dead()
         self.add_deathlink()
         
         # Return from custom function
@@ -95,19 +99,31 @@ class SMGDOL(SMGObject):
             return ((address & 0xFFFF0000) >> 16) + 1, (address & 0x0000FFFF) - 0x10000
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
 
-    def add_deathlink(self):
-        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHLINK])
+    def setup_register(self):
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS["Start"])
         self.write_instruction(PPC.lis(31, upper))
-        self.write_instruction(PPC.lbz(3, lower, 31))
+        self.write_instruction(PPC.addi(31, lower, 31))
+
+    def is_mario_dead(self):
+        self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
+        self.write_instruction(PPC.stb(3, ISDEAD, 31))
+
+    def add_deathlink(self):
+        # Get the value
+        self.write_instruction(PPC.lwz(3, DEATHLINK, 31))
 
         # Skip the function if its less than 1
         self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 6 * 0x4, self.write_pointer))
 
-        # Kill mario and reset
+        # Subtract the timer by one
+        self.write_instruction(PPC.addi(3, 3, -1))
+        self.write_instruction(PPC.stw(3, DEATHLINK, 31))
+
+        # Only kill if value is 1
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
-        self.write_instruction(PPC.li(3, 0))
-        self.write_instruction(PPC.stb(3, lower, 31))
 
     def skip_opening(self):
         #######################################################
