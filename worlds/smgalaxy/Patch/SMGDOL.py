@@ -112,7 +112,7 @@ class SMGDOL(SMGObject):
     def has_player_no_control(self):
         self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
         self.write_instruction(PPC.lwz(3, 0x230, 3))
-        self.write_instruction(PPC.bl(0x802e98b8))
+        self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL], 31))
 
     def add_deathlink(self):
