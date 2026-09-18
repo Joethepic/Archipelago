@@ -269,6 +269,7 @@ class GalaxyContext(CommonContext):
 
         if lives < self.lives and time.time() >= float(self.last_death_link + DEATH_LINK_TIMEOUT):
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
+            self.last_death_link = time.time()
 
         self.lives = lives
 
