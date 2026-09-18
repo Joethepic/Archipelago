@@ -99,17 +99,10 @@ class GalaxyContext(CommonContext):
         # Setup the handler for managing the star colours in scenario select
         self.starcolorhandler = StarColorHandler(star_colour_pointers)
 
-    async def disconnect(self, msg: str = '') -> None:
-        """Disconnect from the server, unhook from Dolphin Memory Engine and set flags.
-        
-        Args:
-            msg (str): Error message to send to the client.
-        """
+    async def disconnect(self, allow_autoreconnect: bool = False) -> None:
+        """Disconnect from the server, unhook from Dolphin Memory Engine and set flags."""
         await super().disconnect()
         dme.un_hook()
-
-        if msg:
-            logger.error(msg)
 
         self.set_dolphin_status(CONNECTION_LOST_STATUS)
         
@@ -327,7 +320,8 @@ class GalaxyContext(CommonContext):
             await self.check_goal()
 
         except Exception as dmeEx:
-            await self.disconnect("Unable to connect to SMG. Details: " + str(dmeEx))
+            logger.error("Unable to connect to SMG. Details: " + str(dmeEx))
+            await self.disconnect()
             await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
     async def dolphin_loop(self) -> None:
