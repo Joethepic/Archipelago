@@ -10,7 +10,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import HASNOCONTROL, LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import GAMESYSTEM, HASNOCONTROL, LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
@@ -106,6 +106,11 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.addi(31, 31, lower))
 
     def can_pause(self):
+        upper, lower = self.get_upper_and_lower_signed(GAMESYSTEM)
+        self.write_instruction(PPC.lis(3, upper,))
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.lwz(3, 0x24, 3))
+        self.write_instruction(PPC.lwz(3, 0xAC, 3))
         self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS["Pause"], 31))
 
