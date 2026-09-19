@@ -107,8 +107,9 @@ class SMGDOL(SMGObject):
 
     def can_pause(self):
         upper, lower = self.get_upper_and_lower_signed(GAMESYSTEM)
-        self.write_instruction(PPC.lis(3, upper,))
+        self.write_instruction(PPC.lis(3, upper))
         self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.lwz(3, 0, 3))
         self.write_instruction(PPC.lwz(3, 0x24, 3))
         self.write_instruction(PPC.lwz(3, 0xAC, 3))
         self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
