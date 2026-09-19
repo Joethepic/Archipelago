@@ -179,7 +179,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.stw(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
 
         # Only kill if value is 1
-        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
 
