@@ -70,7 +70,9 @@ class SMGDOL(SMGObject):
 
         # Custom functions to run every frame
         self.can_pause()
-        self.is_dead__has_no_control()
+        self.is_mario_dead()
+        self.is_mario_disabled()
+        self.can_send_deathlink()
         self.add_deathlink()
         
         # Return from custom function
@@ -133,10 +135,10 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL], 31))
 
     def can_send_deathlink(self):
-        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL]))
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[HASNOCONTROL], 31))
         self.write_instruction(PPC.cntlzw(3, 3))
         self.write_instruction(PPC.srwi(3, 3, 5))
-        self.write_instruction(PPC.lbz(4, STATIC_VARIABLE_OFFSETS["Pause"]))
+        self.write_instruction(PPC.lbz(4, STATIC_VARIABLE_OFFSETS["Pause"], 31))
         self.write_instruction(PPC.and_(3, 3, 4))
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS["send deathlink"], 31))
 
