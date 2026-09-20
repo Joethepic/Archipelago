@@ -263,7 +263,7 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if self.pointers[ISDEAD]:
+        if await self.pointers[ISDEAD].get_value():
             self.pointers[ISDEAD].write_value(False)
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
 
