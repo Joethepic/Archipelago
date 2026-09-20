@@ -36,8 +36,8 @@ MARIO_ACTOR_POINTER_LIST: list[int] = [0x24, 0xAC, 0x10, 0x50, 0xC]
 # RAM address for being able to spin. 0 = disabled, 1 = enabled
 SWING_PERMISSION_POINTER_LIST: list[int] = MARIO_ACTOR_POINTER_LIST + [0xEEB]
 
-# GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder
-LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x30]
+# GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> StarPieceAlmsStorage -> Array Data
+LAST_RECEIVED_ITEM_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0x14, 0x8, 0x20]
 
 STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
