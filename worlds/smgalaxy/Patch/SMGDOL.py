@@ -408,6 +408,19 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0x1EC, 3), 0x80291c1c)
         self.write_instruction(PPC.b(0x803af884, self.write_pointer))
 
+    def add_save_space(self):
+        extra_space = 0x4
+
+        # Expand contruct allocation
+        self.write_instruction(PPC.li(3, 0x20 + extra_space), 0x803ba1ac)
+
+        # Expand serialize size
+        self.write_instruction(PPC.li(5, 0x20 + extra_space), 0x803ba2a0)
+        self.write_instruction(PPC.li(3, 0x20 + extra_space), 0x803ba2b0)
+
+        # Expand deserialize size
+        self.write_instruction(PPC.li(5, 0x20 + extra_space), 0x803ba2c8)
+
     def update_instructions(self):
         self.skip_opening()
         self.set_swing_permission()
@@ -421,6 +434,7 @@ class SMGDOL(SMGObject):
         self.overwrite_all_greens_launch_star()
         self.skip_return_demos()
         self.show_luma_with_dome()
+        self.add_save_space()
 
     def show_galaxy_star_counter(self):
         self.write_instruction(PPC.li(0, 0), 0x801ff4c8)
