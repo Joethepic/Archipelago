@@ -115,14 +115,18 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
         self.write_instruction(PPC.addi(3, 3, -1))
         self.write_instruction(PPC.sth(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
-        self.write_instruction(PPC.b(self.write_pointer + 6 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 9 * 0x4, self.write_pointer))
 
         # Does mario exist
         self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
         self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 6 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 7 * 0x4, self.write_pointer))
 
         # Does mario actor exist
+        self.write_instruction(PPC.mr(3, 29))
         self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 1))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
@@ -141,13 +145,17 @@ class SMGDOL(SMGObject):
         # Skip if mario doesn't exist
         self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 7 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 11 * 0x4, self.write_pointer))
 
         # Is mario controllable
         self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
         self.write_instruction(PPC.cmpi(0, 3, 1))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
-        self.write_instruction(PPC.lwz(3, 0x230, 3))
+        self.write_instruction(PPC.lwz(3, 0x230, 29))
         self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
 
         # Write value to r30 (invert if disabled, 0 if doesn't exist)
