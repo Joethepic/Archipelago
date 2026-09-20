@@ -263,7 +263,8 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if self.pointers[ISDEAD]:
+        if self.pointers[ISDEAD] and time.time() >= float(self.last_death_link + DEFAULT_DEATHLINK_COOLDOWN / 60):
+            self.last_death_link = time.time()
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
 
     def set_dolphin_status(self, status: str) -> None:
