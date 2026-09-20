@@ -18,6 +18,7 @@ DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY: str = "Dolphin did not load the ROM correctly.
 CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready to play SMG!"
 AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
 
+DEFAULT_DEATHLINK_COOLDOWN = 10 * 60
 DEATH_MESSAGES = [
     "got sucked into a black hole",
     "ran into a goomba",
@@ -31,7 +32,6 @@ DEATH_MESSAGES = [
 
 WAIT_TIMER_LONG_TIMEOUT: int = 5
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
-DEATH_LINK_TIMEOUT: int = WAIT_TIMER_LONG_TIMEOUT * 3
 # Colors
 WHITE = (255,  255,  255)
 RED = (255,  0,  0)

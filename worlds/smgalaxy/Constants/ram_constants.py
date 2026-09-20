@@ -43,9 +43,10 @@ STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
 GREENGALAXY = "Green Galaxies"
 LUMAGALAXY = "Luma Galaxies"
+FORCEDEATH = "Kill mario forcefully"
 ISDEAD = "Is mario dead"
-HASNOCONTROL = "Can mario move"
 DEATHLINK = "Deathlink"
+DEATHTIMER = "Time between deathlink deaths"
 LAST_RECV_INDEX = "Last Item Received Idx"
 SLOTNAME = "Slot Name"
 
@@ -58,12 +59,16 @@ variables: list[StaticVariable] = [
     StaticVariable(POWER, 1),
     StaticVariable(GRAND, 1),
     StaticVariable(GREEN, 1),
-    StaticVariable(ISDEAD, 1),
-    StaticVariable(HASNOCONTROL, 1),
-    StaticVariable("Pause", 1),
-    StaticVariable("send deathlink", 1),
     StaticVariable('', 1),
-    StaticVariable(DEATHLINK, 4),
+
+    # Deathlink
+    StaticVariable(FORCEDEATH, 1),
+    StaticVariable(ISDEAD, 1),
+    StaticVariable(DEATHLINK, 1),
+    StaticVariable("Death count", 1),
+    StaticVariable(DEATHTIMER, 2),
+    StaticVariable("Death cooldown", 2),
+
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable(GREENGALAXY, 5 * 32),
