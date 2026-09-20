@@ -3,6 +3,8 @@ from io import BytesIO
 from wiithon.ppc import instructions as PPC
 from wiithon.formats.dol import DOL
 
+from worlds.smgalaxy.Constants.constants import DEFAULT_DEATHLINK_COOLDOWN
+
 
 from .extensions import SMGObject, SMGDOLObject, Pointer
 from .SMGDolObjects.NameObjFactory import NameObjFactory
@@ -10,7 +12,7 @@ from .SMGDolObjects.GalaxyUnlockTable import GalaxyUnlockTable
 from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
-from ..Constants.ram_constants import LUMAGALAXY, STARCOLOUR, GREENGALAXY, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..Constants.ram_constants import DEATHTIMER, FORCEDEATH, GAMESYSTEM, LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
 from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
@@ -66,7 +68,10 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bl(0x805174fc, self.write_pointer))
         self.write_instruction(PPC.bl(0x80399af0, self.write_pointer))
 
-        self.add_deathlink()
+        self.setup_register()
+
+        # Custom functions to run every frame
+        self.deathlink()
         
         # Return from custom function
         self.write_pointer = self.custom_section_address + self.custom_section_size - 5 * 0x4 - variable_space
@@ -87,27 +92,145 @@ class SMGDOL(SMGObject):
         for _ in range(count):
             self.write_instruction(PPC.nop(), address)
 
-    def get_upper_and_lower_unsigned(self, address: int) -> list[int, int]:
+    def get_upper_and_lower_unsigned(self, address: int) -> tuple[int, int]:
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
 
-    def get_upper_and_lower_signed(self, address: int) -> list[int, int]:
+    def get_upper_and_lower_signed(self, address: int) -> tuple[int, int]:
         if address & 0x0000FFFF >= 0x8000:
             return ((address & 0xFFFF0000) >> 16) + 1, (address & 0x0000FFFF) - 0x10000
         return (address & 0xFFFF0000) >> 16, address & 0x0000FFFF
 
-    def add_deathlink(self):
-        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHLINK])
+    def setup_register(self):
+        upper, lower = self.get_upper_and_lower_signed(self.custom_section_address + STATIC_VARIABLE_OFFSETS["Start"])
         self.write_instruction(PPC.lis(31, upper))
-        self.write_instruction(PPC.lbz(3, lower, 31))
+        self.write_instruction(PPC.addi(31, 31, lower))
 
-        # Skip the function if its less than 1
+    def deathlink(self):
+        ##################
+        ### SEND DEATH ###
+        ##################
+        # Skip if death was sent by us and decrement the timer
+        self.write_instruction(PPC.lhz(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.addi(3, 3, -1))
+        self.write_instruction(PPC.sth(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
+        self.write_instruction(PPC.b(self.write_pointer + 19 * 0x4, self.write_pointer))
+
+        # Does mario exist
+        self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 12 * 0x4, self.write_pointer))
+
+        # Does mario actor exist
+        self.write_instruction(PPC.mr(3, 29))
+        self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
         self.write_instruction(PPC.cmpi(0, 3, 1))
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
 
-        # Kill mario and reset
-        self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
+        # Is mario dead
+        self.write_instruction(PPC.mr(3, 29))
+        self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
+
+        # Write death value
         self.write_instruction(PPC.li(3, 0))
-        self.write_instruction(PPC.stb(3, lower, 31))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[ISDEAD], 31))
+
+        #####################
+        ### RECEIVE DEATH ###
+        #####################
+        # Skip if mario doesn't exist
+        self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 11 * 0x4, self.write_pointer))
+
+        # Is mario controllable
+        self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.lwz(3, 0x230, 29))
+        self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
+
+        # Write value to r30 (invert if disabled, 0 if doesn't exist)
+        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(3, 1))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(30, 3, 5))
+
+        # Determine if the game can be paused
+        upper, lower = self.get_upper_and_lower_signed(GAMESYSTEM)
+        self.write_instruction(PPC.lis(3, upper))
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.lwz(3, 0, 3))
+        self.write_instruction(PPC.lwz(3, 0x24, 3))
+        self.write_instruction(PPC.lwz(3, 0xAC, 3))
+
+        # Skip if scene isn't set yet
+        self.write_instruction(PPC.mr(29, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.cntlzw(3, 3))
+        self.write_instruction(PPC.srwi(3, 3, 5))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.mr(3, 29))
+        self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(3, 0))
+
+        # AND mario controllable and game can be paused, write to r30
+        self.write_instruction(PPC.and_(30, 3, 30))
+
+        # Add one to the kill count if deathlink received and reset
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 6 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(3, 0))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
+        self.write_instruction(PPC.addi(3, 3, 1))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
+
+        # Kill mario if forced
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[FORCEDEATH], 31))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
+
+        # Skip if death count is less than 1
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 13 * 0x4, self.write_pointer))
+
+        # Skip if death was recently sent
+        self.write_instruction(PPC.lhz(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
+        self.write_instruction(PPC.cmpi(0, 3, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 9 * 0x4, self.write_pointer))
+
+        # Skip if mario is not killable
+        self.write_instruction(PPC.cmpi(0, 30, 1))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 7 * 0x4, self.write_pointer))
+
+        # Kill mario, set cooldown timer and decrement death count
+        self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
+        self.write_instruction(PPC.addi(3, 3, -1))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
+        self.write_instruction(PPC.lhz(3, STATIC_VARIABLE_OFFSETS[DEATHTIMER], 31))
+        self.write_instruction(PPC.sth(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
+        self.write_instruction(PPC.bl(0x803f1e74, self.write_pointer))
 
     def skip_opening(self):
         #######################################################
@@ -314,6 +437,9 @@ class SMGDOL(SMGObject):
     def hide_galaxy_star_counter(self):
         self.write_instruction(PPC.li(0, 1), 0x801ff4c8)
 
+    def set_default_deathlink_timer(self):
+        self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHTIMER], int.to_bytes(DEFAULT_DEATHLINK_COOLDOWN, 2))
+
     def update_luma_galaxies(self, luma_galaxies: list[GalaxyDestination], starbit_counts: list[int]):
         assert len(luma_galaxies) == 7
 
@@ -400,4 +526,5 @@ class SMGDOL(SMGObject):
         #self.update_luma_galaxies([galaxy for galaxy in luma_galaxies if galaxy.dome_index != None], starbit_counts)
         self.update_green_galaxies([galaxy for galaxy in luma_galaxies if galaxy.orbit_index != None])
 
+        self.set_default_deathlink_timer()
         self.write_slot_name(slot_name)

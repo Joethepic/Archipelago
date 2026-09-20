@@ -13,6 +13,10 @@ CURRENT_SCENE_POINTER_LIST: list[int] = [0x24, 0x0] # 32 chars
 # GameSystem -> GameSystemSceneController -> SceneControlInfo
 CURRENT_GALAXY_POINTER_LIST: list[int] = [0x24, 0x20] # 32 chars
 
+# Gets the current scenario number. Defaults to -1 when none selected (e.g. scenario select)
+# GameSystem -> GameSystemSceneController -> SceneControlInfo
+CURRENT_SCENARIO_POINTER_LIST: list[int] = [0x24, 0x40]
+
 # RAM Address offset to the start of all Galaxy struct address pointers
 # GameSystem -> GameSequenceDirector -> SaveDataHandleSequence -> UserFile -> GameDataHolder -> GameDataAllGalaxyStorage
 GALAXY_DATA_POINTER_LIST: list[int] = [0xC, 0x8, 0xC, 0x0, 0xC, 0x8]
@@ -39,7 +43,10 @@ STATIC_VARIABLES_POINTER = 0x80004024
 STARCOLOUR = "Star Colour"
 GREENGALAXY = "Green Galaxies"
 LUMAGALAXY = "Luma Galaxies"
+FORCEDEATH = "Kill mario forcefully"
+ISDEAD = "Is mario dead"
 DEATHLINK = "Deathlink"
+DEATHTIMER = "Time between deathlink deaths"
 LAST_RECV_INDEX = "Last Item Received Idx"
 SLOTNAME = "Slot Name"
 
@@ -48,10 +55,20 @@ class StaticVariable(NamedTuple):
     size: int
 
 variables: list[StaticVariable] = [
+    StaticVariable("Start", 0),
     StaticVariable(POWER, 1),
     StaticVariable(GRAND, 1),
     StaticVariable(GREEN, 1),
+    StaticVariable('', 1),
+
+    # Deathlink
+    StaticVariable(FORCEDEATH, 1),
+    StaticVariable(ISDEAD, 1),
     StaticVariable(DEATHLINK, 1),
+    StaticVariable("Death count", 1),
+    StaticVariable(DEATHTIMER, 2),
+    StaticVariable("Death cooldown", 2),
+
     StaticVariable(SLOTNAME, 64),
     StaticVariable(STARCOLOUR, 8 * 45),
     StaticVariable(GREENGALAXY, 5 * 32),

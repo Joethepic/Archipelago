@@ -92,11 +92,13 @@ class GalaxyContext(CommonContext):
                          **star_colour_pointers,
                          "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
                          "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
+                         "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.u32, STATIC_VARIABLES_POINTER),
                          itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
                          LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
@@ -150,7 +152,7 @@ class GalaxyContext(CommonContext):
             return
 
         self.last_galaxy = curr_galaxy
-    
+
     async def smg_locs_checker(self) -> None:
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         if not await self.check_ingame():
@@ -261,15 +263,9 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if not await self.check_ingame():
-            return
-        await asyncio.sleep(WAIT_TIMER_LONG_TIMEOUT)
-
-        lives = await self.pointers["Lives"].get_value()
-
-        if lives < self.lives and time.time() >= float(self.last_death_link + DEATH_LINK_TIMEOUT):
+        if self.pointers[ISDEAD] and time.time() >= float(self.last_death_link + DEFAULT_DEATHLINK_COOLDOWN / 60):
+            self.last_death_link = time.time()
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
-        self.lives = lives
 
     def set_dolphin_status(self, status: str) -> None:
         """
@@ -372,10 +368,10 @@ class GalaxyContext(CommonContext):
 
     async def kill_player(self) -> None:
         """Kill the player in game."""
-        if not await self.check_ingame():
-            return
-
-        self.pointers[DEATHLINK].write_value(True)
+        if await self.current_galaxy() == "FileSelect":
+            self.pointers[FORCEDEATH].write_value(True)
+        elif await self.check_ingame():
+            self.pointers[DEATHLINK].write_value(True)
 
     async def server_auth(self, password_requested: bool = False) -> None:
         """
