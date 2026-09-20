@@ -59,10 +59,7 @@ class AstroDomes(SMGObject):
     
                     # Store the galaxy type in the lower bits
                     if galaxy.name in self.major_galaxy_list:
-                        if show_galaxies == 2:
-                            obj_arg0 += 1
-                        else:
-                            obj_arg0 += 0
+                        obj_arg0 += 0
                     elif galaxy.name in self.minor_galaxy_list or galaxy.name in self.special_galaxy_list:
                         obj_arg0 += 1
     
@@ -71,10 +68,7 @@ class AstroDomes(SMGObject):
                         elif galaxy.name in self.special_galaxy_list:
                             self.surprised_galaxy.create_luma_miniature("Mini" + galaxy.name)
                     elif galaxy.name in self.boss_galaxy_list:
-                        if show_galaxies == 2:
-                            obj_arg0 += 1
-                        else:
-                            obj_arg0 += 2
+                        obj_arg0 += 2
 
                     entry["Obj_arg0"] = obj_arg0
 
