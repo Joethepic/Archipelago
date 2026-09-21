@@ -115,7 +115,22 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
         self.write_instruction(PPC.addi(3, 3, -1))
         self.write_instruction(PPC.sth(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
-        self.write_instruction(PPC.b(self.write_pointer + 11 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 21 * 0x4, self.write_pointer))
+
+        # Get scene if it exists
+        upper, lower = self.get_upper_and_lower_signed(GAMESYSTEM)
+        self.write_instruction(PPC.lis(3, upper))
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.lwz(3, 0, 3))
+        self.write_instruction(PPC.lwz(3, 0x24, 3))
+        self.write_instruction(PPC.lwz(3, 0xAC, 3))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 14 * 0x4, self.write_pointer))
+
+        # Get scene object holder if it exists
+        self.write_instruction(PPC.lwz(3, 0x10, 3))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 11 * 0x4, self.write_pointer))
 
         # Get mario holder if exists
         self.write_instruction(PPC.bl(0x802e1528, self.write_pointer))
@@ -136,8 +151,23 @@ class SMGDOL(SMGObject):
         #####################
         ### RECEIVE DEATH ###
         #####################
+        # Get scene if it exists
+        upper, lower = self.get_upper_and_lower_signed(GAMESYSTEM)
+        self.write_instruction(PPC.lis(3, upper))
+        self.write_instruction(PPC.addi(3, 3, lower))
+        self.write_instruction(PPC.lwz(3, 0, 3))
+        self.write_instruction(PPC.lwz(3, 0x24, 3))
+        self.write_instruction(PPC.lwz(3, 0xAC, 3))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 14 * 0x4, self.write_pointer))
+
+        # Get scene object holder if it exists
+        self.write_instruction(PPC.lwz(3, 0x10, 3))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 11 * 0x4, self.write_pointer))
+
         # Get mario holder if exists
-        self.write_instruction(PPC.bl(802e1528, self.write_pointer))
+        self.write_instruction(PPC.bl(0x802e1528, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 0))
         self.write_instruction(PPC.bc(12, 2, self.write_pointer + 8 * 0x4, self.write_pointer))
 
@@ -169,7 +199,7 @@ class SMGDOL(SMGObject):
 
         # Skip if scene isn't set yet
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 3 * 0x4, self.write_pointer))
 
         # Can pause
         self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
