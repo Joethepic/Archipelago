@@ -63,8 +63,8 @@ variables: list[StaticVariable] = [
 
     # Deathlink
     StaticVariable(FORCEDEATH, 1),
-    StaticVariable(ISDEAD, 1),
     StaticVariable(DEATHLINK, 1),
+    StaticVariable(ISDEAD, 1),
     StaticVariable("Death count", 1),
     StaticVariable(DEATHTIMER, 2),
     StaticVariable("Death cooldown", 2),
