@@ -96,7 +96,7 @@ class GalaxyContext(CommonContext):
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
                          LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32),
-                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
+                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
