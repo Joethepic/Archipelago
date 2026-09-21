@@ -95,15 +95,14 @@ class GalaxyContext(CommonContext):
                          "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
+                         LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32),
+                         "Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.u32, STATIC_VARIABLES_POINTER),
                          itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
-                         LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
-        }
-                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER)}
 
         # Setup the handler for managing the star colours in scenario select
         self.starcolorhandler = StarColorHandler(star_colour_pointers)
