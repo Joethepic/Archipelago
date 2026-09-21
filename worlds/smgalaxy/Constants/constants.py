@@ -8,12 +8,15 @@ GAME_NAME: str = "Super Mario Galaxy"
 CLEAN_MD5: int = 0xf99a97f9ae4dccd1db45e9aaab9cebd8
 EXPECTED_GAME_ID: str = "RMGE01"
 
+WAIT_TIMER_LONG_TIMEOUT: int = 5
+WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
+
 # All the dolphin connection messages used in the client
-CONNECTION_REFUSED_STATUS: str = "Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in 5 seconds..."
+CONNECTION_REFUSED_STATUS: str = f"Detected a non-randomized ROM for SMG. Please close and load a different one. Retrying in {WAIT_TIMER_LONG_TIMEOUT} seconds..."
 CONNECTION_LOST_STATUS: str = "Dolphin connection was lost. Please restart your emulator and make sure SMG is running."
-NO_SLOT_NAME_STATUS: str = "No slot name was detected. Ensure a randomized ROM is loaded. Retrying in 5 seconds..."
+NO_SLOT_NAME_STATUS: str = f"No slot name was detected. Ensure a randomized ROM is loaded. Retrying in {WAIT_TIMER_LONG_TIMEOUT} seconds..."
 CONNECTION_VERIFY_SERVER: str = "Dolphin was confirmed to be opened and ready, Connect to the server when ready..."
-CONNECTION_INITIAL_STATUS: str = "Dolphin emulator was not detected to be running. Retrying in 5 seconds..."
+CONNECTION_INITIAL_STATUS: str = f"Dolphin emulator was not detected to be running. Retrying in {WAIT_TIMER_LONG_TIMEOUT} seconds..."
 DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY: str = "Dolphin did not load the ROM correctly. Close only the game / dolphin launcher and try again..."
 CONNECTION_CONNECTED_STATUS: str = "Dolphin is connected, AP is connected, Ready to play SMG!"
 AP_REFUSED_STATUS: str = "AP Refused to connect for one or more reasons, see above for more details."
@@ -30,8 +33,6 @@ DEATH_MESSAGES = [
     "flew too close to the sun"
 ]
 
-WAIT_TIMER_LONG_TIMEOUT: int = 5
-WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 # Colors
 WHITE = (255,  255,  255)
 RED = (255,  0,  0)
