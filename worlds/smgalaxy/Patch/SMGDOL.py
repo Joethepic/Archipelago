@@ -115,20 +115,17 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
         self.write_instruction(PPC.addi(3, 3, -1))
         self.write_instruction(PPC.sth(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
-        self.write_instruction(PPC.b(self.write_pointer + 15 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 11 * 0x4, self.write_pointer))
 
-        # Does mario exist
-        self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 11 * 0x4, self.write_pointer))
+        # Get mario holder if exists
+        self.write_instruction(PPC.bl(0x802e1528, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 8 * 0x4, self.write_pointer))
 
-        # Does mario actor exist
-        self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.srwi(3, 3, 5))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 5 * 0x4, self.write_pointer))
+        # Get mario actor if exists
+        self.write_instruction(PPC.bl(0x802e1520, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 5 * 0x4, self.write_pointer))
 
         # Is mario dead
         self.write_instruction(PPC.bl(0x803f1ea4, self.write_pointer))
@@ -139,24 +136,25 @@ class SMGDOL(SMGObject):
         #####################
         ### RECEIVE DEATH ###
         #####################
-        # Skip if mario doesn't exist
-        self.write_instruction(PPC.bl(0x803f32b8, self.write_pointer))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 11 * 0x4, self.write_pointer))
+        # Get mario holder if exists
+        self.write_instruction(PPC.bl(802e1528, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 8 * 0x4, self.write_pointer))
 
-        # Is mario controllable
-        self.write_instruction(PPC.bl(0x80304204, self.write_pointer))
-        self.write_instruction(PPC.mr(29, 3))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.srwi(3, 3, 5))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
-        self.write_instruction(PPC.lwz(3, 0x230, 29))
+        # Get mario actor if exists
+        self.write_instruction(PPC.bl(0x802e1520, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 5 * 0x4, self.write_pointer))
+
+        # Get mario if exists
+        self.write_instruction(PPC.lwz(3, 0x230, 3))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 2 * 0x4, self.write_pointer))
+
+        # Is input disabled
         self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
 
-        # Write value to r30 (invert if disabled, 0 if doesn't exist)
-        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
+        # Write value
         self.write_instruction(PPC.li(3, 1))
         self.write_instruction(PPC.cntlzw(3, 3))
         self.write_instruction(PPC.srwi(30, 3, 5))
@@ -170,13 +168,10 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0xAC, 3))
 
         # Skip if scene isn't set yet
-        self.write_instruction(PPC.mr(29, 3))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.cntlzw(3, 3))
-        self.write_instruction(PPC.srwi(3, 3, 5))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 4 * 0x4, self.write_pointer))
-        self.write_instruction(PPC.mr(3, 29))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 3 * 0x4, self.write_pointer))
+
+        # Can pause
         self.write_instruction(PPC.bl(0x8033f384, self.write_pointer))
         self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
@@ -186,8 +181,8 @@ class SMGDOL(SMGObject):
 
         # Add one to the kill count if deathlink received and reset
         self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 6 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 6 * 0x4, self.write_pointer))
         self.write_instruction(PPC.li(3, 0))
         self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[DEATHLINK], 31))
         self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
@@ -196,8 +191,8 @@ class SMGDOL(SMGObject):
 
         # Kill mario if forced
         self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[FORCEDEATH], 31))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
 
         # Skip if death count is less than 1
@@ -207,13 +202,13 @@ class SMGDOL(SMGObject):
 
         # Skip if death was recently sent
         self.write_instruction(PPC.lhz(3, STATIC_VARIABLE_OFFSETS["Death cooldown"], 31))
-        self.write_instruction(PPC.cmpi(0, 3, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 3, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 2 * 0x4, self.write_pointer))
         self.write_instruction(PPC.b(self.write_pointer + 9 * 0x4, self.write_pointer))
 
         # Skip if mario is not killable
-        self.write_instruction(PPC.cmpi(0, 30, 1))
-        self.write_instruction(PPC.bc(12, 0, self.write_pointer + 7 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.cmpi(0, 30, 0))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 7 * 0x4, self.write_pointer))
 
         # Kill mario, set cooldown timer and decrement death count
         self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS["Death count"], 31))
