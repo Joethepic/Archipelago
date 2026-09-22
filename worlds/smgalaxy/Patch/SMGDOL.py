@@ -293,6 +293,9 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
         self.write_instruction(PPC.rlwinm(3, 3, 16, 0x10, 0x1F))
 
+    def overwrite_koopa_loading(self):
+        self.write_instruction(PPC.li(30, 1), 0x801ffc90)
+
     def manipulate_arg0_loading(self):
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
         self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feee0)
@@ -451,6 +454,7 @@ class SMGDOL(SMGObject):
         self.skip_opening()
         self.set_swing_permission()
         self.manipulate_miniature_orbit()
+        self.overwrite_koopa_loading()
         self.manipulate_arg0_loading()
         self.read_star_count()
         self.custom_powerstar_colour_loading()
