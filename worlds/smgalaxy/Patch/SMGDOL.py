@@ -295,7 +295,7 @@ class SMGDOL(SMGObject):
 
     def manipulate_arg0_loading(self):
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
-        self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feedc)
+        self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feee0)
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801ff338)
         self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ff4c8)
         self.write_instruction(PPC.lhz(0, 0x8E, 29), 0x801ff8d8)
