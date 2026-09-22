@@ -293,9 +293,12 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0x8C, 31), 0x80200758)
         self.write_instruction(PPC.rlwinm(3, 3, 16, 0x10, 0x1F))
 
+    def overwrite_koopa_loading(self):
+        self.write_instruction(PPC.li(30, 1), 0x801ffc90)
+
     def manipulate_arg0_loading(self):
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801feda8)
-        self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feedc)
+        self.write_instruction(PPC.lhz(30, 0x10, 1), 0x801feee0)
         self.write_instruction(PPC.lhz(0, 0x8E, 3), 0x801ff338)
         self.write_instruction(PPC.lhz(0, 0x8E, 31), 0x801ff4c8)
         self.write_instruction(PPC.lhz(0, 0x8E, 29), 0x801ff8d8)
@@ -451,6 +454,7 @@ class SMGDOL(SMGObject):
         self.skip_opening()
         self.set_swing_permission()
         self.manipulate_miniature_orbit()
+        self.overwrite_koopa_loading()
         self.manipulate_arg0_loading()
         self.read_star_count()
         self.custom_powerstar_colour_loading()
@@ -474,7 +478,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(0, 1), 0x801ff940)
         self.write_instruction(PPC.li(0, 1), 0x801ff9b0)
         self.write_instruction(PPC.li(0, 1), 0x801ffa60)
-        self.write_instruction(PPC.li(0, 1), 0x801ffc44)
 
     def set_default_deathlink_timer(self):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHTIMER], int.to_bytes(DEFAULT_DEATHLINK_COOLDOWN, 2))
