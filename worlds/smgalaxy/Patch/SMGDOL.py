@@ -478,7 +478,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(0, 1), 0x801ff940)
         self.write_instruction(PPC.li(0, 1), 0x801ff9b0)
         self.write_instruction(PPC.li(0, 1), 0x801ffa60)
-        self.write_instruction(PPC.li(0, 1), 0x801ffc44)
 
     def set_default_deathlink_timer(self):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHTIMER], int.to_bytes(DEFAULT_DEATHLINK_COOLDOWN, 2))
