@@ -472,7 +472,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(0, 1), 0x801ff4c8)
 
     def hide_galaxy_silhouette(self):
-        self.write_instruction(PPC.li(0, 1), 0x801feda8)
+        self.write_nop(1, 0x801feddc)
         self.write_instruction(PPC.li(0, 1), 0x801ff338)
         self.write_instruction(PPC.li(0, 1), 0x801ff8d8)
         self.write_instruction(PPC.li(0, 1), 0x801ff940)
