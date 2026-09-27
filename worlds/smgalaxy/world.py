@@ -238,7 +238,6 @@ class SMGWorld(World):
             er_hint_data = {}
             for galaxy in galaxies_list:
                 slot = [key for key, val in self.shuffled_levels.items() if val == galaxy]
-                logging.info(slot)
                 for region in region_list:
                     if region == galaxy:
                         for location in all_location_table.values():
