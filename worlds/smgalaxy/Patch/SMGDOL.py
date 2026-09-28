@@ -544,7 +544,7 @@ class SMGDOL(SMGObject):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
 
     def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int],
-               locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool, starbit_counts: list[int]):
+               locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool, starbit_counts: list[int], goal_count: int):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -552,7 +552,8 @@ class SMGDOL(SMGObject):
                           surprised_galaxy_names=[galaxy.name for galaxy in luma_galaxies],
                           dome_shuffle=dome_shuffle,
                           dome_galaxies=dome_galaxies,
-                          star_requirements=star_requirements)
+                          star_requirements=star_requirements,
+                          goal_count=goal_count)
 
         self.initialise_star_colours(locations)
 
