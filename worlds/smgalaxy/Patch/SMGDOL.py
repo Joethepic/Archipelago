@@ -29,9 +29,6 @@ class SMGDOL(SMGObject):
         super().__init__(None)
         self.dol: DOL = dol
 
-        # Necessary for wiithon
-        #self.data = BytesIO(self.dol.to_bytes())
-
         Pointer.dol = self.dol
         SMGDOLObject.dol = self.dol
 
@@ -444,7 +441,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.blr())
 
     def skip_return_demos(self):
-        self.write_instruction(PPC.li(3, 0), 0x803bac74)
+        self.write_instruction(PPC.li(3, 1), 0x803bac74)
 
     def show_luma_with_dome(self):
         self.write_instruction(PPC.lwz(3, 0x1EC, 3), 0x80291c1c)
