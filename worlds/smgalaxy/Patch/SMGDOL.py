@@ -444,8 +444,8 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.li(3, 1), 0x803bac74)
 
     def show_luma_with_dome(self):
-        self.write_instruction(PPC.lwz(3, 0x1EC, 3), 0x80291c1c)
-        self.write_instruction(PPC.b(0x803af884, self.write_pointer))
+        self.write_instruction(PPC.lwz(4, 0x1EC, 3), 0x80291c1c)
+        self.write_instruction(PPC.b(0x803b1d08, self.write_pointer))
 
     def update_instructions(self):
         self.skip_opening()
