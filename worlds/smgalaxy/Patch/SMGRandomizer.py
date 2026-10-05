@@ -122,8 +122,8 @@ def _get_archive_name() -> str:
 
     lib_path = ""
     if Utils.is_windows:
-        lib_path = f"windows-{sys.version_info.major}-{sys.version_info.minor}"
+        lib_path = f"lib-windows{sys.version_info.major}-{sys.version_info.minor}"
     elif Utils.is_linux:
-        lib_path = f"linux-{sys.version_info.major}-{sys.version_info.minor}"
+        lib_path = f"lib-linux{sys.version_info.major}-{sys.version_info.minor}"
 
     return lib_path
