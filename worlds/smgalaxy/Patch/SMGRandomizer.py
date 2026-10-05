@@ -1,8 +1,11 @@
 import os, sys, tempfile, zipfile, json
 import shutil
+import ssl, certifi, urllib.request
 from importlib import resources
 from typing import Any
 from logging import getLogger
+
+import requests
 
 import Utils
 from .SMGClientHelpers import GalaxyDestination, GalaxyShuffle
@@ -45,13 +48,11 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         lib_path = _get_archive_name()
         self._client_logger.info(f"Dependency archive name to use: {lib_path}")
-        libs_traversable = resources.files("worlds.smgalaxy").joinpath("libs").joinpath(lib_path)
+        os.makedirs(local_dir_path, exist_ok=True)
+        self.download_lib_zip(local_dir_path, lib_path)
 
-        with resources.as_file(libs_traversable) as libs_path:
-            os.makedirs(local_dir_path, exist_ok=True)
-            shutil.copytree(str(libs_path), local_dir_path, dirs_exist_ok=True)
-
-        sys.path.append(local_dir_path)
+        self._client_logger.info(f"Appending the following to sys path to get dependencies correctly: {local_dir_path}")
+        sys.path.insert(0, local_dir_path)
 
     def create_iso(self, vanilla_rom_path: str, target: str):
         try:
@@ -89,6 +90,30 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
             print("Starting building...")
 
             patcher.build(target)
+
+    def download_lib_zip(self, tmp_dir_path: str, lib_path: str) -> None:
+        self._client_logger.info("Getting missing dependencies for Super Mario Galaxy from remote source.")
+        lib_path_base = f"https://github.com/Joethepic/Archipelago/releases/download/{CLIENT_VERSION}"
+        download_path = f"{lib_path_base}/{lib_path}{sys.version_info.major}-{sys.version_info.minor}.zip"
+
+        temp_zip_path = os.path.join(tmp_dir_path, "temp.zip")
+        try:
+            with requests.get(download_path, stream=True) as response:
+                response.raise_for_status()
+                with open(temp_zip_path, 'wb') as created_zip:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        created_zip.write(chunk)
+        except Exception as downloadEx:
+            self._client_logger.error(
+                "While trying to download LM dependencies from the release page, an unexpected error " +
+                f"occurred while using the requests library. Additional details: {str(downloadEx)}")
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            with urllib.request.urlopen(download_path, context=ssl_context) as response, \
+                    open(temp_zip_path, 'wb') as created_zip:
+                created_zip.write(response.read())
+
+        with zipfile.ZipFile(temp_zip_path) as z:
+            z.extractall(tmp_dir_path)
 
 def _get_temp_folder_name() -> str:
     """Gets a temp file based on the current OS, then a subdirectory for game, version, and libs."""
