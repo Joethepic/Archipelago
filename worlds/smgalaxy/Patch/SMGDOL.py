@@ -431,7 +431,8 @@ class SMGDOL(SMGObject):
                     galaxy_offset = region.region_offset * 2
                     break
 
-            classification = ItemClassification[data["classification"]]
+            # TODO review this at a later point.
+            classification = ItemClassification[str(data["classification"]).split("|")[0]]
             self.dol.write_at(star_colour_address + galaxy_offset + scenario, FILL_TYPE_TO_COLOUR_INDEX[classification].to_bytes())
 
     def overwrite_all_greens_launch_star(self):
