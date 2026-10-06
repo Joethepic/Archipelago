@@ -169,8 +169,9 @@ class SMGWorld(World):
         # Apply rules to newly formed entrances based on within-world access, regardless of randomization
         rules_from_er_placements(self)
 
-    def pre_fill(self) -> None:
-        visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml",show_entrance_names=True)
+    # def pre_fill(self) -> None:
+    #     visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml", show_entrance_names=True)
+
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         self.galaxy_counts.update({"D1G1": 0})
@@ -211,17 +212,14 @@ class SMGWorld(World):
                     "player": location.item.player,
                     "name": location.item.name,
                     "game": self.game,
-                    "classification": location.item.classification,
-                    # "type": location.type,
+                    "classification": location.item.classification.name,
                 }
             elif location.item:
-                loc_region: SMGRegionData = region_list[location.parent_region.name]
                 item_info = {
                     "player": location.item.player,
                     "name": location.item.name,
                     "game": location.item.game,
                     "classification": location.item.classification.name,
-                    #"type": location.type,
                 }
             else:
                 item_info = {"name": "Nothing", "game": self.game, "classification": "filler"}
@@ -233,6 +231,7 @@ class SMGWorld(World):
 
         player_container: SMGPlayerContainer = SMGPlayerContainer(output_data, patch_path, self.player_name, self.player)
         player_container.write()
+
     def extend_hint_information(self, hint_data: typing.Dict[int, typing.Dict[int, str]]):
         if self.topology_present:
             er_hint_data = {}
@@ -244,6 +243,3 @@ class SMGWorld(World):
                             if location.galaxy_name == galaxy:
                                 er_hint_data.update({location.code: slot[0]})
             hint_data[self.player] = er_hint_data
-
-                                
-
