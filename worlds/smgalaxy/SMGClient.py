@@ -38,6 +38,7 @@ class GalaxyCommand(ClientCommandProcessor):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
 class GalaxyContext(CommonContext):
+    tags: set[str] = {"AP"} # Required to Overwrite Tracker's default.
     password_required: bool = False
     rom_loaded: bool = False
     command_processor = GalaxyCommand
