@@ -451,6 +451,10 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(4, 0x1EC, 3), 0x80291c1c)
         self.write_instruction(PPC.b(0x803b1d2c, self.write_pointer))
 
+    def fix_grandstar_bug(self):
+        self.write_pointer = 0x803af764
+        self.write_instruction(PPC.bl(0x803b2724, self.write_pointer))
+
     def update_instructions(self):
         self.skip_opening()
         self.set_swing_permission()
@@ -465,6 +469,7 @@ class SMGDOL(SMGObject):
         self.overwrite_all_greens_launch_star()
         self.skip_return_demos()
         self.show_luma_with_dome()
+        self.fix_grandstar_bug()
 
     def show_galaxy_star_counter(self):
         self.write_instruction(PPC.li(0, 0), 0x801ff4c8)

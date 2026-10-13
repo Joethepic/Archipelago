@@ -130,6 +130,8 @@ class GameEventFlagTable(SMGDOLObject):
             elif flag_name.startswith("SpecialStarGrand"):
                 entry.flag_type = FlagType.Type_5
                 entry.condition2 = int(flag_name[-1])
+                entry.condition4.pointing_address = 1
+                entry.condition4.write_pointer()
 
             # Turn on comet luma
             elif flag_name == "EventCometStarter":
