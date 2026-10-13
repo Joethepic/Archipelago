@@ -272,7 +272,7 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.cmpi(0, 3, 1))
 
         # Overwrite flag type 5
-        self.write_instruction(PPC.lbz(3, 0x6, 30), 0x803b38cc)
+        self.write_instruction(PPC.lbz(3, 0x7, 30), 0x803b38cc)
         self.write_instruction(PPC.bl(0x803af884, self.write_pointer))
         self.write_nop(1)
 
