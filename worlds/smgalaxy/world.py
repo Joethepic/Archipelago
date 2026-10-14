@@ -64,6 +64,18 @@ class SMGWorld(World):
         self.galaxy_counts: dict[str, int] = {}
 
     def generate_early(self) -> None:
+        regen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
+        if regen_passthrough and self.game in regen_passthrough:
+            slot_data = regen_passthrough[self.game]
+
+            for key, value in slot_data.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
+                else:
+                    getattr(self.options, key).value = value
+
+            return
+
         self.galaxy_counts = self.get_galaxy_counts()
 
         if "Random" in self.options.mario_colors.value.keys():
@@ -270,4 +282,5 @@ class SMGWorld(World):
 
             slot_data[f.name] = option.value
 
+        slot_data["galaxy_counts"] = self.galaxy_counts
         return slot_data
