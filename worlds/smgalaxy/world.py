@@ -182,13 +182,25 @@ class SMGWorld(World):
         self.multiworld.itempool += local_pool
 
     def connect_entrances(self) -> None:
-        if self.options.galaxy_shuffle:
+        # Since UT will already have the levels shuffled, rather than randomly picking them, we have the list
+        #   that was already chosen, so we should just disconnect, reconnect, then add rules.
+        if self.shuffled_levels:
+            from entrance_rando import disconnect_entrance_for_randomization
+            for entr_name, reg_name in self.shuffled_levels.items():
+                entrance = self.get_entrance(entr_name)
+                if entrance.connected_region.name != reg_name:
+                    disconnect_entrance_for_randomization(entrance, 0, entrance.connected_region.name)
+                    entrance.connect(self.get_region(reg_name))
+
+        elif self.options.galaxy_shuffle:
             # Disconnect entrances based on options choice. Also ensures first available slot is a major galaxy
             self.starting_galaxy = disconnect_from_option(self)
-            # Run randomize entrances, but do not get pairings - we craete our own method for them
+            # Run randomize entrances, but do not get pairings - we create our own method for them
             randomize_entrances(self, True, {0: [0]})
+
         # Apply rules to newly formed entrances based on within-world access, regardless of randomization
         rules_from_er_placements(self)
+        return
 
     # def pre_fill(self) -> None:
     #     visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml", show_entrance_names=True)
