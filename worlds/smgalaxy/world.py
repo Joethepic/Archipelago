@@ -124,11 +124,12 @@ class SMGWorld(World):
                     # Because OptionCounters can somehow be blank entirely, just force these to have values to 0, which
                     # wouldn't need to be added to dome count.
                     if dome_name == "six" and dome_orb_name != "Fifth Orbit":
+                        getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: previous_dome_count})
                         galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
                         continue
 
-                    dome_dict[dome_orb_name] = 0
-                    getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: 0})
+                    dome_dict[dome_orb_name] = previous_dome_count
+                    getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: previous_dome_count})
 
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
@@ -284,4 +285,5 @@ class SMGWorld(World):
             slot_data[f.name] = option.value
 
         slot_data["galaxy_counts"] = self.galaxy_counts
+        slot_data["shuffled_levels"] = self.shuffled_levels
         return slot_data
