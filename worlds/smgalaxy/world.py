@@ -128,6 +128,7 @@ class SMGWorld(World):
                         continue
 
                     dome_dict[dome_orb_name] = 0
+                    getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: 0})
 
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
