@@ -110,6 +110,8 @@ class SMGWorld(World):
                         galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
                         continue
 
+                    dome_dict[dome_orb_name] = 0
+
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
                     continue
