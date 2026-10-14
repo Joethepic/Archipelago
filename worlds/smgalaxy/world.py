@@ -1,6 +1,8 @@
 import os
 from dataclasses import fields
 from typing import ClassVar
+
+from Options import PerGameCommonOptions
 from Utils import visualize_regions
 from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
@@ -17,6 +19,9 @@ from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_it
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.SMGPlayerContainer import SMGPlayerContainer
+
+# Module-level, computed once
+PER_GAME_OPTION_NAMES = {f.name for f in fields(PerGameCommonOptions)}
 
 def runClient(*args):
     from .SMGClient import launch
@@ -245,3 +250,24 @@ class SMGWorld(World):
                             if location.galaxy_name == galaxy:
                                 er_hint_data.update({location.code: slot[0]})
             hint_data[self.player] = er_hint_data
+
+    def fill_slot_data(self) -> dict:
+        # If you need access to the player's chosen options on the client side, there is a helper for that.
+        slot_data: dict = {}
+
+        # This gets all the names of the options from both the world's option class and the inherited class,
+        #   since this world's options inherit from PerGameCommonOptions, there will be duplicates.
+        # HOWEVER, rather than just doing GameOptions.__annotations__ and getting it directly that way,
+        #   you would automatically filter out death_link for example and... well im just lazy lol
+        for f in sorted(fields(self.options), key=lambda f: f.name):
+            if f.name in PER_GAME_OPTION_NAMES:
+                continue
+
+            # Skip options explicitly slot_req = False
+            option = getattr(self.options, f.name)
+            if getattr(option, "slot_req", True) is False:
+                continue
+
+            slot_data[f.name] = option.value
+
+        return slot_data
