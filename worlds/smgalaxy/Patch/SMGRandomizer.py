@@ -89,7 +89,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
     def download_lib_zip(self, tmp_dir_path: str, lib_path: str) -> None:
         self._client_logger.info("Getting missing dependencies for Super Mario Galaxy from remote source.")
-        lib_path_base = f"https://github.com/Joethepic/Archipelago/releases/download/{CLIENT_VERSION}"
+        lib_path_base = f"https://github.com/Joethepic/Archipelago/releases/download/smg-{CLIENT_VERSION}"
         download_path = f"{lib_path_base}/{lib_path}.zip"
 
         temp_zip_path = os.path.join(tmp_dir_path, "temp.zip")
