@@ -1,6 +1,8 @@
 import os
 from dataclasses import fields
 from typing import ClassVar
+
+from Options import PerGameCommonOptions
 from Utils import visualize_regions
 from entrance_rando import randomize_entrances
 from worlds.AutoWorld import World
@@ -17,6 +19,9 @@ from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_it
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.SMGPlayerContainer import SMGPlayerContainer
+
+# Module-level, computed once
+PER_GAME_OPTION_NAMES = {f.name for f in fields(PerGameCommonOptions)}
 
 def runClient(*args):
     from .SMGClient import launch
@@ -59,6 +64,18 @@ class SMGWorld(World):
         self.galaxy_counts: dict[str, int] = {}
 
     def generate_early(self) -> None:
+        regen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
+        if regen_passthrough and self.game in regen_passthrough:
+            slot_data = regen_passthrough[self.game]
+
+            for key, value in slot_data.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
+                else:
+                    getattr(self.options, key).value = value
+
+            return
+
         self.galaxy_counts = self.get_galaxy_counts()
 
         if "Random" in self.options.mario_colors.value.keys():
@@ -107,8 +124,12 @@ class SMGWorld(World):
                     # Because OptionCounters can somehow be blank entirely, just force these to have values to 0, which
                     # wouldn't need to be added to dome count.
                     if dome_name == "six" and dome_orb_name != "Fifth Orbit":
+                        getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: previous_dome_count})
                         galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count
                         continue
+
+                    dome_dict[dome_orb_name] = previous_dome_count
+                    getattr(self.options, f"dome_{dome_name}_counts").value.update({dome_orb_name: previous_dome_count})
 
                     # Special case for Dome 6, as D6 will only ever have 4 galaxies total
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
@@ -140,6 +161,8 @@ class SMGWorld(World):
         local_pool += [self.create_item(itemname.GRAND) for i in range(7)]
         
         # make sure we don't create more stars than locations, somehow
+        self.options.stars_to_finish.value = min(self.options.stars_to_finish.value,
+            len(self.multiworld.get_unfilled_locations(self.player)) - len(local_pool))
         local_pool += [self.create_item(itemname.POWER) for i in range(self.options.stars_to_finish.value)]
 
         # Calculate the number of additional filler items to create to fill all locations
@@ -161,13 +184,25 @@ class SMGWorld(World):
         self.multiworld.itempool += local_pool
 
     def connect_entrances(self) -> None:
-        if self.options.galaxy_shuffle:
+        # Since UT will already have the levels shuffled, rather than randomly picking them, we have the list
+        #   that was already chosen, so we should just disconnect, reconnect, then add rules.
+        if self.shuffled_levels:
+            from entrance_rando import disconnect_entrance_for_randomization
+            for entr_name, reg_name in self.shuffled_levels.items():
+                entrance = self.get_entrance(entr_name)
+                if entrance.connected_region.name != reg_name:
+                    disconnect_entrance_for_randomization(entrance, 0, entrance.connected_region.name)
+                    entrance.connect(self.get_region(reg_name))
+
+        elif self.options.galaxy_shuffle:
             # Disconnect entrances based on options choice. Also ensures first available slot is a major galaxy
             self.starting_galaxy = disconnect_from_option(self)
-            # Run randomize entrances, but do not get pairings - we craete our own method for them
+            # Run randomize entrances, but do not get pairings - we create our own method for them
             randomize_entrances(self, True, {0: [0]})
+
         # Apply rules to newly formed entrances based on within-world access, regardless of randomization
         rules_from_er_placements(self)
+        return
 
     # def pre_fill(self) -> None:
     #     visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml", show_entrance_names=True)
@@ -243,3 +278,26 @@ class SMGWorld(World):
                             if location.galaxy_name == galaxy:
                                 er_hint_data.update({location.code: slot[0]})
             hint_data[self.player] = er_hint_data
+
+    def fill_slot_data(self) -> dict:
+        # If you need access to the player's chosen options on the client side, there is a helper for that.
+        slot_data: dict = {}
+
+        # This gets all the names of the options from both the world's option class and the inherited class,
+        #   since this world's options inherit from PerGameCommonOptions, there will be duplicates.
+        # HOWEVER, rather than just doing GameOptions.__annotations__ and getting it directly that way,
+        #   you would automatically filter out death_link for example and... well im just lazy lol
+        for f in sorted(fields(self.options), key=lambda f: f.name):
+            if f.name in PER_GAME_OPTION_NAMES:
+                continue
+
+            # Skip options explicitly slot_req = False
+            option = getattr(self.options, f.name)
+            if getattr(option, "slot_req", True) is False:
+                continue
+
+            slot_data[f.name] = option.value
+
+        slot_data["galaxy_counts"] = self.galaxy_counts
+        slot_data["shuffled_levels"] = self.shuffled_levels
+        return slot_data

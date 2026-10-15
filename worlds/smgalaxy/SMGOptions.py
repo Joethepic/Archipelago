@@ -219,6 +219,7 @@ class MarioColors(OptionDict):
         "Shoes": "Brown",
         "Gloves": "White"
     }
+    slot_req = False
 
 class HideGalaxy(Choice):
     """
@@ -238,6 +239,7 @@ class HideGalaxy(Choice):
     option_Visible = 0
     option_Hide_Minors = 1
     option_Hide_All = 2
+    slot_req = False
 
 class StarColors(Toggle):
     """
@@ -249,6 +251,7 @@ class StarColors(Toggle):
     """
     display_name = "Star Colors"
     internal_name = "star_colors"
+    slot_req = False
 
 # this defines all the options.
 @dataclass
