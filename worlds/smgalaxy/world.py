@@ -161,6 +161,8 @@ class SMGWorld(World):
         local_pool += [self.create_item(itemname.GRAND) for i in range(7)]
         
         # make sure we don't create more stars than locations, somehow
+        self.options.stars_to_finish.value = min(self.options.stars_to_finish.value,
+            len(self.multiworld.get_unfilled_locations(self.player)) - len(local_pool))
         local_pool += [self.create_item(itemname.POWER) for i in range(self.options.stars_to_finish.value)]
 
         # Calculate the number of additional filler items to create to fill all locations
