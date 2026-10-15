@@ -52,7 +52,7 @@ class TitleScreen(SMGObject):
     def update(self, **kwargs) -> None:
 
         names_image_data, _, _, width, height = texture_utils.encode_image_from_path(
-            PROJECT_ROOT.joinpath('Patch', 'SMGObjects', 'names.png').read_bytes(),
+            BytesIO(PROJECT_ROOT.joinpath('Patch', 'SMGObjects', 'names.png').read_bytes()),
             ImageFormat.RGB5A3, PaletteFormat.IA8)
 
         tpl_bytes = self.arc_file.get_file(TITLE_SCREEN_LOGO_FILE_PATH).data
