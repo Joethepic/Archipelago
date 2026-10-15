@@ -56,7 +56,6 @@ class Patch:
             "AstroDomeScenario": AstroDomeScenario(),
             "AstroDomes": AstroDomes(),
             "AstroDomeEntrances": AstroDomeEntrances(),
-            "PowerStar": PowerStar()
             "PowerStar": PowerStar(),
             "TitleScreen": TitleScreen(),
         }
