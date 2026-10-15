@@ -37,7 +37,9 @@ from gclib import texture_utils
 from gclib.gx_enums import ImageFormat, PaletteFormat
 
 from ..extensions import SMGObject
-from ...Constants.patch_constants import TITLE_SCREEN_LOGO_PATH, TITLE_SCREEN_BRLYT_PATH, TITLE_SCREEN_LOGO_FILE_PATH
+from ...Constants.patch_constants import TITLE_SCREEN_LOGO_PATH, TITLE_SCREEN_BRLYT_PATH, TITLE_SCREEN_LOGO_FILE_PATH, \
+    PROJECT_ROOT
+
 
 class TitleScreen(SMGObject):
     def __init__(self) -> None:
@@ -48,7 +50,10 @@ class TitleScreen(SMGObject):
         self.arc_file = Rarc.read(BytesIO(uncompressed_bytes))
 
     def update(self, **kwargs) -> None:
-        names_image_data, _, _, width, height = texture_utils.encode_image_from_path("worlds/smgalaxy/Patch/SMGObjects/names.png", ImageFormat.RGB5A3, PaletteFormat.IA8)
+
+        names_image_data, _, _, width, height = texture_utils.encode_image_from_path(
+            PROJECT_ROOT.joinpath('Patch', 'SMGObjects', 'names.png').read_bytes(),
+            ImageFormat.RGB5A3, PaletteFormat.IA8)
 
         tpl_bytes = self.arc_file.get_file(TITLE_SCREEN_LOGO_FILE_PATH).data
         tpl_stream = BytesIO(tpl_bytes)
