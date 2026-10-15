@@ -95,7 +95,7 @@ locbosses_table: dict[str, SMGLocationData]  = {
 }
 
 goal_table: dict[str, SMGLocationData] = {
-    locname.GALAXYREACTORSTAR1: SMGLocationData(["GoalLOC"], regname.GALREAC1BOSS,
+    locname.GALAXYREACTORSTAR1: SMGLocationData([], regname.GALREAC1BOSS,
                                                 None, regname.BOWSER3, galaxyignname.BOWSER3, game_address=0)
 }
 
