@@ -82,11 +82,11 @@ locspecialstages_table: dict[str, SMGLocationData]  = {
 }
 
 locbosses_table: dict[str, SMGLocationData]  = {
-    locname.ROBOTREACTORSTAR1: SMGLocationData([regname.ROBOTRE1MEGAL, "Power Star Locations", "Boss Star"], regname.ROBOTRE1MEGAL,
+    locname.ROBOTREACTORSTAR1: SMGLocationData([regname.BOWJR1, "Power Star Locations", "Boss Star"], regname.ROBOTRE1MEGAL,
                                                170000026, regname.BOWJR1, galaxyignname.BOWJR1, game_address=0),
     locname.STARREACTORSTAR1: SMGLocationData([regname.BOWSER1, "Power Star Locations", "Boss Star"], regname.STAREABOSSAR,
                                               170000027, regname.BOWSER1, galaxyignname.BOWSER1, game_address=0),
-    locname.AIRSHIPARMADASTAR1: SMGLocationData([regname.AIRARM1BATTL, "Power Star Locations", "Boss Star"], regname.AIRARM1BATTL,
+    locname.AIRSHIPARMADASTAR1: SMGLocationData([regname.BOWJR2, "Power Star Locations", "Boss Star"], regname.AIRARM1BATTL,
                                                 170000028, regname.BOWJR2, galaxyignname.BOWJR2, game_address=0),
     locname.LAVAREACTORSTAR1: SMGLocationData([regname.BOWJR3, "Power Star Locations", "Boss Star"], regname.LAVREALAVA2,
                                               170000029, regname.BOWJR3, galaxyignname.BOWJR3, game_address=0),
@@ -95,7 +95,7 @@ locbosses_table: dict[str, SMGLocationData]  = {
 }
 
 goal_table: dict[str, SMGLocationData] = {
-    locname.GALAXYREACTORSTAR1: SMGLocationData([""], regname.GALREAC1BOSS,
+    locname.GALAXYREACTORSTAR1: SMGLocationData(["GoalLOC"], regname.GALREAC1BOSS,
                                                 None, regname.BOWSER3, galaxyignname.BOWSER3, game_address=0)
 }
 
