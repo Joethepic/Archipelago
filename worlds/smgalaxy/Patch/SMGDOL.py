@@ -398,14 +398,6 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.b(0x803b1d08, self.write_pointer))
         self.write_nop(8)
 
-    def skip_wii_strap(self):
-        #########################
-        # Skip wii strap screen #
-        #########################
-        self.write_instruction(PPC.addi(4, 13, -0x3080), 0x80340408)
-        self.write_instruction(PPC.li(4, 1), 0x803406ac)
-        self.write_instruction(PPC.li(4, 2), 0x803406d0)
-
     def show_bros_button(self):
         #################################################
         # Show the bros button to select Mario or Luigi #
@@ -464,7 +456,6 @@ class SMGDOL(SMGObject):
         self.read_star_count()
         self.custom_powerstar_colour_loading()
         self.custom_grandstar_count()
-        self.skip_wii_strap()
         self.show_bros_button()
         self.overwrite_all_greens_launch_star()
         self.skip_return_demos()
