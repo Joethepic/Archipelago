@@ -1,4 +1,6 @@
 from enum import StrEnum
+from importlib import resources
+from importlib.abc import Traversable
 from typing import NamedTuple
 
 from BaseClasses import ItemClassification
@@ -19,6 +21,8 @@ ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
 ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
 POWER_STAR_PATH = "/ObjectData/PowerStar.arc"
 TITLE_SCREEN_LOGO_PATH = "/LayoutData/TitleLogo.arc"
+
+PROJECT_ROOT: Traversable = resources.files("worlds.smgalaxy")
 
 # ASTRODOMEENTRANCES
 class Domes(StrEnum):
