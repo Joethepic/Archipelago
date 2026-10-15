@@ -18,6 +18,7 @@ ASTRO_DOME_PATH = "/StageData/AstroDome.arc"
 ASTRO_DOME_SCENARIO_PATH = "/StageData/AstroDome/AstroDomeScenario.arc"
 ASTRO_GALAXY_PATH: str = "/StageData/AstroGalaxy.arc"
 POWER_STAR_PATH = "/ObjectData/PowerStar.arc"
+TITLE_SCREEN_LOGO_PATH = "/LayoutData/TitleLogo.arc"
 
 # ASTRODOMEENTRANCES
 class Domes(StrEnum):
@@ -115,6 +116,10 @@ LAYERB_PATH: str = "/jmp/placement/layerb/"
 LAYERE_PATH: str = "/jmp/placement/layere/"
 LAYERF_PATH: str = "/jmp/placement/layerf/"
 LAYERG_PATH: str = "/jmp/placement/layerg/"
+
+# TitleScreen
+TITLE_SCREEN_LOGO_FILE_PATH = "/timg/mytitlelogo.tpl"
+TITLE_SCREEN_BRLYT_PATH = "/blyt/titlelogo.brlyt"
 
 # SMGDOL
 GATEWAY_IN_GAME: str = region_list[GATEWAY].in_game_name

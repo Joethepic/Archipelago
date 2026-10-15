@@ -9,6 +9,7 @@ from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
 from .SMGObjects.PowerStar import PowerStar
+from .SMGObjects.TitleScreen import TitleScreen
 from .SMGStages.AstroDome import AstroDomes
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
@@ -56,6 +57,8 @@ class Patch:
             "AstroDomes": AstroDomes(),
             "AstroDomeEntrances": AstroDomeEntrances(),
             "PowerStar": PowerStar()
+            "PowerStar": PowerStar(),
+            "TitleScreen": TitleScreen(),
         }
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
