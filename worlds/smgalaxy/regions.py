@@ -647,8 +647,7 @@ def create_regions(world: "SMGWorld"):
     if world.options.enable_purple_coin_stars.value == 1:
         create_locations(locPC_table, world)
 
-    if world.options.stars_to_finish.value > 103 >= len(list(world.get_locations()))-1:
-        world.options.stars_to_finish.value = len(list(world.get_locations()))-1
+    world.options.stars_to_finish.value = min(world.options.stars_to_finish.value, len(list(world.get_locations())) - 1)
 
     world.get_region(regname.GALREAC1BOSS).add_event(locname.GALAXYREACTORSTAR1, "Peach")
 
