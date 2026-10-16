@@ -264,20 +264,29 @@ class StarColors(Toggle):
 
 class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option type
     """
-    Determine how Observatory Lumas' star bit counts are determined
+    Determine how Observatory Lumas' star bit counts are determined. All values are rounded to the nearest 100
 
     Vanilla - The counts remained unchanged from their original values
 
-    Progressive Values -
+    Progressive Values - If a value for a hungry luma in Starbit Luma Counts are not higher than the last one, the
+    number will be re-rolled so that it is higher than the last luma.This option primarily enforces that counts are
+    always increasing.
 
-    Choice -
+    Choice - Hungry Luma starbit requirements will be set exactly, using the Starbit Luma Count option.
 
-    Min/Max -
-
-    By Sphere -
+    By Sphere - Counts are determined by placement in the multiworld, using Gateway Luma as the maximum. All hungry lumas
+    logically require access to a Starbit farming area in this option.
     """
+    display_name = "Observatory Hungry Luma Behavior"
+    internal_name = "observatory_hungry_luma_behavior"
+    slot_req = True
+    option_Vanilla = 0
+    option_Progressive_Values = 1
+    option_Choice = 2
+    option_By_Sphere = 3
 
-class ObservatoryLumaCounts(OptionCounter):
+
+class ObservatoryLumaCounts(RandomOptionCounter):
     """
     Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
 
@@ -288,7 +297,7 @@ class ObservatoryLumaCounts(OptionCounter):
     min = 0
     max = 9999
     valid_keys = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma","Dome 4 Hungry Luma",
-                  "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma", "Random"]
+                  "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma"]
     default = {
         "Dome 1 Hungry Luma": 400,
         "Dome 2 Hungry Luma": 400,
@@ -296,7 +305,7 @@ class ObservatoryLumaCounts(OptionCounter):
         "Dome 4 Hungry Luma": 800,
         "Dome 5 Hungry Luma": 1000,
         "Dome 6 Hungry Luma": 1200,
-        "Gateway Luma Luma": 1600
+        "Gateway Hungry Luma": 1600
     }
     slot_req = True
 
