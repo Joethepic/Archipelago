@@ -51,7 +51,8 @@ class ShuffleDomes(Toggle):
 # this defines the enable_purple_coin_stars setting 
 class EnablePurpleCoinStars(Toggle):
     """
-    Add Purple Coin star location. Only one of these is normally available outside of post game
+    Add Purple Coin star locations. These will turn Purple Coin stars into locations, accessible before Final Bowser. If
+    this option is off, Purple Coin stars will give nothing when completed.
     """
     display_name = "Enable Purple Coin Stars"
     internal_name = "enable_purple_coin_stars"
