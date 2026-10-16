@@ -262,6 +262,44 @@ class StarColors(Toggle):
     internal_name = "star_colors"
     slot_req = False
 
+class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option type
+    """
+    Determine how Observatory Lumas' star bit counts are determined
+
+    Vanilla - The counts remained unchanged from their original values
+
+    Progressive Values -
+
+    Choice -
+
+    Min/Max -
+
+    By Sphere -
+    """
+
+class ObservatoryLumaCounts(OptionCounter):
+    """
+    Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
+
+    Adding 'Random: XXX' will roll ALL values somewhere between 0 and XXX
+    """
+    display_name = "Observatory Luma Counts"
+    internal_name = "observatory_luma_counts"
+    min = 0
+    max = 9999
+    valid_keys = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma","Dome 4 Hungry Luma",
+                  "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma", "Random"]
+    default = {
+        "Dome 1 Hungry Luma": 400,
+        "Dome 2 Hungry Luma": 400,
+        "Dome 3 Hungry Luma": 600,
+        "Dome 4 Hungry Luma": 800,
+        "Dome 5 Hungry Luma": 1000,
+        "Dome 6 Hungry Luma": 1200,
+        "Gateway Luma Luma": 1600
+    }
+    slot_req = True
+
 # this defines all the options.
 @dataclass
 class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
