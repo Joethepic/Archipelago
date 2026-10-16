@@ -264,7 +264,7 @@ class StarColors(Toggle):
 
 class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option type
     """
-    Determine how Observatory Lumas' star bit counts are determined. All values are rounded to the nearest 100
+    Choose how Observatory Lumas' starbit counts are determined.
 
     Vanilla - The counts remained unchanged from their original values
 
