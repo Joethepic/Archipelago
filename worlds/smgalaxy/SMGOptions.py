@@ -5,6 +5,15 @@ from typing import Dict, Any
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
     DeathLinkMixin
 
+class RandomOptionCounter(OptionCounter):
+    """OptionCounter whose values also accept Range text: random, random-high, random-range-5-20, random-low, etc."""
+
+    def __init__(self, value: dict[str, Any]) -> None:
+        parser = type(self.__class__.__name__, (Range,), {"range_start": self.min, "range_end": self.max,
+                                                          "default": self.min, "__module__": self.__module__})
+        super().__init__({key: amount if type(amount) == int else parser.from_text(str(amount)).value
+                          for key, amount in value.items()})
+
 
 class GalaxyShuffle(OptionSet):
     """
@@ -68,7 +77,7 @@ class StarstoFinish(Range):
     range_end = 119
     default = 60
 
-class Dome1Offsets(OptionCounter):
+class Dome1Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
@@ -91,7 +100,7 @@ class Dome1Offsets(OptionCounter):
     }
 
 
-class Dome2Offsets(OptionCounter):
+class Dome2Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -112,7 +121,7 @@ class Dome2Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome3Offsets(OptionCounter):
+class Dome3Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -133,7 +142,7 @@ class Dome3Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome4Offsets(OptionCounter):
+class Dome4Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -154,7 +163,7 @@ class Dome4Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome5Offsets(OptionCounter):
+class Dome5Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -175,7 +184,7 @@ class Dome5Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome6Offsets(OptionCounter):
+class Dome6Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 6, which is the Garden in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
