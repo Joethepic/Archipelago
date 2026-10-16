@@ -95,7 +95,7 @@ class Dome2Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -116,7 +116,7 @@ class Dome3Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -137,7 +137,7 @@ class Dome4Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -158,7 +158,7 @@ class Dome5Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped if it goes above 10
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -179,7 +179,7 @@ class Dome6Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 6, which is the Garden in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and will be capped if it goes above 20
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
