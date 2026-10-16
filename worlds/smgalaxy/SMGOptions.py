@@ -326,16 +326,22 @@ class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     galaxy_shuffle_type: GalaxyShuffleType
     hide_galaxy: HideGalaxy
     star_colors: StarColors
+    observatory_hungry_luma_behavior: ObservatoryLumaBehavior
+    observatory_luma_counts: ObservatoryLumaCounts
 
 option_groups = [
     OptionGroup("Extra Locations", [
         EnablePurpleCoinStars,
     ]),
-    OptionGroup("Access Options", [
+    OptionGroup("Logic Options", [
         StarstoFinish,
         ShuffleDomes,
         GalaxyShuffle,
-        GalaxyShuffleType
+        GalaxyShuffleType,
+    ]),
+    OptionGroup("Observatory Luma Behavior", [
+        ObservatoryLumaBehavior,
+        ObservatoryLumaCounts,
     ]),
     OptionGroup("Dome Offsets", [
        Dome1Offsets,
@@ -345,9 +351,6 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
-#    OptionGroup("Observatory Luma Behavior", [
-
-#    ]),
     OptionGroup("Cosmetics", [
         MarioColors,
         StarColors,
