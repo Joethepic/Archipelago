@@ -61,7 +61,7 @@ class EnablePurpleCoinStars(Toggle):
 class StarstoFinish(Range):
     """
     This will set the number of stars required to reach the center of the universe.
-    This will be capped at 104 stars if extra locations are not enabled in a single world multiworld.
+    This will be capped at 103 stars if extra locations are not enabled.
     """
     display_name = "Stars to finish"
     internal_name = "stars_to_finish"
@@ -72,8 +72,8 @@ class StarstoFinish(Range):
 class Dome1Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
-    Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
-    will be capped to ensure generation if necessary.
+    Each number corresponds to how many more stars are needed than the last orbit,
+    and will be capped based on an estimated number of available locations
     The first orbit in Dome 1 will always have no star requirement.
 
     These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
@@ -96,7 +96,7 @@ class Dome2Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and will be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -117,7 +117,7 @@ class Dome3Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and will be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -138,7 +138,7 @@ class Dome4Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and will be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -159,7 +159,7 @@ class Dome5Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and will be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
@@ -180,7 +180,7 @@ class Dome6Offsets(OptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 6, which is the Garden in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and will be capped if it goes above 20
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
     """
