@@ -479,10 +479,11 @@ class SMGDOL(SMGObject):
     def set_default_deathlink_timer(self):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[DEATHTIMER], int.to_bytes(DEFAULT_DEATHLINK_COOLDOWN, 2))
 
-    def update_luma_galaxies(self, luma_galaxies: list[GalaxyDestination], starbit_counts: list[int]):
+    def update_luma_galaxies(self, luma_galaxies: list[GalaxyDestination], starbit_counts: dict[str, int]):
         assert len(luma_galaxies) == 7
+        assert len(starbit_counts.values()) == 7
 
-        for galaxy, starbit_count, i in zip(luma_galaxies, starbit_counts, range(7)):
+        for galaxy, starbit_count, i in zip(luma_galaxies, starbit_counts.values(), range(7)):
             address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[LUMAGALAXY] + i * 0x20
             self.dol.write_at(address, galaxy.name.encode('utf-8'))
             self.dol.write_at(address + 30, int.to_bytes(starbit_count, 2))
@@ -541,7 +542,7 @@ class SMGDOL(SMGObject):
         self.dol.write_at(self.custom_section_address + STATIC_VARIABLE_OFFSETS[SLOTNAME], slot_name.encode('utf-8'))
 
     def update(self, dome_galaxies: list[GalaxyDestination], luma_galaxies: list[GalaxyDestination], dome_shuffle: dict[int, int], star_requirements: dict[str, int],
-               locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool, starbit_counts: list[int], goal_count: int):
+               locations: dict, show_galaxies: int, slot_name: str, hide_star_colours: bool, starbit_counts: dict[str, int], goal_count: int):
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
