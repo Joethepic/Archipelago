@@ -4,10 +4,11 @@ from BaseClasses import Region, Entrance, MultiWorld
 from entrance_rando import disconnect_entrance_for_randomization
 import logging
 
+from locations import hungry_luma_events_table
 from .items import SMGItem
 from .Constants.Names import region_names as regname, galaxy_in_game_names as galaxyIG, location_names as locname
 from .SMGOptions import SMGOptions
-from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData
+from .locations import SMGLocation, locPC_table, base_stars_locations, SMGLocationData, starbit_farm_event_table
 
 if TYPE_CHECKING:
     from . import SMGWorld
@@ -648,6 +649,12 @@ def create_regions(world: "SMGWorld"):
         create_locations(locPC_table, world)
 
     world.options.stars_to_finish.value = min(world.options.stars_to_finish.value, len(list(world.get_locations())) - 1)
+
+    for loc, data in starbit_farm_event_table.items():
+        world.get_region(data.region).add_event(loc, "Can Farm Starbits")
+
+    for loc, data in hungry_luma_events_table.items():
+        world.get_region(data.region).add_event(loc, "Hungry Luma Event")
 
     world.get_region(regname.GALREAC1BOSS).add_event(locname.GALAXYREACTORSTAR1, "Peach")
 

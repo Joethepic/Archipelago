@@ -268,35 +268,38 @@ class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option 
 
     Vanilla - The counts remained unchanged from their original values
 
-    Progressive Values - If a value for a hungry luma in Starbit Luma Counts are not higher than the last one, the
-    number will be re-rolled so that it is higher than the last luma.This option primarily enforces that counts are
-    always increasing.
-
     Choice - Hungry Luma starbit requirements will be set exactly, using the Starbit Luma Count option.
 
     By Sphere - Counts are determined by placement in the multiworld, using Gateway Luma as the maximum. All hungry lumas
     logically require access to a Starbit farming area in this option.
+
+    Progressive Values Low - If a value for a hungry luma in Starbit Luma Counts are not higher than the last one, the
+    number will be randomly rolled so that it is higher than the last luma. This option primarily enforces that counts are
+    always increasing. This is capped at a max of 5000 and does skew towards that
+
+    Progressive Values High - The same as Progressive Counts Low but capped at 9999
     """
     display_name = "Observatory Hungry Luma Behavior"
     internal_name = "observatory_hungry_luma_behavior"
     slot_req = True
     option_Vanilla = 0
-    option_Progressive_Values = 1
-    option_Choice = 2
-    option_By_Sphere = 3
+    option_Choice = 1
+    option_By_Sphere = 2
+    option_Progressive_Values_Low = 3
+    option_Progressive_Values_High = 4
 
 
 class ObservatoryLumaCounts(RandomOptionCounter):
     """
     Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
 
-    Adding 'Random: XXX' will roll ALL values somewhere between 0 and XXX
+    You are allowed to use the various random options directly next to the luma you want to be random, in place of a number
     """
     display_name = "Observatory Luma Counts"
     internal_name = "observatory_luma_counts"
     min = 0
     max = 9999
-    valid_keys = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma","Dome 4 Hungry Luma",
+    valid_keys: list[str] = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma", "Dome 4 Hungry Luma",
                   "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma"]
     default = {
         "Dome 1 Hungry Luma": 400,
@@ -304,8 +307,8 @@ class ObservatoryLumaCounts(RandomOptionCounter):
         "Dome 3 Hungry Luma": 600,
         "Dome 4 Hungry Luma": 800,
         "Dome 5 Hungry Luma": 1000,
-        "Dome 6 Hungry Luma": 1200,
-        "Gateway Hungry Luma": 1600
+        "Dome 6 Hungry Luma": 1600,
+        "Gateway Hungry Luma": 1200
     }
     slot_req = True
 

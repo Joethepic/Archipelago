@@ -1,7 +1,9 @@
 import os
 from dataclasses import fields
 from typing import ClassVar
+from math import ceil
 
+from BaseClasses import MultiWorld
 from Options import PerGameCommonOptions
 from Utils import visualize_regions
 from entrance_rando import randomize_entrances
@@ -14,7 +16,7 @@ from . import items, regions, Rules, web_world, SMGOptions
 from .Constants.Names import region_names as regname, item_names as itemname, location_names as locname
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
-from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table
+from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table, hungry_luma_events_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
@@ -28,6 +30,11 @@ def runClient(*args):
     launch_subprocess(launch, name = "SMG Client", args = args)
 
 components.append(Component("SMG Client", func=runClient, component_type=Type.CLIENT, file_identifier=SuffixIdentifier(".apsmg")))
+
+
+def _set_gen_thread_finished(multiworld: MultiWorld, game_name: str):
+    for world in multiworld.get_game_worlds(game_name):
+        world.finished_post_generation.set()
 
 class SMGWorld(World):
     """
@@ -54,6 +61,7 @@ class SMGWorld(World):
     required_client_version = (0, 6, 6)
 
     hint_blacklist = {"B: Bowser's Galaxy Reactor", "Peach"}
+    starbit_luma_spheres: dict[str, int]
     ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
     def __init__(self, *args, **kwargs):
@@ -62,6 +70,8 @@ class SMGWorld(World):
         self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
         self.starting_galaxy: str = regname.GOODEGG
         self.galaxy_counts: dict[str, int] = {}
+        self.starbit_luma_spheres = {}
+
 
     def generate_early(self) -> None:
         regen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
@@ -75,6 +85,26 @@ class SMGWorld(World):
                     getattr(self.options, key).value = value
 
             return
+
+        for key in self.options.observatory_luma_counts.valid_keys:
+            if key not in self.options.observatory_luma_counts.value.keys():
+                self.options.observatory_luma_counts.value.update({key: 0})
+        if self.options.observatory_hungry_luma_behavior.value == self.options.observatory_hungry_luma_behavior.option_Vanilla:
+            self.options.observatory_luma_counts.value = self.options.observatory_luma_counts.default
+        elif self.options.observatory_hungry_luma_behavior.value >= 3: # If We're using one of the progressive value options
+            luma_list: list[str] = list(sorted(self.options.observatory_luma_counts.valid_keys))
+            last_starbit_count: int = 0
+            starbit_cap: int = 5000 if self.options.observatory_hungry_luma_behavior.value == 3 else 9999
+            for luma in luma_list:
+                if luma == "Dome 1 Hungry Luma":
+                    last_starbit_count = self.options.observatory_luma_counts.value[luma]
+                else:
+                    if self.options.observatory_luma_counts.value[luma] < last_starbit_count:
+                        if last_starbit_count == starbit_cap:
+                            self.options.observatory_luma_counts.value[luma] = starbit_cap
+                        else:
+                            self.options.observatory_luma_counts.value[luma] = self.random.randrange(last_starbit_count,starbit_cap)
+                    last_starbit_count = self.options.observatory_luma_counts.value[luma]
 
         self.galaxy_counts = self.get_galaxy_counts()
 
@@ -207,8 +237,44 @@ class SMGWorld(World):
     # def pre_fill(self) -> None:
     #     visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml", show_entrance_names=True)
 
+    @classmethod
+    def stage_generate_output(cls, multiworld: MultiWorld, output_directory: str):
+        luma_worlds = {world.player for world in multiworld.get_game_worlds(cls.game)
+                      if world.options.observatory_hungry_luma_behavior.value == world.options.observatory_hungry_luma_behavior.option_By_Sphere}
+            try:
+                def check_boo_players_done() -> None:
+                    done_players = set()
+                    for player in luma_worlds:
+                        player_luma_world = multiworld.worlds[player]
+                        if len(player_luma_world.starbit_luma_spheres.keys()) == len(hungry_luma_events_table.keys()):
+                            done_players.add(player)
+                    luma_worlds.difference_update(done_players)
+                if luma_worlds:
+                    for sphere_num, sphere in enumerate(multiworld.get_spheres(), 1):
+                        for loc in sphere:
+                            if loc.player in luma_worlds and loc.name in hungry_luma_events_table.keys():
+                                player_world = multiworld.worlds[loc.player]
+                                player_world.starbit_luma_spheres.update({loc.name: sphere_num})
+                            check_boo_players_done()
+
+                        if not luma_worlds:
+                            return
+            except Exception:
+                import traceback
+                traceback.print_exc()
+                raise
+            finally:
+                _set_gen_thread_finished(multiworld, cls.game)
+
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
+        if self.options.observatory_hungry_luma_behavior.value == self.options.observatory_hungry_luma_behavior.option_By_Sphere:
+            max_value: int = self.options.observatory_luma_counts.value["Gateway Hungry Luma"]
+            max_sphere: int = max(self.starbit_luma_spheres.values())
+            sphere_unit = ceil(max_value/max_sphere)
+            for luma in self.starbit_luma_spheres:
+                self.options.observatory_luma_counts.value[luma] = self.starbit_luma_spheres[luma]*sphere_unit
+
         self.galaxy_counts.update({"D1G1": 0})
         # Output seed name and slot number to seed RNG in randomizer client
         output_data: dict = {

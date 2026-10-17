@@ -564,7 +564,7 @@ class SMGDOL(SMGObject):
 
         self.manipulate_star_loading(hide_star_colours)
 
-        #self.update_luma_galaxies([galaxy for galaxy in luma_galaxies if galaxy.dome_index != None], starbit_counts)
+        self.update_luma_galaxies([galaxy for galaxy in luma_galaxies if galaxy.dome_index != None], starbit_counts)
         self.update_green_galaxies([galaxy for galaxy in luma_galaxies if galaxy.orbit_index != None])
 
         self.set_default_deathlink_timer()
