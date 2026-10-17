@@ -39,7 +39,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         # Skip install if already present for this version
         if os.path.isdir(local_dir_path) and os.listdir(local_dir_path):
             self._client_logger.info(f"SMG Dependencies already exist, including them in sys.path: {local_dir_path}")
-            sys.path.append(local_dir_path)
+            sys.path.insert(0, local_dir_path)
             return
 
         lib_path = _get_archive_name()
