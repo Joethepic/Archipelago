@@ -3,7 +3,7 @@ from BaseClasses import ItemClassification as IC
 from typing import NamedTuple, Optional, Dict, Set
 
 from.Constants.Names import item_names as itemname
-
+from.Constants.Names import item_ids as itemid
 class SMGItemData(NamedTuple):
     type: list[str]
     code: Optional[int]
@@ -22,15 +22,19 @@ class SMGItem(Item):
 
 # This is all the items that are used by the game we define them here so they can be used.
 item_table: dict[str, SMGItemData] = {
-  itemname.POWER: SMGItemData(["Power Stars"], 170000004, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
-  itemname.GRAND: SMGItemData(["Grand Stars", "Power Stars"], 170000005, IC.progression),
-  itemname.GREEN: SMGItemData(["Green Stars", "Power Stars"], 170000006, IC.progression),
-  
+  itemname.POWER: SMGItemData(["Power Stars"], itemid.POWER, IC.progression_deprioritized_skip_balancing),# rom address  0x007ACCA0F2FF8760 don't remeber how i found this or if it's acurate so could use double check.
+  itemname.GRAND: SMGItemData(["Grand Stars", "Power Stars"], itemid.GRAND, IC.progression),
+  itemname.GREEN: SMGItemData(["Green Stars", "Power Stars"], itemid.GREEN, IC.progression),
   #This is not going to be used in v1 as disccused "Progressive Comets": SMGItemData(["Comet"], 170000008, IC.progression),
 }
 
 filler_item_table: dict [str, SMGItemData] = {
-    itemname.ONEUP: SMGItemData(["Filler Items"], 170000007, IC.filler),
+    itemname.ONEUP: SMGItemData(["Filler Items"], itemid.ONEUP, IC.filler),
+    itemname.STARBIT1: SMGItemData(["Filler Items"], itemid.STARBIT1, IC.filler),
+    itemname.STARBIT2: SMGItemData(["Filler Items"], itemid.STARBIT2, IC.filler),
+    itemname.STARBIT3: SMGItemData(["Filler Items"], itemid.STARBIT3, IC.filler),
+    itemname.STARBIT4: SMGItemData(["Filler Items"], itemid.STARBIT4, IC.filler),
+    itemname.STARBIT5: SMGItemData(["Filler Items"], itemid.STARBIT5, IC.filler)
 }
 
 

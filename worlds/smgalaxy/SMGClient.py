@@ -13,6 +13,7 @@ from CommonClient import ClientCommandProcessor, logger, server_loop, gui_enable
 from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
+from .Constants.Names import item_ids as itemid
 from .Constants.Names import galaxy_in_game_names as galaxyignname
 
 from .regions import SMGRegionData, region_list
@@ -201,29 +202,45 @@ class GalaxyContext(CommonContext):
         for item_id in self.items_received[self.highest_processed_item_index:]:
             # TODO: change to constants and probably a NamedTuple aswell
             match item_id.item:
-                case 170000007:
+                case itemid.ONEUP:
                     self.lives = await self.pointers["Lives"].get_value() + 1
                     self.pointers["Lives"].write_value(self.lives)
-
-                case 170000004:
+                case itemid.POWER:
                     logger.debug("Power Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
-
-                case 170000005:
+                case itemid.GRAND:
                     logger.debug("Grand Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
                     grandstars = await self.pointers[GRAND].get_value() + 1
                     self.pointers[GRAND].write_value(min(7, grandstars))
-
-                case 170000006:
+                case itemid.GREEN:
                     logger.debug("Green Star Received")
                     powerstars = await self.pointers[POWER].get_value() + 1
                     self.pointers[POWER].write_value(min(245, powerstars))
                     greenstars = await self.pointers[itemname.GREEN].get_value() + 1
                     self.pointers[itemname.GREEN].write_value(min(3, greenstars))
-            
+                case itemid.STARBIT1:
+                    logger.debug("10 Star bits received")
+                    starbits = await self.pointers["Starbits"].get_value() + 10
+                    self.pointers["Starbits"].write_value(starbits)
+                case itemid.STARBIT2:
+                    logger.debug("25 Star bits received")
+                    starbits = await self.pointers["Starbits"].get_value() + 25
+                    self.pointers["Starbits"].write_value(starbits)
+                case itemid.STARBIT3:
+                    logger.debug("50 Star bits received")
+                    starbits = await self.pointers["Starbits"].get_value() + 50
+                    self.pointers["Starbits"].write_value(starbits)
+                case itemid.STARBIT4:
+                    logger.debug("100 Star bits received")
+                    starbits = await self.pointers["Starbits"].get_value() + 100
+                    self.pointers["Starbits"].write_value(starbits)
+                case itemid.STARBIT5:
+                    logger.debug("250 Star bits received")
+                    starbits = await self.pointers["Starbits"].get_value() + 250
+                    self.pointers["Starbits"].write_value(starbits)
             self.highest_processed_item_index += 1
 
         self.pointers[LAST_RECV_INDEX].write_value(self.highest_processed_item_index)
