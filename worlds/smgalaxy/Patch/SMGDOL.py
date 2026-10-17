@@ -170,30 +170,31 @@ class SMGDOL(SMGObject):
         self.write_instruction(PPC.lwz(3, 0x24, 3))
         self.write_instruction(PPC.lwz(3, 0xAC, 3))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 14 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 15 * 0x4, self.write_pointer))
 
         # Get scene object holder if it exists
         self.write_instruction(PPC.lwz(3, 0x10, 3))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 11 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 12 * 0x4, self.write_pointer))
 
         # Get mario holder if exists
         self.write_instruction(PPC.bl(0x802e1528, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 8 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 9 * 0x4, self.write_pointer))
 
         # Get mario actor if exists
         self.write_instruction(PPC.bl(0x802e1520, self.write_pointer))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 5 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 6 * 0x4, self.write_pointer))
 
         # Get mario if exists
         self.write_instruction(PPC.lwz(3, 0x230, 3))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 3 * 0x4, self.write_pointer))
 
         # Is input disabled
         self.write_instruction(PPC.bl(0x802e98b8, self.write_pointer))
+        self.write_instruction(PPC.b(self.write_pointer + 2 * 0x4, self.write_pointer))
 
         # Write value
         self.write_instruction(PPC.li(3, 1))
@@ -233,7 +234,9 @@ class SMGDOL(SMGObject):
         # Kill mario if forced
         self.write_instruction(PPC.lbz(3, STATIC_VARIABLE_OFFSETS[FORCEDEATH], 31))
         self.write_instruction(PPC.cmpi(0, 3, 0))
-        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 2 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.bc(12, 2, self.write_pointer + 4 * 0x4, self.write_pointer))
+        self.write_instruction(PPC.li(3, 0))
+        self.write_instruction(PPC.stb(3, STATIC_VARIABLE_OFFSETS[FORCEDEATH], 31))
         self.write_instruction(PPC.b(self.write_pointer + 13 * 0x4, self.write_pointer))
 
         # Skip if death count is less than 1
