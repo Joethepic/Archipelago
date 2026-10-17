@@ -102,6 +102,7 @@ class GalaxyContext(CommonContext):
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
                          DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+                         FORCEDEATH: Pointer([STATIC_VARIABLE_OFFSETS[FORCEDEATH]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
                          itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER)}
 
@@ -364,14 +365,21 @@ class GalaxyContext(CommonContext):
         """
         super().on_deathlink(data)
         if data["source"] != self.player_names[self.slot]:
+            logger.debug("Deathlink received")
             Utils.async_start(self.kill_player(), "SMG - Kill Player")
 
     async def kill_player(self) -> None:
         """Kill the player in game."""
         if await self.current_galaxy() == "FileSelect":
+            logger.debug("In file select")
             self.pointers[FORCEDEATH].write_value(True)
+            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            self.pointers[FORCEDEATH].write_value(False)
         elif await self.check_ingame():
-            self.pointers[DEATHLINK].write_value(True)
+            logger.debug("In game")
+            self.pointers[FORCEDEATH].write_value(True)
+            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            self.pointers[FORCEDEATH].write_value(False)
 
     async def server_auth(self, password_requested: bool = False) -> None:
         """
