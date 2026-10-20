@@ -241,30 +241,29 @@ class SMGWorld(World):
     def stage_generate_output(cls, multiworld: MultiWorld, output_directory: str):
         luma_worlds = {world.player for world in multiworld.get_game_worlds(cls.game)
                       if world.options.observatory_hungry_luma_behavior.value == world.options.observatory_hungry_luma_behavior.option_By_Sphere}
-            try:
-                def check_boo_players_done() -> None:
-                    done_players = set()
-                    for player in luma_worlds:
-                        player_luma_world = multiworld.worlds[player]
-                        if len(player_luma_world.starbit_luma_spheres.keys()) == len(hungry_luma_events_table.keys()):
-                            done_players.add(player)
-                    luma_worlds.difference_update(done_players)
-                if luma_worlds:
-                    for sphere_num, sphere in enumerate(multiworld.get_spheres(), 1):
-                        for loc in sphere:
-                            if loc.player in luma_worlds and loc.name in hungry_luma_events_table.keys():
-                                player_world = multiworld.worlds[loc.player]
-                                player_world.starbit_luma_spheres.update({loc.name: sphere_num})
-                            check_boo_players_done()
-
-                        if not luma_worlds:
-                            return
-            except Exception:
-                import traceback
-                traceback.print_exc()
-                raise
-            finally:
-                _set_gen_thread_finished(multiworld, cls.game)
+        try:
+            def check_boo_players_done() -> None:
+                done_players = set()
+                for player in luma_worlds:
+                    player_luma_world = multiworld.worlds[player]
+                    if len(player_luma_world.starbit_luma_spheres.keys()) == len(hungry_luma_events_table.keys()):
+                        done_players.add(player)
+                luma_worlds.difference_update(done_players)
+            if luma_worlds:
+                for sphere_num, sphere in enumerate(multiworld.get_spheres(), 1):
+                    for loc in sphere:
+                        if loc.player in luma_worlds and loc.name in hungry_luma_events_table.keys():
+                            player_world = multiworld.worlds[loc.player]
+                            player_world.starbit_luma_spheres.update({loc.name: sphere_num})
+                        check_boo_players_done()
+                    if not luma_worlds:
+                        return
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            raise
+        finally:
+            _set_gen_thread_finished(multiworld, cls.game)
 
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
