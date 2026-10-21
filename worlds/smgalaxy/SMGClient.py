@@ -16,6 +16,8 @@ from .Constants.Names import item_names as itemname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
 
 from .regions import SMGRegionData, region_list
+from .locations import locPC_table
+from .SMGOptions import *
 from .smg_helpers import *
 import dolphin_memory_engine as dme
 
@@ -44,7 +46,7 @@ class GalaxyContext(CommonContext):
     command_processor = GalaxyCommand
     game: str = GAME_NAME
     items_handling = 0b111
-
+    PCunset = False
     runloop: Optional[asyncio.Task[None]] = None
     dolphin_status: str = CONNECTION_INITIAL_STATUS
 
@@ -238,8 +240,17 @@ class GalaxyContext(CommonContext):
 
         self.starcolorhandler.init_all_star_colors()
 
+        if self.PCunset == True:
+            await self.setPC()
         self.needs_recalculating = False
     
+    async def setPC(self) -> None:
+        if self.slot_data["enable_purple_coin_stars"] == False:
+            for location in locPC_table.values():
+                value = await self.pointers[location.in_game_galaxy_name].get_value()
+                value |= (1 << location.game_address)
+                self.pointers[location.in_game_galaxy_name].write_value(value)
+                self.PCunset = False
     async def try_hook(self) -> bool:
         """Try to hook the Dolphin Memory Engine process into dolphin.
         
@@ -347,7 +358,9 @@ class GalaxyContext(CommonContext):
             
             case "Connected":
                 self.highest_processed_item_index = 0
-                
+                self.slot_data = args["slot_data"]
+                self.purple_coins_enabled = bool(self.slot_data["enable_purple_coin_stars"])
+                self.PCunset = True
             #case "Bounced":
             #    if args["source"] != self.player_names[self.slot]:
             #        pass # handle (death) links
