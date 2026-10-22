@@ -56,6 +56,7 @@ class EnablePurpleCoinStars(Toggle):
     """
     display_name = "Enable Purple Coin Stars"
     internal_name = "enable_purple_coin_stars"
+    slot_req = True
 
 # this allows players to pick their own star count to finish the game. 
 class StarstoFinish(Range):
