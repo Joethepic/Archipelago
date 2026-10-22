@@ -135,11 +135,13 @@ class SMGWorld(World):
                 if dome_name == "six" and dome_orb_name == "Fifth Orbit":
                     continue
                 if dome_orb_name == "First Orbit":
-                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_dome_count + int(dome_dict[dome_orb_name])
-                    previous_orbit_count = previous_dome_count + int(dome_dict[dome_orb_name])
+                    count = min(self.options.stars_to_finish.value, previous_dome_count + int(dome_dict[dome_orb_name]))
+                    galaxy_counts[f"D{dome_num}G{i + 1}"] = count
+                    previous_orbit_count = count
                 else:
-                    galaxy_counts[f"D{dome_num}G{i + 1}"] = previous_orbit_count + int(dome_dict[dome_orb_name])
-                    previous_orbit_count = previous_orbit_count + int(dome_dict[dome_orb_name])
+                    count = min(self.options.stars_to_finish.value, previous_orbit_count + int(dome_dict[dome_orb_name]))
+                    galaxy_counts[f"D{dome_num}G{i + 1}"] = count
+                    previous_orbit_count = count
 
         return galaxy_counts
 
