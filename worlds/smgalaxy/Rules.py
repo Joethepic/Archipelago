@@ -1071,13 +1071,9 @@ def rules_from_er_placements(world: "SMGWorld"):
             galaxy_entr: Entrance = world.get_entrance(f"Dome {dome_num} {orbit_name} Galaxy")
             galaxy_type: str = region_list[galaxy_entr.connected_region.name].type
 
-            star_count = min(star_count, world.options.stars_to_finish.value) # Jake added this line here
-            if star_count <= available_locations:
-                world.set_rule(galaxy_entr, HasGroup("Power Stars", count=star_count))
-            else:
-                world.set_rule(galaxy_entr, HasGroup("Power Stars", count=available_locations))
-                world.galaxy_counts[galaxy] = available_locations
-
+            star_count = min(star_count, world.options.stars_to_finish.value, available_locations)
+            world.set_rule(galaxy_entr, HasGroup("Power Stars", count=star_count))
+            world.galaxy_counts[galaxy] = star_count
             available_locations += 4 if galaxy_type == "Major" else 1
 
     for galaxy_slot in all_galaxy_slots:
