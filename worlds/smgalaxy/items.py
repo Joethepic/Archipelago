@@ -8,7 +8,7 @@ class SMGItemData(NamedTuple):
     type: list[str]
     code: Optional[int]
     classification: IC
-    other_variable: Optional[int] = None
+    default_weight: int = 1
 
 # this lets us use these items by using SMGItem.
 class SMGItem(Item):
@@ -29,16 +29,19 @@ item_table: dict[str, SMGItemData] = {
 }
 
 filler_item_table: dict [str, SMGItemData] = {
-    itemname.ONEUP: SMGItemData(["Filler Items"], itemid.ONEUP, IC.filler),
-    itemname.STARBIT1: SMGItemData(["Filler Items"], itemid.STARBIT1, IC.filler),
-    itemname.STARBIT2: SMGItemData(["Filler Items"], itemid.STARBIT2, IC.filler),
-    itemname.STARBIT3: SMGItemData(["Filler Items"], itemid.STARBIT3, IC.filler),
-    itemname.STARBIT4: SMGItemData(["Filler Items"], itemid.STARBIT4, IC.filler),
-    itemname.STARBIT5: SMGItemData(["Filler Items"], itemid.STARBIT5, IC.filler)
+    itemname.ONEUP: SMGItemData(["Filler Items"], itemid.ONEUP, IC.filler, 15),
+    itemname.STARBIT1: SMGItemData(["Filler Items"], itemid.STARBIT1, IC.filler, 40),
+    itemname.STARBIT2: SMGItemData(["Filler Items"], itemid.STARBIT2, IC.filler, 20),
+    itemname.STARBIT3: SMGItemData(["Filler Items"], itemid.STARBIT3, IC.filler, 15),
+    itemname.STARBIT4: SMGItemData(["Filler Items"], itemid.STARBIT4, IC.filler, 9),
+    itemname.STARBIT5: SMGItemData(["Filler Items"], itemid.STARBIT5, IC.filler, 1)
 }
 
+trap_filler_items: dict[str, SMGItemData] = {
 
-all_items_table: dict[str, SMGItemData] = {**item_table, **filler_item_table}
+}
+
+all_items_table: dict[str, SMGItemData] = {**item_table, **filler_item_table, **trap_filler_items}
 
 ITEM_NAME_TO_ID: dict[str, int] =  {
     name: data.code for name, data in all_items_table.items() if data.code is not None}

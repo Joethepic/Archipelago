@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
     DeathLinkMixin
-
+from .items import trap_filler_items
 
 class GalaxyShuffle(OptionSet):
     """
@@ -254,6 +254,33 @@ class StarColors(Toggle):
     internal_name = "star_colors"
     slot_req = False
 
+class TrapWeights(OptionCounter):
+    """
+    Set Trap Weights for traps chosen as filler items, if Trap Percentage is greater than 0
+    Each weight represents a number of balls in a lottery roller with that trap on it.
+    So if you had ___ Trap set to 3, and ___ Trap set to 7, and the rest set to 0,
+    you would have a 3/10 for a ___ Trap to be chosen when rolling for trap fillers
+    Must be between 0 and 100
+    """
+    display_name = "Trap Weights"
+    internal_name = "trap_weights"
+    min = 0
+    max = 100
+    valid_keys = trap_filler_items.keys()
+    default = {item: data.default_weight for item, data in trap_filler_items.items()}
+    all_on_dict = {item: 100 for item in trap_filler_items.keys()}
+    all_off_dict = {item: 0 for item in trap_filler_items.keys()}
+
+class TrapPercentage(Range):
+    """
+    Set the percentage of filler items that are traps. Default percentage is 0%
+    """
+    display_name = "Trap Percentage"
+    internal_name = "trap_percentage"
+    range_start = 0
+    range_end = 100
+    default = 0
+
 # this defines all the options.
 @dataclass
 class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
@@ -271,6 +298,8 @@ class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     galaxy_shuffle_type: GalaxyShuffleType
     hide_galaxy: HideGalaxy
     star_colors: StarColors
+    trap_weights: TrapWeights
+    trap_percentage: TrapPercentage
 
 option_groups = [
     OptionGroup("Extra Locations", [
@@ -298,6 +327,10 @@ option_groups = [
         StarColors,
         HideGalaxy,
     ]),
+    OptionGroup("Item Pool Modifications", [
+        TrapWeights,
+        TrapPercentage,
+    ])
 ]
 
 

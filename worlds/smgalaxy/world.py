@@ -1,4 +1,4 @@
-import os
+import os, math
 from dataclasses import fields
 from typing import ClassVar
 
@@ -15,7 +15,7 @@ from .Constants.Names import region_names as regname, item_names as itemname, lo
 from .Constants.constants import AP_WORLD_VERSION_NAME, CLIENT_VERSION, GAME_NAME
 from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table
-from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
+from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table, filler_item_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
 from .SMGSettings import SuperMarioGalaxy
 from .Patch.SMGPlayerContainer import SMGPlayerContainer
@@ -53,6 +53,11 @@ class SMGWorld(World):
     location_name_groups = get_location_names_per_category()
     required_client_version = (0, 6, 6)
 
+    # Adding all filler dict to be used later on
+    all_filler_dict: dict[str, int]
+    trap_filler_dict: dict[str, int]
+    other_filler_dict: dict[str, int]
+
     hint_blacklist = {"B: Bowser's Galaxy Reactor", "Peach"}
     ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
@@ -62,6 +67,9 @@ class SMGWorld(World):
         self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
         self.starting_galaxy: str = regname.GOODEGG
         self.galaxy_counts: dict[str, int] = {}
+        self.all_filler_dict = {}
+        self.trap_filler_dict = {}
+        self.other_filler_dict = {}
 
     def generate_early(self) -> None:
         regen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
@@ -77,6 +85,12 @@ class SMGWorld(World):
             return
 
         self.galaxy_counts = self.get_galaxy_counts()
+
+        self.trap_filler_dict: dict[str, int] = self.options.trap_weights.value
+
+        self.other_filler_dict: dict[str, int] = {item: data.default_weight for item, data in filler_item_table.items()}
+
+        self.all_filler_dict = {**self.trap_filler_dict, **self.other_filler_dict}
 
         if "Random" in self.options.mario_colors.value.keys():
             self.options.mario_colors.value = {
@@ -151,8 +165,13 @@ class SMGWorld(World):
         
         return item
 
+    # Used for ItemLink and overrides the one used by AP.
     def get_filler_item_name(self) -> str:
-        return itemname.ONEUP
+        if sum(self.all_filler_dict.values()) != 0:
+            filler_dict = dict(sorted(self.all_filler_dict.items()))
+            return self.random.choices(list(filler_dict.keys()), weights=list(filler_dict.values()), k=1)[0]
+        else:
+            return itemname.ONEUP
     
     def create_items(self):
         # creates the green stars in each player's itempool
@@ -176,12 +195,33 @@ class SMGWorld(World):
             extra_stars: int = 0
         local_pool += [self.create_item(itemname.POWER) for i in range(extra_stars)]
         n_filler_items = n_locations - len(local_pool)
+        n_trap_items = math.ceil(n_filler_items*(self.options.trap_percentage.value/100))
+        n_other_filler = n_filler_items - n_trap_items
 
         # Create filler
-        for _ in range(n_filler_items):
-            local_pool.append(self.create_item(self.get_filler_item_name()))
+        if sum(self.trap_filler_dict.values()) > 0:# Add filler items to the item pool. Add traps if they are on.
+            for _ in range(n_trap_items):
+                local_pool.append(self.create_item(self.get_trap_item_name()))
+
+            for _ in range(n_other_filler):
+                local_pool.append(self.create_item((self.get_other_filler_item())))
+        else:
+            for _ in range(n_filler_items):
+                local_pool.append(self.create_item((self.get_other_filler_item())))
 
         self.multiworld.itempool += local_pool
+
+    def get_trap_item_name(self) -> str:
+        filler_traps = dict(sorted(self.trap_filler_dict.items()))
+        return self.random.choices(list(filler_traps.keys()), weights=list(filler_traps.values()), k=1)[0]
+
+
+    def get_other_filler_item(self) -> str:
+        if sum(self.other_filler_dict.values()) != 0:
+            other_filler = dict(sorted(self.other_filler_dict.items()))
+            return self.random.choices(list(other_filler.keys()), weights=list(other_filler.values()), k=1)[0]
+        else:
+            return itemname.ONEUP
 
     def connect_entrances(self) -> None:
         # Since UT will already have the levels shuffled, rather than randomly picking them, we have the list
