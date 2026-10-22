@@ -486,7 +486,11 @@ class SMGDOL(SMGObject):
         assert len(luma_galaxies) == 7
         assert len(starbit_counts.values()) == 7
 
-        for galaxy, starbit_count, i in zip(luma_galaxies, starbit_counts.values(), range(7)):
+        luma_order: list[int] = [0, 1, 2, 6, 5, 3, 4]
+
+        starbits = [list(starbit_counts.values())[i] for i in luma_order]
+
+        for galaxy, starbit_count, i in zip(luma_galaxies, starbits, range(7)):
             address = self.custom_section_address + STATIC_VARIABLE_OFFSETS[LUMAGALAXY] + i * 0x20
             self.dol.write_at(address, galaxy.name.encode('utf-8'))
             self.dol.write_at(address + 30, int.to_bytes(starbit_count, 2))
