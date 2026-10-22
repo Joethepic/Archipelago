@@ -486,7 +486,7 @@ class SMGDOL(SMGObject):
         assert len(luma_galaxies) == 7
         assert len(starbit_counts.values()) == 7
 
-        luma_order: list[int] = [0, 1, 2, 6, 5, 3, 4]
+        luma_order: list[int] = [0, 1, 2, 5, 6, 3, 4]
 
         starbits = [list(starbit_counts.values())[i] for i in luma_order]
 
