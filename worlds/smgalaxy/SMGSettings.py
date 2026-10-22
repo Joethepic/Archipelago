@@ -29,7 +29,7 @@ class DolphinProcessName(str):
     """The name of the Dolphin process to connect to. Leave blank for system default."""
     pass
 
-class SuperMarioGalaxy(settings.Group):
+class SuperMarioGalaxySettings(settings.Group):
     """Various Super Mario Galaxy Settings"""
     iso_file: ISOFile = ISOFile(ISOFile.copy_to)
     dolphin_settings: EmulatorSettings = EmulatorSettings()

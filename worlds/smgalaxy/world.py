@@ -20,7 +20,7 @@ from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table, hungry_luma_events_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
-from .SMGSettings import SuperMarioGalaxy
+from .SMGSettings import SuperMarioGalaxySettings
 from .Patch.SMGPlayerContainer import SMGPlayerContainer
 
 # Module-level, computed once
@@ -52,7 +52,7 @@ class SMGWorld(World):
     #option definitions
     options_dataclass = SMGOptions.SMGOptions
     options: SMGOptions.SMGOptions
-    settings: ClassVar[SuperMarioGalaxy]
+    settings: ClassVar[SuperMarioGalaxySettings]
 
     item_name_to_id: ClassVar[dict[str, int]] = ITEM_NAME_TO_ID
     location_name_to_id: ClassVar[dict[str, int]] = LOCATION_NAME_TO_ID
