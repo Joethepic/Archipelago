@@ -1,4 +1,5 @@
 import os
+import threading
 from dataclasses import fields
 from typing import ClassVar
 from math import ceil
@@ -66,6 +67,7 @@ class SMGWorld(World):
 
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
+        self.finished_post_generation = threading.Event()
         self.origin_region_name: str = regname.SHIP
         self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
         self.starting_galaxy: str = regname.GOODEGG
@@ -366,3 +368,4 @@ class SMGWorld(World):
         slot_data["galaxy_counts"] = self.galaxy_counts
         slot_data["shuffled_levels"] = self.shuffled_levels
         return slot_data
+
