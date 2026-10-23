@@ -99,13 +99,16 @@ class SMGWorld(World):
             starbit_cap: int = 5000 if self.options.observatory_hungry_luma_behavior.value == 3 else 9999
             for luma in luma_list:
                 if luma == "Dome 1 Hungry Luma":
-                    last_starbit_count = self.options.observatory_luma_counts.value[luma]
+                    self.options.observatory_luma_counts.value[luma] = min(self.options.observatory_luma_counts.value[luma], starbit_cap)
+                    last_starbit_count = min(self.options.observatory_luma_counts.value[luma], starbit_cap)
                 else:
                     if self.options.observatory_luma_counts.value[luma] < last_starbit_count:
                         if last_starbit_count == starbit_cap:
                             self.options.observatory_luma_counts.value[luma] = starbit_cap
                         else:
                             self.options.observatory_luma_counts.value[luma] = self.random.randrange(last_starbit_count,starbit_cap)
+                    else:
+                        self.options.observatory_luma_counts.value[luma] = min(self.options.observatory_luma_counts.value[luma], starbit_cap)
                     last_starbit_count = self.options.observatory_luma_counts.value[luma]
 
         self.galaxy_counts = self.get_galaxy_counts()
