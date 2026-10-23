@@ -109,7 +109,7 @@ class SMGWorld(World):
                         else:
                             self.options.observatory_luma_counts.value[luma] = self.random.randrange(last_starbit_count,starbit_cap)
                     else:
-                        self.options.observatory_luma_counts.value[luma] = min(self.options.observatory_luma_counts.value[luma], starbit_cap)
+                        self.options.observatory_luma_counts.value[luma] = min(sorted_counts[i], starbit_cap)
                     last_starbit_count = self.options.observatory_luma_counts.value[luma]
 
         self.galaxy_counts = self.get_galaxy_counts()
