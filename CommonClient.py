@@ -1196,8 +1196,6 @@ def run_as_textclient(*args):
 
         def on_package(self, cmd: str, args: dict):
             if cmd == "Connected":
-                if bool(self.slot_data['death_link']) :
-                    Utils.async_start(self.update_death_link(self.slot_data["death_link"]), name="Update Deathlink")
                 self.game = self.slot_info[self.slot].game
 
         async def disconnect(self, allow_autoreconnect: bool = False):
