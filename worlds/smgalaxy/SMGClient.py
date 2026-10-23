@@ -382,12 +382,12 @@ class GalaxyContext(CommonContext):
                 self.password_required = bool(args["password"])
             
             case "Connected":
-                if bool(self.slot_data['death_link']) :
-                    Utils.async_start(self.update_death_link(self.slot_data["death_link"]), name="Update Deathlink")
                 self.highest_processed_item_index = 0
                 self.slot_data = args["slot_data"]
                 self.purple_coins_enabled = bool(self.slot_data["enable_purple_coin_stars"])
                 self.PCunset = True
+                if bool(self.slot_data['death_link']) :
+                    Utils.async_start(self.update_death_link(self.slot_data["death_link"]), name="Update Deathlink")
             #case "Bounced":
             #    if args["source"] != self.player_names[self.slot]:
             #        pass # handle (death) links
