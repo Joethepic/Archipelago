@@ -29,7 +29,7 @@ DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE = "DME_DOLPHIN_PROCESS_NAME"
 
 # DME seems to only load the environment variables value once, then after the first hook it never retrieves it again.
 # It is in our best interest to set this up first, then call hook later
-smg_settings: SuperMarioGalaxySettings = getattr(get_settings(),"smgalaxy.world_options").dolphin_settings
+smg_settings: SuperMarioGalaxySettings = getattr(get_settings(),"smgalaxy.world_options")
 if smg_settings.dolphin_process_name:
     os.environ[DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE] = smg_settings.dolphin_process_name
 elif DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE in os.environ:
