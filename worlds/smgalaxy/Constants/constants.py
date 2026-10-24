@@ -2,7 +2,7 @@ from enum import IntEnum
 
 # Client Constants
 AP_WORLD_VERSION_NAME: str = "APWorldVersion"
-CLIENT_VERSION: str = "V0.0.1"
+CLIENT_VERSION: str = "V0.0.2"
 CLIENT_NAME: str = "SMG Client"
 GAME_NAME: str = "Super Mario Galaxy"
 CLEAN_MD5: int = 0xf99a97f9ae4dccd1db45e9aaab9cebd8
