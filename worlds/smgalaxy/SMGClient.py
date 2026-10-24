@@ -1,9 +1,8 @@
 import asyncio
 import os
 from pathlib import Path
-import time
 import sys
-from typing import NamedTuple, Optional
+from typing import Optional
 import copy
 import random
 
@@ -17,12 +16,11 @@ from .Constants.Names import galaxy_in_game_names as galaxyignname
 from .dolphin_launcher import DolphinLauncher
 from .regions import SMGRegionData, region_list
 from .locations import locPC_table
-from .SMGOptions import *
 from .smg_helpers import *
 from settings import get_settings
 import dolphin_memory_engine as dme
 
-# Load settings and enforce that LM options exist. If they do, import their name and save for later use.
+# Load settings and enforce that SMG options exist. If they do, import their name and save for later use.
 from .SMGSettings import SuperMarioGalaxySettings, DolphinProcessName
 
 DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE = "DME_DOLPHIN_PROCESS_NAME"
@@ -481,8 +479,12 @@ def launch(*launch_args: str):
 
             SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
     except Exception as patchEx:
+        error_str: str = str(patchEx)
+        if "wii magic word is not" in str(patchEx).lower():
+            error_str = f"Detected a non-ISO file was provide. {CLIENT_NAME} only works with North American ISO files currently."
+
         client_msg: str = (f"An unknown error occurred while trying to patch a file for {CLIENT_NAME}.\n" +
-            f"Additional details:\n{str(patchEx)}")
+            f"Additional details:\n{error_str}")
         logger.error(client_msg)
         Utils.messagebox(f"Patch Client Issue {CLIENT_NAME}", client_msg, True)
         raise patchEx
