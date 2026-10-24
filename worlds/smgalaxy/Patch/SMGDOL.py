@@ -450,6 +450,9 @@ class SMGDOL(SMGObject):
         self.write_pointer = 0x803af764
         self.write_instruction(PPC.bl(0x803b2724, self.write_pointer))
 
+    def always_show_luigi(self):
+        self.write_instruction(PPC.li(3, 1), 0x8027676c)
+
     def update_instructions(self):
         self.skip_opening()
         self.set_swing_permission()
@@ -464,6 +467,7 @@ class SMGDOL(SMGObject):
         self.skip_return_demos()
         self.show_luma_with_dome()
         self.fix_grandstar_bug()
+        self.always_show_luigi()
 
     def show_galaxy_star_counter(self):
         self.write_instruction(PPC.li(0, 0), 0x801ff4c8)
