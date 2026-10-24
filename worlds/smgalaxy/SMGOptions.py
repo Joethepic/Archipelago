@@ -40,6 +40,9 @@ class RandomOptionCounter(OptionCounter):
                             raise OptionError(f"Range value for max {user_max} cannot be higher than Range value "
                                 f"for min {user_min} for option {self.__class__.__name__}")
 
+                        self.min = user_min
+                        self.max = user_max
+
                         # Since random_weighted_range has multiple "modes", I split to make the mode tage basically
                         random_tag = random_parts[2] if random_parts[2] in ["low", "middle", "high"] else random_mode
                         if random_tag != random_mode:
