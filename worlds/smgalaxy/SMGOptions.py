@@ -3,16 +3,54 @@ from typing import Dict, Any
 
 
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
-    DeathLinkMixin
+    DeathLinkMixin, random_weighted_range, OptionError, _RANDOM_OPTS
+
 
 class RandomOptionCounter(OptionCounter):
     """OptionCounter whose values also accept Range text: random, random-high, random-range-5-20, random-low, etc."""
 
     def __init__(self, value: dict[str, Any]) -> None:
-        parser = type(self.__class__.__name__, (Range,), {"range_start": self.min, "range_end": self.max,
-                                                          "default": self.min, "__module__": self.__module__})
-        super().__init__({key: amount if type(amount) == int else parser.from_text(str(amount)).value
-                          for key, amount in value.items()})
+        random_dict: dict = {}
+        for key, amt in value.items():
+            if isinstance(amt, int):
+                random_dict[key] = amt
+
+            elif isinstance(amt, str):
+                # Since Range Objects hardcode range start and range end, I cannot just call Random.from_text, so
+                #   enjoy 4am Jake being pissed and instead re-making this code here just to make option counters random.
+
+                parsed_txt = str(amt).lower()
+                if parsed_txt == "high":
+                    random_dict[key] = self.max
+                elif parsed_txt == "low":
+                    random_dict[key] = self.min
+                elif parsed_txt.startswith("random"):
+                    random_mode: str = "random"
+                    if parsed_txt.startswith("random-range-"):
+                        # Get the users random min, max to pass directly to random_weighted_range
+                        random_parts: list = parsed_txt.split("-")
+                        user_min, user_max = int(random_parts[-2]), int(random_parts[-1])
+                        if user_min < self.min:
+                            raise OptionError(f"{user_min} is lower than minimum {self.min} "
+                                f"for option {self.__class__.__name__}")
+                        elif user_max > self.max:
+                            raise OptionError(f"{user_max} is higher than maximum {self.max} "
+                                f"for option {self.__class__.__name__}")
+                        elif user_min > user_max:
+                            raise OptionError(f"Range value for max {user_max} cannot be higher than Range value "
+                                f"for min {user_min} for option {self.__class__.__name__}")
+
+                        # Since random_weighted_range has multiple "modes", I split to make the mode tage basically
+                        random_tag = random_parts[2] if random_parts[2] in ["low", "middle", "high"] else random_mode
+                        if random_tag != random_mode:
+                            random_mode = f"random-{random_tag}"
+                    random_dict[key] = random_weighted_range(random_mode, self.min, self.max)
+
+            else:
+                raise OptionError(f"Invalid value provided for option {self.__class__.__name__}. You must provide "
+                    f"either an integer directly or a valid range option, such as {"; ".join(_RANDOM_OPTS)}")
+
+        super().__init__(random_dict)
 
 
 class GalaxyShuffle(OptionSet):
@@ -88,6 +126,12 @@ class Dome1Offsets(RandomOptionCounter):
 
     These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
     at least one world to start.
+
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "Second Orbit": random
+        "Second Orbit": random-range-1-8
+    The range is between 0 and 8
     """
     display_name = "Dome 1 Access"
     internal_name = "dome_one_counts"
@@ -109,6 +153,11 @@ class Dome2Offsets(RandomOptionCounter):
     and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 2 Access"
     internal_name = "dome_two_counts"
@@ -130,6 +179,11 @@ class Dome3Offsets(RandomOptionCounter):
     and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 3 Access"
     internal_name = "dome_three_counts"
@@ -151,6 +205,11 @@ class Dome4Offsets(RandomOptionCounter):
     and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 4 Access"
     internal_name = "dome_four_counts"
@@ -172,6 +231,11 @@ class Dome5Offsets(RandomOptionCounter):
     and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 5 Access"
     internal_name = "dome_five_counts"
@@ -193,6 +257,11 @@ class Dome6Offsets(RandomOptionCounter):
     and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-20
+    The range is between 0 and 20
     """
     display_name = "Dome 6 Access"
     internal_name = "dome_six_counts"
@@ -295,7 +364,11 @@ class ObservatoryLumaCounts(RandomOptionCounter):
     """
     Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
 
-    You are allowed to use the various random options directly next to the luma you want to be random, in place of a number
+    You are allowed to use the various random options directly next to the luma you want to be random, instead of a number
+    Example:
+        "Dome 1 Hungry Luma": random
+        "Dome 1 Hungry Luma": random-range-1-500
+    The range is between 0 and 9999
     """
     display_name = "Observatory Luma Counts"
     internal_name = "observatory_luma_counts"
