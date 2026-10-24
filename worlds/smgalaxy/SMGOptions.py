@@ -5,6 +5,15 @@ from typing import Dict, Any
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
     DeathLinkMixin
 
+class RandomOptionCounter(OptionCounter):
+    """OptionCounter whose values also accept Range text: random, random-high, random-range-5-20, random-low, etc."""
+
+    def __init__(self, value: dict[str, Any]) -> None:
+        parser = type(self.__class__.__name__, (Range,), {"range_start": self.min, "range_end": self.max,
+                                                          "default": self.min, "__module__": self.__module__})
+        super().__init__({key: amount if type(amount) == int else parser.from_text(str(amount)).value
+                          for key, amount in value.items()})
+
 
 class GalaxyShuffle(OptionSet):
     """
@@ -70,7 +79,7 @@ class StarstoFinish(Range):
     range_end = 119
     default = 60
 
-class Dome1Offsets(OptionCounter):
+class Dome1Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -93,7 +102,7 @@ class Dome1Offsets(OptionCounter):
     }
 
 
-class Dome2Offsets(OptionCounter):
+class Dome2Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -114,7 +123,7 @@ class Dome2Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome3Offsets(OptionCounter):
+class Dome3Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -135,7 +144,7 @@ class Dome3Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome4Offsets(OptionCounter):
+class Dome4Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -156,7 +165,7 @@ class Dome4Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome5Offsets(OptionCounter):
+class Dome5Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -177,7 +186,7 @@ class Dome5Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome6Offsets(OptionCounter):
+class Dome6Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 6, which is the Garden in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
@@ -255,6 +264,56 @@ class StarColors(Toggle):
     internal_name = "star_colors"
     slot_req = False
 
+class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option type
+    """
+    Choose how Observatory Lumas' starbit counts are determined.
+
+    Vanilla - The counts remained unchanged from their original values
+
+    Choice - Hungry Luma starbit requirements will be set exactly, using the Starbit Luma Count option.
+
+    By Sphere - Counts are determined by placement in the multiworld, using Gateway Luma as the maximum. All hungry lumas
+    logically require access to a Starbit farming area in this option.
+
+    Progressive Values Low - If a value for a hungry luma in Starbit Luma Counts are not higher than the last one, the
+    number will be randomly rolled so that it is higher than the last luma. This option primarily enforces that counts are
+    always increasing. This is capped at a max of 5000 and does skew towards that
+
+    Progressive Values High - The same as Progressive Counts Low but capped at 9999
+    """
+    display_name = "Observatory Hungry Luma Behavior"
+    internal_name = "observatory_hungry_luma_behavior"
+    slot_req = True
+    option_Vanilla = 0
+    option_Choice = 1
+    option_By_Sphere = 2
+    option_Progressive_Values_Low = 3
+    option_Progressive_Values_High = 4
+
+
+class ObservatoryLumaCounts(RandomOptionCounter):
+    """
+    Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
+
+    You are allowed to use the various random options directly next to the luma you want to be random, in place of a number
+    """
+    display_name = "Observatory Luma Counts"
+    internal_name = "observatory_luma_counts"
+    min = 0
+    max = 9999
+    valid_keys: list[str] = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma", "Dome 4 Hungry Luma",
+                  "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma"]
+    default = {
+        "Dome 1 Hungry Luma": 400,
+        "Dome 2 Hungry Luma": 400,
+        "Dome 3 Hungry Luma": 600,
+        "Dome 4 Hungry Luma": 800,
+        "Dome 5 Hungry Luma": 1000,
+        "Dome 6 Hungry Luma": 1600,
+        "Gateway Hungry Luma": 1200
+    }
+    slot_req = True
+
 # this defines all the options.
 @dataclass
 class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
@@ -272,16 +331,22 @@ class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     galaxy_shuffle_type: GalaxyShuffleType
     hide_galaxy: HideGalaxy
     star_colors: StarColors
+    observatory_hungry_luma_behavior: ObservatoryLumaBehavior
+    observatory_luma_counts: ObservatoryLumaCounts
 
 option_groups = [
     OptionGroup("Extra Locations", [
         EnablePurpleCoinStars,
     ]),
-    OptionGroup("Access Options", [
+    OptionGroup("Logic Options", [
         StarstoFinish,
         ShuffleDomes,
         GalaxyShuffle,
-        GalaxyShuffleType
+        GalaxyShuffleType,
+    ]),
+    OptionGroup("Observatory Luma Behavior", [
+        ObservatoryLumaBehavior,
+        ObservatoryLumaCounts,
     ]),
     OptionGroup("Dome Offsets", [
        Dome1Offsets,
@@ -291,9 +356,6 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
-#    OptionGroup("Observatory Luma Behavior", [
-
-#    ]),
     OptionGroup("Cosmetics", [
         MarioColors,
         StarColors,

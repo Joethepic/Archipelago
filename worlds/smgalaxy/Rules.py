@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from BaseClasses import Entrance
-from rule_builder.rules import HasGroup, Has
+from rule_builder.rules import HasGroup, Has, Rule, True_
 from .regions import connect_regions, region_list, all_galaxy_slots
 from.Constants.Names import region_names as regname
 
@@ -956,19 +956,20 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.GALREAC1LAVAT).connect(world.get_region(regname.GALREAC1STAIR),
                                                     "Galaxy Reactor: Lava Launch Star")
     world.get_region(regname.GALREAC1STAIR).connect(world.get_region(regname.GALREAC1BOSS))
-    world.get_region(regname.SHIP).connect(world.get_region(regname.SWEETSWEET), "Sweet Sweet Hungry Luma")
+    world.get_region(regname.SHIP).connect(world.get_region(regname.SWEETSWEET), "Sweet Sweet Hungry Luma",
+                                           StarbitCount(world, world.options.observatory_luma_counts.value["Dome 1 Hungry Luma"]))
     world.get_region(regname.SWEETSWEET).connect(world.get_region(regname.SWEETSW1SWEET),
                                                  "Sweet Sweet: Rocky Road")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SLINGPOD), "Sling Pod Hungry Luma",
-                    Has("Grand Star"))
+                    Has("Grand Star") & StarbitCount(world, world.options.observatory_luma_counts.value["Dome 2 Hungry Luma"]))
     world.get_region(regname.SLINGPOD).connect(world.get_region(regname.SLINGPO1WEBPU),
                                                "Sling Pod: A Very Sticky Situation")
     world.get_region(regname.SHIP).connect(world.get_region(regname.DRIPDROP), "Drip Drop Hungry Luma",
-                    Has("Grand Star", 2))
+                    Has("Grand Star", 2) & StarbitCount(world, world.options.observatory_luma_counts.value["Dome 3 Hungry Luma"]))
     world.get_region(regname.DRIPDROP).connect(world.get_region(regname.DRIPDRO1WATER),
                                                "Drip Drop: Giant Eel Outbreak")
     world.get_region(regname.SHIP).connect(world.get_region(regname.BIGMOUTH), "Bigmouth Hungry Luma",
-                    Has("Grand Star", 3))
+                    Has("Grand Star", 3) & StarbitCount(world, world.options.observatory_luma_counts.value["Dome 4 Hungry Luma"]))
     world.get_region(regname.BIGMOUTH).connect(world.get_region(regname.BIGMOUT1ENTRY),
                                                "Bigmouth: Bigmouth's Gold Bait")
     world.get_region(regname.BIGMOUT1ENTRY).connect(world.get_region(regname.BIGMOUT1THROA))
@@ -976,7 +977,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.BIGMOUT1LOWER).connect(world.get_region(regname.BIGMOUT1UPPER),
                                                     "Bigmouth: Stomach Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SANDSPIRAL), "Sand Spiral Hungry Luma",
-                    Has("Grand Star", 4))
+                    Has("Grand Star", 4) & StarbitCount(world, world.options.observatory_luma_counts.value["Dome 5 Hungry Luma"]))
     world.get_region(regname.SANDSPIRAL).connect(world.get_region(regname.SANDSPI1SHIPB),
                                                  "Sand Spiral: Choosing a Favorite Snack")
     world.get_region(regname.SANDSPI1SHIPB).connect(world.get_region(regname.SANDSPI1SANDT),
@@ -984,7 +985,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.SANDSPI1SANDT).connect(world.get_region(regname.SANDSPI1SPIRA),
                                                  "Sand Spiral: Tunnel Sling Star")
     world.get_region(regname.SHIP).connect(world.get_region(regname.SNOWCAP), "Snow Cap Hungry Luma",
-                    Has("Grand Star", 5))
+                    Has("Grand Star", 5) & StarbitCount(world, world.options.observatory_luma_counts.value["Dome 6 Hungry Luma"]))
     world.get_region(regname.SNOWCAP).connect(world.get_region(regname.SNOWCAP1GLASS),
                                                  "Snow Cap: Star Bunnies in the Snow")
     world.get_region(regname.SNOWCAP1GLASS).connect(world.get_region(regname.SNOWCAP1SNOWY),
@@ -1004,7 +1005,7 @@ def set_rules(world: "SMGWorld", player: int):
     world.get_region(regname.GATEWAY1LRGTU).connect(world.get_region(regname.GATEWAY1LRGTI),
                                                     "Gateway: Large Tuning Planet Pipe")
     world.get_region(regname.SHIP).connect(world.get_region(regname.BOOBONE), "Boo's Boneyard Hungry Luma",
-                    Has("Grand Star", 5))
+                    Has("Grand Star", 5) & StarbitCount(world, world.options.observatory_luma_counts.value["Gateway Hungry Luma"]))
     world.get_region(regname.BOOBONE).connect(world.get_region(regname.BOOBONE1SKULL),
                                                  "Boo's Boneyard: Racing the Spooky Speedster")
     world.get_region(regname.BOOBONE1SKULL).connect(world.get_region(regname.BOOBONE1PIT),
@@ -1078,6 +1079,9 @@ def rules_from_er_placements(world: "SMGWorld"):
     for galaxy_slot in all_galaxy_slots:
         world.shuffled_levels[world.get_entrance(galaxy_slot).name] = world.get_entrance(galaxy_slot).connected_region.name
 
+def StarbitCount(world: "SMGWorld", count: int) -> Rule[Any]:
+    return True_() if count < 1000 and world.options.observatory_hungry_luma_behavior.value != world.options.observatory_hungry_luma_behavior.option_By_Sphere\
+        else Has("Can Farm Starbits")
 
     # # special stages logic Left here for reference later on default values
     # add_rule(world.get_location("LDL: Surfing 101"), Has("Power Star", player, 5))

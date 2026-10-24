@@ -2,7 +2,7 @@ from BaseClasses import Item
 from BaseClasses import ItemClassification as IC
 from typing import NamedTuple, Optional, Dict, Set
 
-from.Constants.Names import item_names as itemname
+from .Constants.Names import item_names as itemname
 
 class SMGItemData(NamedTuple):
     type: list[str]

@@ -1,6 +1,7 @@
 from wiithon import WiiIsoPatcher
 from wiithon.formats.dol import DOL
 from wiithon.ppc import instructions as PPC
+from typing import Any
 
 from ..Constants.patch_constants import GATEWAY_ENTRANCE_ADDRESS, GATEWAY_EXIT_ADDRESS
 from ..Patch.extensions import SMGObject
@@ -34,16 +35,15 @@ class Patch:
         self.galaxies: dict[str, str] = output['Galaxies']
         self.locations: dict = output['Locations']
         self.slot_name: str = output['Name']
-        #self.luma_starbit_counts: list[int] = output['name']
-        self.luma_starbit_counts = None
 
         # Options
-        options: dict[str] = output['Options']
+        options: dict[str, Any] = output['Options']
         self.mario_colours: dict[str, str] = options['mario_colors']
         self.dome_shuffle: dict[str, str] = options['dome_shuffle']
         self.show_galaxies: int = options['hide_galaxy']
         self.star_colours: int = options['star_colors']
         self.goal_count: int = options['stars_to_finish']
+        self.luma_starbit_counts: dict[str, int] = options["observatory_luma_counts"]
 
         self.old_galaxies: list = list(self.galaxies.keys())
         self.new_galaxies: list = list(self.galaxies.values())

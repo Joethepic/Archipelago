@@ -1,9 +1,8 @@
 from typing import Dict, NamedTuple, Optional, Set, Any
 from BaseClasses import Location, Region
-from rule_builder.rules import Rule
+from rule_builder.rules import Rule, CanReachEntrance
 
-from.Constants.Names import region_names as regname
-from .Constants.Names import location_names as locname
+from .Constants.Names import location_names as locname, region_names as regname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
 
 class SMGLocation(Location):
@@ -97,6 +96,41 @@ locbosses_table: dict[str, SMGLocationData]  = {
 goal_table: dict[str, SMGLocationData] = {
     locname.GALAXYREACTORSTAR1: SMGLocationData([], regname.GALREAC1BOSS,
                                                 None, regname.BOWSER3, galaxyignname.BOWSER3, game_address=0)
+}
+
+starbit_farm_event_table: dict[str, SMGLocationData] = {
+    locname.BUBBLEBREEZESTARBITFARM: SMGLocationData([], regname.BUBBRE1SWAMP2,
+                                                None, regname.BUBBLEBREEZE, galaxyignname.BUBBLEBREEZE, game_address=0),
+    locname.MELTYSTARBITFARM: SMGLocationData([], regname.MELTY3LAVPL,
+                                                None, regname.MELTY, galaxyignname.MELTY, game_address=0),
+    locname.SLINGPODSTARBITFARM: SMGLocationData([], regname.SLINGPO1WEBPU,
+                                                None, regname.SLINGPOD, galaxyignname.SLINGPOD, game_address=0),
+    locname.HONEYHIVESTARBITFARM: SMGLocationData([], regname.HONEYHI1POUND,
+                                                 None, regname.HONEYHIVE, galaxyignname.HONEYHIVE, game_address=0),
+}
+
+hungry_luma_events_table: dict[str, SMGLocationData] = {
+    locname.DOME1LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Sweet Sweet Hungry Luma", regname.SHIP)),
+    locname.DOME2LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Sling Pod Hungry Luma", regname.SHIP)),
+    locname.DOME3LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Drip Drop Hungry Luma", regname.SHIP)),
+    locname.DOME4LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Bigmouth Hungry Luma", regname.SHIP)),
+    locname.DOME5LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Sand Spiral Hungry Luma", regname.SHIP)),
+    locname.DOME6LUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                            default_access= CanReachEntrance("Snow Cap Hungry Luma", regname.SHIP)),
+    locname.GATEWAYLUMAEVENT: SMGLocationData([], regname.SHIP,
+                                                 None, regname.SHIP, "Comet Observatory", game_address=0,
+                                              default_access= CanReachEntrance("Boo's Boneyard Hungry Luma", regname.SHIP)),
 }
 
 locSJ_table: dict[str, SMGLocationData]  = {
