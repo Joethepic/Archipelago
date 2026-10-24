@@ -20,7 +20,7 @@ from .Rules import rules_from_er_placements
 from .locations import LOCATION_NAME_TO_ID, get_location_names_per_category, SMGLocation, all_location_table, hungry_luma_events_table
 from .items import SMGItem, ITEM_NAME_TO_ID, get_item_names_per_category, all_items_table
 from .regions import disconnect_from_option, region_list, SMGRegionData, galaxies_list
-from .SMGSettings import SuperMarioGalaxy
+from .SMGSettings import SuperMarioGalaxySettings
 from .Patch.SMGPlayerContainer import SMGPlayerContainer
 
 # Module-level, computed once
@@ -52,7 +52,7 @@ class SMGWorld(World):
     #option definitions
     options_dataclass = SMGOptions.SMGOptions
     options: SMGOptions.SMGOptions
-    settings: ClassVar[SuperMarioGalaxy]
+    settings: ClassVar[SuperMarioGalaxySettings]
 
     item_name_to_id: ClassVar[dict[str, int]] = ITEM_NAME_TO_ID
     location_name_to_id: ClassVar[dict[str, int]] = LOCATION_NAME_TO_ID
@@ -95,17 +95,21 @@ class SMGWorld(World):
             self.options.observatory_luma_counts.value = self.options.observatory_luma_counts.default
         elif self.options.observatory_hungry_luma_behavior.value >= 3: # If We're using one of the progressive value options
             luma_list: list[str] = list(sorted(self.options.observatory_luma_counts.valid_keys))
+            sorted_counts: list[int] = list(sorted(self.options.observatory_luma_counts.value.values()))
             last_starbit_count: int = 0
             starbit_cap: int = 5000 if self.options.observatory_hungry_luma_behavior.value == 3 else 9999
-            for luma in luma_list:
+            for i, luma, in enumerate(luma_list):
                 if luma == "Dome 1 Hungry Luma":
-                    last_starbit_count = self.options.observatory_luma_counts.value[luma]
+                    self.options.observatory_luma_counts.value[luma] = min(sorted_counts[i], starbit_cap)
+                    last_starbit_count = min(sorted_counts[i], starbit_cap)
                 else:
-                    if self.options.observatory_luma_counts.value[luma] < last_starbit_count:
+                    if sorted_counts[i] < last_starbit_count:
                         if last_starbit_count == starbit_cap:
                             self.options.observatory_luma_counts.value[luma] = starbit_cap
                         else:
                             self.options.observatory_luma_counts.value[luma] = self.random.randrange(last_starbit_count,starbit_cap)
+                    else:
+                        self.options.observatory_luma_counts.value[luma] = min(sorted_counts[i], starbit_cap)
                     last_starbit_count = self.options.observatory_luma_counts.value[luma]
 
         self.galaxy_counts = self.get_galaxy_counts()
