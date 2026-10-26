@@ -1,4 +1,5 @@
-import os, sys, tempfile, zipfile, json
+from io import BytesIO
+import os, sys, tempfile, zipfile, json, shutil
 import ssl, certifi, urllib.request, requests
 from typing import Any
 from logging import getLogger
@@ -57,23 +58,29 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         # Download the decompilation repository
         if not os.path.exists(petari_dir):
+            print("Downloading repository")
+
             # Get the decompilation repo
             with requests.get("https://github.com/Fl-ppie/Petari/archive/refs/heads/Archipelago.zip", stream=True) as response:
                 response.raise_for_status()
-                print("Downloaded zip")
+
                 petari_zip_path = os.path.join(patch_dir, "Petari.zip")
 
                 # Extract the zip to a local dir
                 with open(petari_zip_path, "wb") as new_zip:
                     for chunk in response.iter_content(chunk_size=8192):
                         new_zip.write(chunk)
-            
+
+            print("Verifying downloaded file")
+
             # Verify the downloaded zip file
             import hashlib
             with open(petari_zip_path, "rb") as petari_zip:
                 file_md5 = hashlib.file_digest(petari_zip, "md5").hexdigest().lower()
                 if file_md5 != PETARI_ZIP_MD5:
                     raise ValueError(f"Petari hash does not match.\nGot: {file_md5}, expected: {PETARI_ZIP_MD5}.")
+
+            print("Unzipping file")
             
             # Unzip the file and remove it
             import zipfile
@@ -81,27 +88,62 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
                 petari_zip.extractall(patch_dir)
             os.remove(petari_zip_path)
 
-        # TODO: replace files
+            print("Modifying configure.py")
 
-        # Get the DOL from the ROM and place it for ninja to read
-        orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
-        os.makedirs(orig_dir, exist_ok=True)
+            # Modify configure.py to accept all TUs as matching
+            configure_path = os.path.join(petari_dir, "configure.py")
+            with open(configure_path, "r") as f:
+                lines = [line for line in f]
 
-        orig_dol_path = os.path.join(orig_dir, "main.dol")
-        if not os.path.exists(orig_dol_path):
-            from wiithon import WiiIsoPatcher
-            with WiiIsoPatcher(vanilla_rom_path) as patcher, open(orig_dol_path, "wb") as f:
-                f.write(patcher.read_dol().to_bytes())
+            # Set all to matching
+            for i, line in enumerate(lines):
+                if "def MatchingFor(*versions) -> bool:\n" == line:
+                    lines.insert(i + 1, "    return True\n")
+                    break
+            else:
+                raise ValueError("Was not able to find the line to modify in configure.py.")
 
-        # Create the ninja build and run it
+            # Write new configure.py
+            with open(configure_path, "w") as f:
+                f.writelines(lines)
+
+        print("Replacing Petari files")
+
+        # Replace decompiled files with custom files
+        replace_dir = os.path.join(patch_dir, "Petari-Replacements")
+        for dir_path, _, file_names in os.walk(replace_dir):
+            for file_name in file_names:
+                print(f"Replacing {file_name}")
+
+                replacement_file_path = os.path.join(dir_path, file_name)
+                rel_path = os.path.relpath(dir_path, replace_dir)
+                original_file_path = os.path.join(petari_dir, rel_path, file_name)
+                
+                shutil.copyfile(replacement_file_path, original_file_path)
+
+        # Generate a new DOL if it doesn't already exist
         built_dol_path = os.path.join(petari_dir, "build", game_version, "main.dol")
         if not os.path.exists(built_dol_path): # TODO: Also check dol hash in the future
             import subprocess
 
+            print("Getting original DOL")
+
+            # Get the DOL from the ROM and place it for ninja to read
+            orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
+            os.makedirs(orig_dir, exist_ok=True)
+
+            orig_dol_path = os.path.join(orig_dir, "main.dol")
+            if not os.path.exists(orig_dol_path):
+                from wiithon import WiiIsoPatcher
+                with WiiIsoPatcher(vanilla_rom_path) as patcher, open(orig_dol_path, "wb") as f:
+                    f.write(patcher.read_dol().to_bytes())
+
+            print("Generating new DOL")
+
             # Generate build.ninja if it doesn't exist
             build_ninja_path = os.path.join(petari_dir, "build.ninja")
             if not os.path.exists(build_ninja_path):
-                subprocess.run([sys.executable, "configure.py", "-v", game_version, "--non-matching", "--no-progress"], cwd=petari_dir, check=True)
+                subprocess.run([sys.executable, "configure.py", "-v", game_version], cwd=petari_dir, check=True)
 
             # Run ninja and produce a new dol
             subprocess.run(["ninja"], cwd=petari_dir, check=True)
@@ -115,7 +157,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         except:
             raise ImportError(f"Cannot continue patching {GAME_NAME} due to missing libraries.")
 
-        self._generate_dol(vanilla_rom_path, "RMGE01")
+        built_dol_path = self._generate_dol(vanilla_rom_path, "RMGE01")
 
         from .Patch import Patch
         with WiiIsoPatcher(vanilla_rom_path) as patcher:
@@ -138,11 +180,15 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
             patch.update(dome_galaxies, dome_shuffle, luma_galaxies)
 
             def dol_patch(dol: DOL):
-                patch.build_dol(dol)
-                patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts, gateway_galaxy)
+                with open(built_dol_path, "rb") as f:
+                    patch.dol = dol.read(f)
+                #patch.build_dol(dol)
+                #patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts, gateway_galaxy)
 
             patcher.patch_dol(dol_patch)
             patcher.build(target)
+
+            print("Finished!")
 
     def download_lib_zip(self, tmp_dir_path: str, lib_path: str) -> None:
         self._client_logger.info("Getting missing dependencies for Super Mario Galaxy from remote source.")
