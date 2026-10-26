@@ -70,19 +70,19 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
                 with open(petari_zip_path, "wb") as new_zip:
                     for chunk in response.iter_content(chunk_size=8192):
                         new_zip.write(chunk)
-                print("Verifying zip")
-                # Verify the downloaded zip file
-                import hashlib
-                with open(petari_zip_path, "rb") as petari_zip:
-                    file_md5 = hashlib.file_digest(petari_zip, "md5").hexdigest().lower()
-                    if file_md5 != PETARI_ZIP_MD5:
-                        raise ValueError(f"Petari hash does not match.\nGot: {file_md5}, expected: {PETARI_ZIP_MD5}.")
-                print("Unzipping")
-                # Unzip the file and remove it
-                import zipfile
-                with zipfile.ZipFile(petari_zip_path, "r") as petari_zip:
-                    petari_zip.extractall(patch_dir)
-                os.remove(petari_zip_path)
+            print("Verifying zip")
+            # Verify the downloaded zip file
+            import hashlib
+            with open(petari_zip_path, "rb") as petari_zip:
+                file_md5 = hashlib.file_digest(petari_zip, "md5").hexdigest().lower()
+                if file_md5 != PETARI_ZIP_MD5:
+                    raise ValueError(f"Petari hash does not match.\nGot: {file_md5}, expected: {PETARI_ZIP_MD5}.")
+            print("Unzipping")
+            # Unzip the file and remove it
+            import zipfile
+            with zipfile.ZipFile(petari_zip_path, "r") as petari_zip:
+                petari_zip.extractall(patch_dir)
+            os.remove(petari_zip_path)
 
         # TODO: replace files
 
@@ -104,7 +104,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         old_build_path = os.path.join(os.curdir, "build.ninja")
         build_ninja_path = os.path.abspath(os.path.join(petari_dir, "build.ninja"))
         print("Running ninja")
-        if not os.path.exists(built_dol_path):
+        if not os.path.exists(built_dol_path): # TODO: Also check dol hash in the future
             import subprocess
 
             # Generate build.ninja if it doesn't exist
@@ -115,7 +115,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
                 os.rename(old_build_path, build_ninja_path)
 
             # Run ninja and produce a new dol
-            subprocess.run(["ninja", "-C", petari_dir, "-f", build_ninja_path]) 
+            subprocess.run(["ninja", "-C", petari_dir, "-f", build_ninja_path])
 
         return built_dol_path
 
