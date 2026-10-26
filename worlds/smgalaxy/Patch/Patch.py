@@ -1,6 +1,7 @@
 from wiithon import WiiIsoPatcher
 from wiithon.formats.dol import DOL
 from wiithon.ppc import instructions as PPC
+from typing import Any
 
 from ..Constants.patch_constants import GATEWAY_ENTRANCE_ADDRESS, GATEWAY_EXIT_ADDRESS
 from ..Patch.extensions import SMGObject
@@ -9,6 +10,7 @@ from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
 from .SMGObjects.PowerStar import PowerStar
+from .SMGObjects.TitleScreen import TitleScreen
 from .SMGStages.AstroDome import AstroDomes
 from .SMGStages.AstroDomeScenario import AstroDomeScenario
 from .SMGStages.AstroGalaxy import AstroGalaxy
@@ -32,15 +34,16 @@ class Patch:
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
         self.locations: dict = output['Locations']
-        self.slot_name: str = output["Name"]
-        #self.luma_starbit_counts: list[int] = output['name']
-        self.luma_starbit_counts = None
+        self.slot_name: str = output['Name']
 
         # Options
-        self.mario_colours: dict[str, str] = output['Options']['mario_colors']
-        self.dome_shuffle: dict[str, str] = output['Options']['dome_shuffle']
-        self.show_galaxies: int = output['Options']['hide_galaxy']
-        self.star_colours: int = output['Options']['star_colors']
+        options: dict[str, Any] = output['Options']
+        self.mario_colours: dict[str, str] = options['mario_colors']
+        self.dome_shuffle: dict[str, str] = options['dome_shuffle']
+        self.show_galaxies: int = options['hide_galaxy']
+        self.star_colours: int = options['star_colors']
+        self.goal_count: int = options['stars_to_finish']
+        self.luma_starbit_counts: dict[str, int] = options["observatory_luma_counts"]
 
         self.old_galaxies: list = list(self.galaxies.keys())
         self.new_galaxies: list = list(self.galaxies.values())
@@ -53,7 +56,8 @@ class Patch:
             "AstroDomeScenario": AstroDomeScenario(),
             "AstroDomes": AstroDomes(),
             "AstroDomeEntrances": AstroDomeEntrances(),
-            "PowerStar": PowerStar()
+            "PowerStar": PowerStar(),
+            "TitleScreen": TitleScreen(),
         }
 
     def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
@@ -78,7 +82,8 @@ class Patch:
                         show_galaxies=self.show_galaxies,
                         slot_name=self.slot_name,
                         hide_star_colours=self.star_colours,
-                        starbit_counts=self.luma_starbit_counts)
+                        starbit_counts=self.luma_starbit_counts,
+                        goal_count=self.goal_count)
 
         galaxy_name = gateway_galaxy.name
         if galaxy_name == "HeavensDoorGalaxy":

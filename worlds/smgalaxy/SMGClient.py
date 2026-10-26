@@ -1,9 +1,8 @@
 import asyncio
 import os
 from pathlib import Path
-import time
 import sys
-from typing import NamedTuple, Optional
+from typing import Optional
 import copy
 import random
 
@@ -14,10 +13,25 @@ from .Constants.ram_constants import *
 from .Constants.constants import *
 from .Constants.Names import item_names as itemname
 from .Constants.Names import galaxy_in_game_names as galaxyignname
-
+from .dolphin_launcher import DolphinLauncher
 from .regions import SMGRegionData, region_list
+from .locations import locPC_table
 from .smg_helpers import *
+from settings import get_settings
 import dolphin_memory_engine as dme
+
+# Load settings and enforce that SMG options exist. If they do, import their name and save for later use.
+from .SMGSettings import SuperMarioGalaxySettings, DolphinProcessName
+
+DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE = "DME_DOLPHIN_PROCESS_NAME"
+
+# DME seems to only load the environment variables value once, then after the first hook it never retrieves it again.
+# It is in our best interest to set this up first, then call hook later
+smg_settings: SuperMarioGalaxySettings = getattr(get_settings(),"smgalaxy.world_options")
+if smg_settings.dolphin_process_name:
+    os.environ[DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE] = smg_settings.dolphin_process_name
+elif DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE in os.environ:
+    del os.environ[DME_DOLPHIN_PROCESS_NAME_ENV_VARIABLE]
 
 TRACKER_LOADED = False
 try:
@@ -37,13 +51,25 @@ class GalaxyCommand(ClientCommandProcessor):
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
+    def _cmd_change_dolphin_process_name(self, process_name: str):
+        """Specify the name of the Dolphin process to connect to. "" for system default."""
+        self.ctx.hook_check = False
+        self.ctx.hook_name = process_name
+        logger.info(f"Changing Dolphin process name to: {process_name if process_name else ""}")
+        smg_settings.dolphin_process_name = DolphinProcessName(process_name)
+        get_settings().save()
+        log_msg: str = f"Dolphin process name set to {process_name or "default"}. You must open a new client for this to take effect."
+        logger.info(log_msg)
+        Utils.messagebox("Close SMG Client to take effect", log_msg)
+
 class GalaxyContext(CommonContext):
+    tags: set[str] = {"AP"} # Required to Overwrite Tracker's default.
     password_required: bool = False
     rom_loaded: bool = False
     command_processor = GalaxyCommand
     game: str = GAME_NAME
     items_handling = 0b111
-
+    PCunset = False
     runloop: Optional[asyncio.Task[None]] = None
     dolphin_status: str = CONNECTION_INITIAL_STATUS
 
@@ -95,15 +121,14 @@ class GalaxyContext(CommonContext):
                          "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
                          "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
                          "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
+                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
+                         LAST_RECV_INDEX: Pointer([STATIC_VARIABLE_OFFSETS[LAST_RECV_INDEX]], ValueType.u32, STATIC_VARIABLES_POINTER),
                          POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
                          ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
-                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.u32, STATIC_VARIABLES_POINTER),
+                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
                          itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER),
-                         LAST_RECV_INDEX: Pointer(LAST_RECEIVED_ITEM_POINTER_LIST, ValueType.u32)
-        }
-                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.u16)}
+                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER)}
 
         # Setup the handler for managing the star colours in scenario select
         self.starcolorhandler = StarColorHandler(star_colour_pointers)
@@ -238,8 +263,17 @@ class GalaxyContext(CommonContext):
 
         self.starcolorhandler.init_all_star_colors()
 
+        if self.PCunset == True:
+            await self.setPC()
         self.needs_recalculating = False
     
+    async def setPC(self) -> None:
+        if self.slot_data["enable_purple_coin_stars"] == False:
+            for location in locPC_table.values():
+                value = await self.pointers[location.in_game_galaxy_name].get_value()
+                value |= (1 << location.game_address)
+                self.pointers[location.in_game_galaxy_name].write_value(value)
+                self.PCunset = False
     async def try_hook(self) -> bool:
         """Try to hook the Dolphin Memory Engine process into dolphin.
         
@@ -263,8 +297,8 @@ class GalaxyContext(CommonContext):
         if "DeathLink" not in self.tags:
             return
         
-        if self.pointers[ISDEAD] and time.time() >= float(self.last_death_link + DEFAULT_DEATHLINK_COOLDOWN / 60):
-            self.last_death_link = time.time()
+        if await self.pointers[ISDEAD].get_value():
+            self.pointers[ISDEAD].write_value(False)
             await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
 
     def set_dolphin_status(self, status: str) -> None:
@@ -347,7 +381,11 @@ class GalaxyContext(CommonContext):
             
             case "Connected":
                 self.highest_processed_item_index = 0
-                
+                self.slot_data = args["slot_data"]
+                self.purple_coins_enabled = bool(self.slot_data["enable_purple_coin_stars"])
+                self.PCunset = True
+                if bool(self.slot_data['death_link']) :
+                    Utils.async_start(self.update_death_link(self.slot_data["death_link"]), name="Update Deathlink")
             #case "Bounced":
             #    if args["source"] != self.player_names[self.slot]:
             #        pass # handle (death) links
@@ -423,13 +461,14 @@ async def _main(connect, password):
 # launches/starts everything we need
 def launch(*launch_args: str):
     import colorama, os
-
+    dolphin_launcher: DolphinLauncher = DolphinLauncher()
     Utils.init_logging(CLIENT_NAME)
     logger.info(f"Starting {CLIENT_NAME}")
     
     parser = get_base_parser()
     parser.add_argument("apsmg_file", default="", type=str, nargs="?", help="Path to an AP SMG file")
     args = parser.parse_args(launch_args)
+    iso_path: str = ""
 
     try:
         from .Patch.SMGRandomizer import SuperMarioGalaxyRandomiser
@@ -440,12 +479,17 @@ def launch(*launch_args: str):
 
             SuperMarioGalaxyRandomiser(args.apsmg_file).patch(iso_path)
     except Exception as patchEx:
+        error_str: str = str(patchEx)
+        if "wii magic word is not" in str(patchEx).lower():
+            error_str = f"Detected a non-ISO file was provide. {CLIENT_NAME} only works with North American ISO files currently."
+
         client_msg: str = (f"An unknown error occurred while trying to patch a file for {CLIENT_NAME}.\n" +
-            f"Additional details:\n{str(patchEx)}")
+            f"Additional details:\n{error_str}")
         logger.error(client_msg)
         Utils.messagebox(f"Patch Client Issue {CLIENT_NAME}", client_msg, True)
         raise patchEx
 
+    Utils.asyncio.run(dolphin_launcher.launch_dolphin_async(iso_path))
     colorama.just_fix_windows_console()
     asyncio.run(_main(args.connect, args.password))
     colorama.deinit()

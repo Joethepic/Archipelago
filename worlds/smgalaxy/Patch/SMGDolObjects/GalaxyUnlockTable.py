@@ -57,7 +57,7 @@ class GalaxyUnlockTable(SMGDOLObject):
             entry.power_star_requirement = star_requirement
             entry.return_dome = dome_index
 
-    def update(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], **kwargs) -> None:
+    def update(self, dome_galaxies: list[GalaxyDestination], star_requirements: dict[str, int], goal_count: int, **kwargs) -> None:
         requirements: dict[int, dict[int, int]] = {i: {} for i in range(1, 7)}
 
         for location, requirement in star_requirements.items():
@@ -75,8 +75,12 @@ class GalaxyUnlockTable(SMGDOLObject):
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.NAME] = entry.name
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION0] = entry.open_condition0
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.OPEN_CONDITION1] = entry.open_condition1
-            self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
             self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.RETURN_DOME] = entry.return_dome
+
+            if entry.name != "KoopaBattleVs3Galaxy":
+                self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = entry.power_star_requirement
+            else:
+                self.table.entries[entry.entry_index][GalaxyUnlockTableFieldNames.POWER_STAR_REQUIREMENT] = goal_count
 
         bcsv_bytes = self.table.export_bcsv(str_fmt="shift-jis")
 

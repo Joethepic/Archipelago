@@ -3,7 +3,57 @@ from typing import Dict, Any
 
 
 from Options import Choice, Range, PerGameCommonOptions, OptionSet, Toggle, OptionCounter, OptionDict, OptionGroup, \
-    DeathLinkMixin
+    DeathLinkMixin, random_weighted_range, OptionError, _RANDOM_OPTS
+
+
+class RandomOptionCounter(OptionCounter):
+    """OptionCounter whose values also accept Range text: random, random-high, random-range-5-20, random-low, etc."""
+
+    def __init__(self, value: dict[str, Any]) -> None:
+        random_dict: dict = {}
+        for key, amt in value.items():
+            if isinstance(amt, int):
+                random_dict[key] = amt
+
+            elif isinstance(amt, str):
+                # Since Range Objects hardcode range start and range end, I cannot just call Random.from_text, so
+                #   enjoy 4am Jake being pissed and instead re-making this code here just to make option counters random.
+
+                parsed_txt = str(amt).lower()
+                if parsed_txt == "high":
+                    random_dict[key] = self.max
+                elif parsed_txt == "low":
+                    random_dict[key] = self.min
+                elif parsed_txt.startswith("random"):
+                    random_mode: str = "random"
+                    if parsed_txt.startswith("random-range-"):
+                        # Get the users random min, max to pass directly to random_weighted_range
+                        random_parts: list = parsed_txt.split("-")
+                        user_min, user_max = int(random_parts[-2]), int(random_parts[-1])
+                        if user_min < self.min:
+                            raise OptionError(f"{user_min} is lower than minimum {self.min} "
+                                f"for option {self.__class__.__name__}")
+                        elif user_max > self.max:
+                            raise OptionError(f"{user_max} is higher than maximum {self.max} "
+                                f"for option {self.__class__.__name__}")
+                        elif user_min > user_max:
+                            raise OptionError(f"Range value for max {user_max} cannot be higher than Range value "
+                                f"for min {user_min} for option {self.__class__.__name__}")
+
+                        self.min = user_min
+                        self.max = user_max
+
+                        # Since random_weighted_range has multiple "modes", I split to make the mode tage basically
+                        random_tag = random_parts[2] if random_parts[2] in ["low", "middle", "high"] else random_mode
+                        if random_tag != random_mode:
+                            random_mode = f"random-{random_tag}"
+                    random_dict[key] = random_weighted_range(random_mode, self.min, self.max)
+
+            else:
+                raise OptionError(f"Invalid value provided for option {self.__class__.__name__}. You must provide "
+                    f"either an integer directly or a valid range option, such as {"; ".join(_RANDOM_OPTS)}")
+
+        super().__init__(random_dict)
 
 
 class GalaxyShuffle(OptionSet):
@@ -51,16 +101,18 @@ class ShuffleDomes(Toggle):
 # this defines the enable_purple_coin_stars setting 
 class EnablePurpleCoinStars(Toggle):
     """
-    Add Purple Coin star location. Only one of these is normally available outside of post game
+    Add Purple Coin star locations. These will turn Purple Coin stars into locations, accessible before Final Bowser. If
+    this option is off, Purple Coin stars will give nothing when completed.
     """
     display_name = "Enable Purple Coin Stars"
     internal_name = "enable_purple_coin_stars"
+    slot_req = True
 
 # this allows players to pick their own star count to finish the game. 
 class StarstoFinish(Range):
     """
     This will set the number of stars required to reach the center of the universe.
-    This will be capped at 104 stars if extra locations are not enabled in a single world multiworld.
+    This will be capped at 103 stars if extra locations are not enabled.
     """
     display_name = "Stars to finish"
     internal_name = "stars_to_finish"
@@ -68,15 +120,21 @@ class StarstoFinish(Range):
     range_end = 119
     default = 60
 
-class Dome1Offsets(OptionCounter):
+class Dome1Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 1, which is the Terrace in vanilla.
-    Each number corresponds to how many more stars are needed than the last orbit. In Dome 1, some of these numbers
-    will be capped to ensure generation if necessary.
+    Each number corresponds to how many more stars are needed than the last orbit,
+    and will be capped based on an estimated number of available locations
     The first orbit in Dome 1 will always have no star requirement.
 
     These are based on each orbit in the dome, in case levels are shuffled. First Orbit is excluded, to ensure you have
     at least one world to start.
+
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "Second Orbit": random
+        "Second Orbit": random-range-1-8
+    The range is between 0 and 8
     """
     display_name = "Dome 1 Access"
     internal_name = "dome_one_counts"
@@ -91,13 +149,18 @@ class Dome1Offsets(OptionCounter):
     }
 
 
-class Dome2Offsets(OptionCounter):
+class Dome2Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 2, which is the Fountain in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 2 Access"
     internal_name = "dome_two_counts"
@@ -112,13 +175,18 @@ class Dome2Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome3Offsets(OptionCounter):
+class Dome3Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 3, which is the Kitchen in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 3 Access"
     internal_name = "dome_three_counts"
@@ -133,13 +201,18 @@ class Dome3Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome4Offsets(OptionCounter):
+class Dome4Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 4, which is the Bedroom in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 4 Access"
     internal_name = "dome_four_counts"
@@ -154,13 +227,18 @@ class Dome4Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome5Offsets(OptionCounter):
+class Dome5Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 5, which is the Engine Room in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 10
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-10
+    The range is between 0 and 10
     """
     display_name = "Dome 5 Access"
     internal_name = "dome_five_counts"
@@ -175,13 +253,18 @@ class Dome5Offsets(OptionCounter):
         "Fifth Orbit": 0
     }
 
-class Dome6Offsets(OptionCounter):
+class Dome6Offsets(RandomOptionCounter):
     """
     Set the star requirements for each galaxy in the Dome 6, which is the Garden in vanilla.
     Each number corresponds to how many more stars are needed than the last orbit,
-    and willed be capped if it goes above 20
+    and will be capped based on an estimated number of available locations
 
     These are based on each orbit in the dome, in case levels are shuffled.
+    You are allowed to use the various random options directly next to the offset you want to be random, instead of a number
+    Example:
+        "First Orbit": random
+        "First Orbit": random-range-1-20
+    The range is between 0 and 20
     """
     display_name = "Dome 6 Access"
     internal_name = "dome_six_counts"
@@ -219,6 +302,7 @@ class MarioColors(OptionDict):
         "Shoes": "Brown",
         "Gloves": "White"
     }
+    slot_req = False
 
 class HideGalaxy(Choice):
     """
@@ -238,6 +322,7 @@ class HideGalaxy(Choice):
     option_Visible = 0
     option_Hide_Minors = 1
     option_Hide_All = 2
+    slot_req = False
 
 class StarColors(Toggle):
     """
@@ -249,6 +334,61 @@ class StarColors(Toggle):
     """
     display_name = "Star Colors"
     internal_name = "star_colors"
+    slot_req = False
+
+class ObservatoryLumaBehavior(Choice): #TODO Jake wants to make a custom option type
+    """
+    Choose how Observatory Lumas' starbit counts are determined.
+
+    Vanilla - The counts remained unchanged from their original values
+
+    Choice - Hungry Luma starbit requirements will be set exactly, using the Starbit Luma Count option.
+
+    By Sphere - Counts are determined by placement in the multiworld, using Gateway Luma as the maximum. All hungry lumas
+    logically require access to a Starbit farming area in this option.
+
+    Progressive Values Low - If a value for a hungry luma in Starbit Luma Counts are not higher than the last one, the
+    number will be randomly rolled so that it is higher than the last luma. This option primarily enforces that counts are
+    always increasing. This is capped at a max of 5000 and does skew towards that
+
+    Progressive Values High - The same as Progressive Counts Low but capped at 9999
+    """
+    display_name = "Observatory Hungry Luma Behavior"
+    internal_name = "observatory_hungry_luma_behavior"
+    slot_req = True
+    option_Vanilla = 0
+    option_Choice = 1
+    option_By_Sphere = 2
+    option_Progressive_Values_Low = 3
+    option_Progressive_Values_High = 4
+
+
+class ObservatoryLumaCounts(RandomOptionCounter):
+    """
+    Determine how many star bits are required for each Hungry Luma in the observatory. Maximum is 9999
+
+    You are allowed to use the various random options directly next to the luma you want to be random, instead of a number
+    Example:
+        "Dome 1 Hungry Luma": random
+        "Dome 1 Hungry Luma": random-range-1-500
+    The range is between 0 and 9999
+    """
+    display_name = "Observatory Luma Counts"
+    internal_name = "observatory_luma_counts"
+    min = 0
+    max = 9999
+    valid_keys: list[str] = ["Dome 1 Hungry Luma", "Dome 2 Hungry Luma", "Dome 3 Hungry Luma", "Dome 4 Hungry Luma",
+                  "Dome 5 Hungry Luma", "Dome 6 Hungry Luma", "Gateway Hungry Luma"]
+    default = {
+        "Dome 1 Hungry Luma": 400,
+        "Dome 2 Hungry Luma": 400,
+        "Dome 3 Hungry Luma": 600,
+        "Dome 4 Hungry Luma": 800,
+        "Dome 5 Hungry Luma": 1000,
+        "Dome 6 Hungry Luma": 1600,
+        "Gateway Hungry Luma": 1200
+    }
+    slot_req = True
 
 # this defines all the options.
 @dataclass
@@ -267,16 +407,22 @@ class SMGOptions(PerGameCommonOptions, DeathLinkMixin):
     galaxy_shuffle_type: GalaxyShuffleType
     hide_galaxy: HideGalaxy
     star_colors: StarColors
+    observatory_hungry_luma_behavior: ObservatoryLumaBehavior
+    observatory_luma_counts: ObservatoryLumaCounts
 
 option_groups = [
     OptionGroup("Extra Locations", [
         EnablePurpleCoinStars,
     ]),
-    OptionGroup("Access Options", [
+    OptionGroup("Logic Options", [
         StarstoFinish,
         ShuffleDomes,
         GalaxyShuffle,
-        GalaxyShuffleType
+        GalaxyShuffleType,
+    ]),
+    OptionGroup("Observatory Luma Behavior", [
+        ObservatoryLumaBehavior,
+        ObservatoryLumaCounts,
     ]),
     OptionGroup("Dome Offsets", [
        Dome1Offsets,
@@ -286,9 +432,6 @@ option_groups = [
        Dome5Offsets,
        Dome6Offsets
     ]),
-#    OptionGroup("Observatory Luma Behavior", [
-
-#    ]),
     OptionGroup("Cosmetics", [
         MarioColors,
         StarColors,
