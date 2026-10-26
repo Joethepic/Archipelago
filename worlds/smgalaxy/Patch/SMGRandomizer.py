@@ -56,10 +56,7 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         petari_dir = os.path.join(patch_dir, "Petari-Archipelago")
 
         # Download the decompilation repository
-        print("Generating dol...")
-        if os.path.exists(petari_dir):
-            print("Petari path already exists")
-        else:
+        if not os.path.exists(petari_dir):
             # Get the decompilation repo
             with requests.get("https://github.com/Fl-ppie/Petari/archive/refs/heads/Archipelago.zip", stream=True) as response:
                 response.raise_for_status()
@@ -70,14 +67,14 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
                 with open(petari_zip_path, "wb") as new_zip:
                     for chunk in response.iter_content(chunk_size=8192):
                         new_zip.write(chunk)
-            print("Verifying zip")
+            
             # Verify the downloaded zip file
             import hashlib
             with open(petari_zip_path, "rb") as petari_zip:
                 file_md5 = hashlib.file_digest(petari_zip, "md5").hexdigest().lower()
                 if file_md5 != PETARI_ZIP_MD5:
                     raise ValueError(f"Petari hash does not match.\nGot: {file_md5}, expected: {PETARI_ZIP_MD5}.")
-            print("Unzipping")
+            
             # Unzip the file and remove it
             import zipfile
             with zipfile.ZipFile(petari_zip_path, "r") as petari_zip:
@@ -85,7 +82,6 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
             os.remove(petari_zip_path)
 
         # TODO: replace files
-
 
         # Get the DOL from the ROM and place it for ninja to read
         orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
@@ -99,23 +95,16 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         # Create the ninja build and run it
         built_dol_path = os.path.join(petari_dir, "build", game_version, "main.dol")
-        configure_path = os.path.join(petari_dir, "configure.py")
-        
-        old_build_path = os.path.join(os.curdir, "build.ninja")
-        build_ninja_path = os.path.abspath(os.path.join(petari_dir, "build.ninja"))
-        print("Running ninja")
         if not os.path.exists(built_dol_path): # TODO: Also check dol hash in the future
             import subprocess
 
             # Generate build.ninja if it doesn't exist
+            build_ninja_path = os.path.join(petari_dir, "build.ninja")
             if not os.path.exists(build_ninja_path):
-                subprocess.run(["python", configure_path, "-v", game_version])
-
-                # Move it to the subfolder because python is stupid
-                os.rename(old_build_path, build_ninja_path)
+                subprocess.run([sys.executable, "configure.py", "-v", game_version, "--non-matching", "--no-progress"], cwd=petari_dir, check=True)
 
             # Run ninja and produce a new dol
-            subprocess.run(["ninja", "-C", petari_dir, "-f", build_ninja_path])
+            subprocess.run(["ninja"], cwd=petari_dir, check=True)
 
         return built_dol_path
 
