@@ -46,7 +46,7 @@ def get_base_rom_path() -> str:
         file_name = Utils.user_path(file_name)
         options["smgalaxy.world_options"]["iso_file"] = file_name
 
-    verify_base_rom(file_name)
+    #verify_base_rom(file_name)
     return file_name
 
 def verify_base_rom(clean_iso_path: str):

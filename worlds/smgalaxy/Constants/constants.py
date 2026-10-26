@@ -34,6 +34,9 @@ DEATH_MESSAGES = [
     "flew too close to the sun"
 ]
 
+# Petari
+PETARI_ZIP_MD5 = "bd0bd4b0df166f35ef5ce133ce297626"
+
 # Colors
 WHITE = (255,  255,  255)
 RED = (255,  0,  0)

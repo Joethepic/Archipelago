@@ -6,7 +6,7 @@ from logging import getLogger
 import Utils
 from .SMGClientHelpers import GalaxyDestination, GalaxyShuffle
 from ..SMGSettings import get_base_rom_path
-from ..Constants.constants import GAME_NAME, CLIENT_NAME, CLIENT_VERSION
+from ..Constants.constants import GAME_NAME, CLIENT_NAME, CLIENT_VERSION, PETARI_ZIP_MD5
 
 from worlds.Files import APAutoPatchInterface, AutoPatchRegister
 
@@ -50,12 +50,83 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
         self._client_logger.info(f"Appending the following SMG to sys path to get dependencies correctly: {local_dir_path}")
         sys.path.insert(0, local_dir_path)
 
+    def _generate_dol(self, vanilla_rom_path: str, game_version: str) -> str:
+        """Create a new DOL based on the decompilation and AP specific changes."""
+        patch_dir = os.path.join(os.curdir, "worlds", "smgalaxy", "Patch")
+        petari_dir = os.path.join(patch_dir, "Petari-Archipelago")
+
+        # Download the decompilation repository
+        print("Generating dol...")
+        if os.path.exists(petari_dir):
+            print("Petari path already exists")
+        else:
+            # Get the decompilation repo
+            with requests.get("https://github.com/Fl-ppie/Petari/archive/refs/heads/Archipelago.zip", stream=True) as response:
+                response.raise_for_status()
+                print("Downloaded zip")
+                petari_zip_path = os.path.join(patch_dir, "Petari.zip")
+
+                # Extract the zip to a local dir
+                with open(petari_zip_path, "wb") as new_zip:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        new_zip.write(chunk)
+                print("Verifying zip")
+                # Verify the downloaded zip file
+                import hashlib
+                with open(petari_zip_path, "rb") as petari_zip:
+                    file_md5 = hashlib.file_digest(petari_zip, "md5").hexdigest().lower()
+                    if file_md5 != PETARI_ZIP_MD5:
+                        raise ValueError(f"Petari hash does not match.\nGot: {file_md5}, expected: {PETARI_ZIP_MD5}.")
+                print("Unzipping")
+                # Unzip the file and remove it
+                import zipfile
+                with zipfile.ZipFile(petari_zip_path, "r") as petari_zip:
+                    petari_zip.extractall(patch_dir)
+                os.remove(petari_zip_path)
+
+        # TODO: replace files
+
+
+        # Get the DOL from the ROM and place it for ninja to read
+        orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
+        os.makedirs(orig_dir, exist_ok=True)
+
+        orig_dol_path = os.path.join(orig_dir, "main.dol")
+        if not os.path.exists(orig_dol_path):
+            from wiithon import WiiIsoPatcher
+            with WiiIsoPatcher(vanilla_rom_path) as patcher, open(orig_dol_path, "wb") as f:
+                f.write(patcher.read_dol().to_bytes())
+
+        # Create the ninja build and run it
+        built_dol_path = os.path.join(petari_dir, "build", game_version, "main.dol")
+        configure_path = os.path.join(petari_dir, "configure.py")
+        
+        old_build_path = os.path.join(os.curdir, "build.ninja")
+        build_ninja_path = os.path.abspath(os.path.join(petari_dir, "build.ninja"))
+        print("Running ninja")
+        if not os.path.exists(built_dol_path):
+            import subprocess
+
+            # Generate build.ninja if it doesn't exist
+            if not os.path.exists(build_ninja_path):
+                subprocess.run(["python", configure_path, "-v", game_version])
+
+                # Move it to the subfolder because python is stupid
+                os.rename(old_build_path, build_ninja_path)
+
+            # Run ninja and produce a new dol
+            subprocess.run(["ninja", "-C", petari_dir, "-f", build_ninja_path]) 
+
+        return built_dol_path
+
     def create_iso(self, vanilla_rom_path: str, target: str):
         try:
             from wiithon import WiiIsoPatcher
             from wiithon.formats.dol import DOL
         except:
             raise ImportError(f"Cannot continue patching {GAME_NAME} due to missing libraries.")
+
+        self._generate_dol(vanilla_rom_path, "RMGE01")
 
         from .Patch import Patch
         with WiiIsoPatcher(vanilla_rom_path) as patcher:
