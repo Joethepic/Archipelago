@@ -13,6 +13,7 @@ from .SMGDolObjects.GameEventFlagTable import GameEventFlagTable
 from ..Constants.Names.item_names import POWER, GRAND, GREEN
 from ..Constants.patch_constants import *
 from ..Constants.ram_constants import DEATHTIMER, FORCEDEATH, GAMESYSTEM, LUMAGALAXY, STARCOLOUR, GREENGALAXY, ISDEAD, DEATHLINK, SLOTNAME, STATIC_VARIABLE_OFFSETS, STATIC_VARIABLES_POINTER
+from ..SMGOptions import ObservatoryLumaCounts
 from ..locations import all_location_table
 from ..regions import region_list, galaxies_list
 
@@ -491,7 +492,7 @@ class SMGDOL(SMGObject):
         assert len(starbit_counts.values()) == 7
 
         luma_order: list[int] = [0, 1, 2, 5, 6, 3, 4]
-
+        starbit_counts = {k: starbit_counts[k] for k in sorted(ObservatoryLumaCounts.valid_keys)}
         starbits = [list(starbit_counts.values())[i] for i in luma_order]
 
         for galaxy, starbit_count, i in zip(luma_galaxies, starbits, range(7)):
