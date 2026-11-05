@@ -17,6 +17,7 @@ from .dolphin_launcher import DolphinLauncher
 from .regions import SMGRegionData, region_list
 from .locations import locPC_table
 from .smg_helpers import *
+from .WiiConnection import WiiConnection, APPacket, PacketType
 from settings import get_settings
 import dolphin_memory_engine as dme
 
@@ -51,6 +52,39 @@ class GalaxyCommand(ClientCommandProcessor):
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
+    def _cmd_set_wii_host_and_port(self, host_and_port: str):
+        """Set the host and port that the client will open a connection on with the Wii.
+        Format: address:port (123.45.67.89:12345) with address between 0 and 255, and port between 0 and 65535."""
+        if isinstance(self.ctx, GalaxyContext):
+            try:
+                host, port = host_and_port.split(":")
+            except:
+                logger.error("Invalid format, expected in the form: address:port.")
+                return
+
+            octets = host.split(".")
+
+            if len(octets) != 4:
+                logger.error("Invalid address format, expected in the form: XXX.YYY.ZZZ.WWW")
+                return
+
+            for octet in octets:
+                if 0 <= int(octet) <= 255:
+                    continue
+
+                logger.error(f"Invalid octet value, octet {octet} must be between 0 and 255.")
+                return
+
+            port = int(port)
+
+            if not 0 <= port <= 65535:
+                logger.error("Invalid port value, must be between 0 and 65535.")
+                return
+
+            self.ctx.host = host
+            self.ctx.port = port
+            self.ctx.wii.open(host, port)
+            
     def _cmd_change_dolphin_process_name(self, process_name: str):
         """Specify the name of the Dolphin process to connect to. "" for system default."""
         self.ctx.hook_check = False
@@ -73,16 +107,20 @@ class GalaxyContext(CommonContext):
     runloop: Optional[asyncio.Task[None]] = None
     dolphin_status: str = CONNECTION_INITIAL_STATUS
 
-    last_galaxy: str = ""
+    #last_galaxy: str = ""
 
-    needs_recalculating: bool = True
-    pointers: dict[str, Pointer] = {}
+    #needs_recalculating: bool = True
+    #pointers: dict[str, Pointer] = {}
 
     highest_processed_item_index: int
 
-    lives: int
+    #lives: int
 
-    starcolorhandler: StarColorHandler
+    #starcolorhandler: StarColorHandler
+
+    wii: WiiConnection
+    host: str
+    port: str
 
     def make_gui(self) -> type["kvui.GameManager"]:
         """
@@ -106,32 +144,36 @@ class GalaxyContext(CommonContext):
         super().__init__(server_address, password)
 
         # Create pointer dictionary for all the galaxy star flags
-        star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
-            [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u8) for value in region_list.values() if
-            value.region_offset is not None}
+        #star_count_flag_pointers = {value.in_game_name: Pointer(GALAXY_DATA_POINTER_LIST +
+        #    [value.region_offset, STAR_BIT_FLAG_OFFSET], ValueType.u8) for value in region_list.values() if
+        #    value.region_offset is not None}
 
-        star_colour_pointers = {value.in_game_name + "Colours" + str(index): 
-                                Pointer([STATIC_VARIABLE_OFFSETS[STARCOLOUR] + value.region_offset * 2 + index], ValueType.u8, STATIC_VARIABLES_POINTER)
-                                for value in region_list.values() if value.region_offset is not None for index in range(8)}
+        #star_colour_pointers = {value.in_game_name + "Colours" + str(index): 
+        #                        Pointer([STATIC_VARIABLE_OFFSETS[STARCOLOUR] + value.region_offset * 2 + index], ValueType.u8, STATIC_VARIABLES_POINTER)
+        #                        for value in region_list.values() if value.region_offset is not None for index in range(8)}
 
-        self.pointers = {**star_count_flag_pointers,
-                         **star_colour_pointers,
-                         "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
-                         "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
-                         "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
-                         "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
-                         "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
-                         #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
-                         LAST_RECV_INDEX: Pointer([STATIC_VARIABLE_OFFSETS[LAST_RECV_INDEX]], ValueType.u32, STATIC_VARIABLES_POINTER),
-                         POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
-                         DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
-                         itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
-                         SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER)}
+        #self.pointers = {**star_count_flag_pointers,
+        #                 **star_colour_pointers,
+        # #                 "Scene Name": Pointer(CURRENT_SCENE_POINTER_LIST, ValueType.string32),
+        #                  "Galaxy Name": Pointer(CURRENT_GALAXY_POINTER_LIST, ValueType.string32),
+        #                  "Scenario Number": Pointer(CURRENT_SCENARIO_POINTER_LIST, ValueType.s32),
+        #                  "Lives": Pointer(ONEUP_POINTER_LIST, ValueType.u16),
+        #                  "Starbits": Pointer(STARBITS_POINTER_LIST, ValueType.u32),
+        #                  #"Swing": Pointer(SWING_PERMISSION_POINTER_LIST, ValueType.BOOL),
+        #                  LAST_RECV_INDEX: Pointer([STATIC_VARIABLE_OFFSETS[LAST_RECV_INDEX]], ValueType.u32, STATIC_VARIABLES_POINTER),
+        #                  POWER: Pointer([STATIC_VARIABLE_OFFSETS[POWER]], ValueType.u8, STATIC_VARIABLES_POINTER),
+        #                  GRAND: Pointer([STATIC_VARIABLE_OFFSETS[GRAND]], ValueType.u8, STATIC_VARIABLES_POINTER),
+        #                  ISDEAD: Pointer([STATIC_VARIABLE_OFFSETS[ISDEAD]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+        #                  DEATHLINK: Pointer([STATIC_VARIABLE_OFFSETS[DEATHLINK]], ValueType.BOOL, STATIC_VARIABLES_POINTER),
+        #                  itemname.GREEN: Pointer([STATIC_VARIABLE_OFFSETS[itemname.GREEN]], ValueType.u8, STATIC_VARIABLES_POINTER),
+        #                  SLOTNAME: Pointer([STATIC_VARIABLE_OFFSETS[SLOTNAME]], ValueType.string64, STATIC_VARIABLES_POINTER)}
 
         # Setup the handler for managing the star colours in scenario select
-        self.starcolorhandler = StarColorHandler(star_colour_pointers)
+        #self.starcolorhandler = StarColorHandler(star_colour_pointers)
+
+        self.wii = WiiConnection()
+        self.host = ""
+        self.port = ""
 
     async def disconnect(self, allow_autoreconnect: bool = False) -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags."""
@@ -141,7 +183,7 @@ class GalaxyContext(CommonContext):
         self.set_dolphin_status(CONNECTION_LOST_STATUS)
         
         self.rom_loaded = False
-        self.needs_recalculating = True
+        #self.needs_recalculating = True
         
     async def check_ingame(self) -> bool:
         """Checks to see if Mario/Luigi is in game and not at file select.
@@ -149,10 +191,11 @@ class GalaxyContext(CommonContext):
         Returns:
             bool: Player in game.
         """
-        game_status: str = await self.pointers["Scene Name"].get_value()
-        curr_galaxy: str = await self.current_galaxy()
+        return True
+        #game_status: str = await self.pointers["Scene Name"].get_value()
+        #curr_galaxy: str = await self.current_galaxy()
         
-        return game_status == "Game" and curr_galaxy != "FileSelect"
+        #return game_status == "Game" and curr_galaxy != "FileSelect"
 
     async def current_galaxy(self) -> str:
         """
@@ -162,21 +205,22 @@ class GalaxyContext(CommonContext):
         Returns:
             str: The current galaxy (stage) name.
         """
-        return await self.pointers["Galaxy Name"].get_value()
+        return ""
+        #return await self.pointers["Galaxy Name"].get_value()
     
     async def last_visited_galaxy(self) -> None:
         """Update the last galaxy we were in and recalculate pointers if necessary."""
-        if not await self.check_ingame():
-            return
-        curr_galaxy: str = await self.current_galaxy()
+        #if not await self.check_ingame():
+        #    return
+        #curr_galaxy: str = await self.current_galaxy()
 
-        if curr_galaxy != self.last_galaxy:
-            self.needs_recalculating = True
+        #if curr_galaxy != self.last_galaxy:
+        #    self.needs_recalculating = True
 
-        if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
-            return
+        # if curr_galaxy in ["AstroDome", "AstroGalaxy"]:
+        #     return
 
-        self.last_galaxy = curr_galaxy
+        # self.last_galaxy = curr_galaxy
 
     async def smg_locs_checker(self) -> None:
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
@@ -192,10 +236,10 @@ class GalaxyContext(CommonContext):
             if local_loc.game_address is None:
                 continue
 
-            star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
-            if await self.current_galaxy() == galaxyignname.DOME or await self.current_galaxy() == galaxyignname.OBSERVATORY:
-                if (star_bit_flag & (1 << local_loc.game_address)) > 0:
-                    self.locations_checked.add(loc_id)
+            # star_bit_flag: int = await self.pointers[region_data.in_game_name].get_value()
+            # if await self.current_galaxy() == galaxyignname.DOME or await self.current_galaxy() == galaxyignname.OBSERVATORY:
+            #     if (star_bit_flag & (1 << local_loc.game_address)) > 0:
+            #         self.locations_checked.add(loc_id)
         await self.check_locations(self.locations_checked)
 
     async def check_collect(self):
@@ -203,9 +247,9 @@ class GalaxyContext(CommonContext):
             for key, location in all_location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
                     continue
-                value = await self.pointers[location.in_game_galaxy_name].get_value()
-                value |= (1 << location.game_address)
-                self.pointers[location.in_game_galaxy_name].write_value(value)
+                #value = await self.pointers[location.in_game_galaxy_name].get_value()
+                #value |= (1 << location.game_address)
+                #self.pointers[location.in_game_galaxy_name].write_value(value)
 
     async def check_goal(self):
         if await self.current_galaxy() == galaxyignname.EPILOGUE:
@@ -219,53 +263,60 @@ class GalaxyContext(CommonContext):
 
     async def smg_recv_items(self) -> None:
         """Modify the items we have received to change things in game."""
-        if not await self.check_ingame():
-            return
+        #if not await self.check_ingame():
+        #    return
 
-        self.highest_processed_item_index = await self.pointers[LAST_RECV_INDEX].get_value()
+        #self.highest_processed_item_index = await self.pointers[LAST_RECV_INDEX].get_value()
         for item_id in self.items_received[self.highest_processed_item_index:]:
             # TODO: change to constants and probably a NamedTuple aswell
             match item_id.item:
                 case 170000007:
-                    self.lives = await self.pointers["Lives"].get_value() + 1
-                    self.pointers["Lives"].write_value(self.lives)
+                    logger.debug("One-up receivec")
+                    self.wii.send(APPacket(PacketType.Lives, 1))
+                    #self.lives = await self.pointers["Lives"].get_value() + 1
+                    #self.pointers["Lives"].write_value(self.lives)
 
                 case 170000004:
                     logger.debug("Power Star Received")
-                    powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(min(245, powerstars))
+                    self.wii.send(APPacket(PacketType.PowerStar, 1))
+                    #powerstars = await self.pointers[POWER].get_value() + 1
+                    #self.pointers[POWER].write_value(min(245, powerstars))
 
                 case 170000005:
                     logger.debug("Grand Star Received")
-                    powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(min(245, powerstars))
-                    grandstars = await self.pointers[GRAND].get_value() + 1
-                    self.pointers[GRAND].write_value(min(7, grandstars))
+                    self.wii.send(APPacket(PacketType.PowerStar, 1))
+                    self.wii.send(APPacket(PacketType.GrandStar, 1))
+                    #powerstars = await self.pointers[POWER].get_value() + 1
+                    #self.pointers[POWER].write_value(min(245, powerstars))
+                    #grandstars = await self.pointers[GRAND].get_value() + 1
+                    #self.pointers[GRAND].write_value(min(7, grandstars))
 
                 case 170000006:
                     logger.debug("Green Star Received")
-                    powerstars = await self.pointers[POWER].get_value() + 1
-                    self.pointers[POWER].write_value(min(245, powerstars))
-                    greenstars = await self.pointers[itemname.GREEN].get_value() + 1
-                    self.pointers[itemname.GREEN].write_value(min(3, greenstars))
+                    self.wii.send(APPacket(PacketType.PowerStar, 1))
+                    self.wii.send(APPacket(PacketType.GreenStar, 1))
+                    #powerstars = await self.pointers[POWER].get_value() + 1
+                    #self.pointers[POWER].write_value(min(245, powerstars))
+                    #greenstars = await self.pointers[itemname.GREEN].get_value() + 1
+                    #self.pointers[itemname.GREEN].write_value(min(3, greenstars))
             
             self.highest_processed_item_index += 1
 
-        self.pointers[LAST_RECV_INDEX].write_value(self.highest_processed_item_index)
+        #self.pointers[LAST_RECV_INDEX].write_value(self.highest_processed_item_index)
             
     async def recalculate_pointers(self) -> None:
         """Recalculate the chain of offsets for each pointer as to avoid stale memory reading."""
-        if not self.needs_recalculating:
-            return
+        # if not self.needs_recalculating:
+        #     return
         
-        for pointer in self.pointers.values():
-            await pointer.recalculate()
+        # for pointer in self.pointers.values():
+        #     await pointer.recalculate()
 
-        self.starcolorhandler.init_all_star_colors()
+        # self.starcolorhandler.init_all_star_colors()
 
-        if self.PCunset == True:
-            await self.setPC()
-        self.needs_recalculating = False
+        # if self.PCunset == True:
+        #     await self.setPC()
+        # self.needs_recalculating = False
     
     async def setPC(self) -> None:
         if self.slot_data["enable_purple_coin_stars"] == False:
@@ -274,6 +325,7 @@ class GalaxyContext(CommonContext):
                 value |= (1 << location.game_address)
                 self.pointers[location.in_game_galaxy_name].write_value(value)
                 self.PCunset = False
+    
     async def try_hook(self) -> bool:
         """Try to hook the Dolphin Memory Engine process into dolphin.
         
@@ -294,12 +346,14 @@ class GalaxyContext(CommonContext):
 
     async def check_death(self) -> None:
         """Checking if we need to send a deathlink."""
-        if "DeathLink" not in self.tags:
-            return
+        # if "DeathLink" not in self.tags:
+        #     return
         
-        if await self.pointers[ISDEAD].get_value():
-            self.pointers[ISDEAD].write_value(False)
-            await self.send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
+        # if await self.pointers[ISDEAD].get_value():
+        #     self.pointers[ISDEAD].write_value(False)
+    
+    async def send_death(self) -> None:
+        await super().send_death(self.player_names[self.slot] + ' ' + random.choice(DEATH_MESSAGES))
 
     def set_dolphin_status(self, status: str) -> None:
         """
@@ -314,38 +368,46 @@ class GalaxyContext(CommonContext):
     async def dme_loop(self) -> None:
         """Main loop that checks in game values using Dolphin Memory Engine."""
         try:
-            # If DME is not already hooked or connected in any way
-            if not dme.is_hooked() and not await self.try_hook():
+            if not self.wii.is_connected():
+                self.wii.connect()
+                logger.info(f"Failed to connect. Status: {self.wii.status}")
+                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
                 return
+            logger.info(f"Status: {self.wii.status}")
+            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            return
+            # If DME is not already hooked or connected in any way
+            # if not dme.is_hooked() and not await self.try_hook():
+            #     return
 
-            await self.recalculate_pointers()
+            # #await self.recalculate_pointers()
                             
-            if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
-                #checks the id of the game as a string
-                romgameid: bytes = dme.read_bytes(0x80000000,6)
-                if romgameid.decode() != EXPECTED_GAME_ID:
-                    dme.un_hook()
+            # if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
+            #     #checks the id of the game as a string
+            #     romgameid: bytes = dme.read_bytes(0x80000000,6)
+            #     if romgameid.decode() != EXPECTED_GAME_ID:
+            #         dme.un_hook()
 
-                    self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
+            #         self.set_dolphin_status(DOLPHIN_DIDNT_LOAD_ROM_CORRECTLY)
 
-                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                    return
+            #         await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+            #         return
 
-                if not self.auth:
-                    self.auth = await self.pointers[SLOTNAME].get_value()
+            #     # if not self.auth:
+            #     #     self.auth = await self.pointers[SLOTNAME].get_value()
                     
-                # Inform the player we are ready and waiting for them to connect.
-                if not self.rom_loaded:
-                    self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
-                    self.rom_loaded = True
+            #     # Inform the player we are ready and waiting for them to connect.
+            #     if not self.rom_loaded:
+            #         self.set_dolphin_status(CONNECTION_VERIFY_SERVER)
+            #         self.rom_loaded = True
 
-                    await self.server_auth(self.password_required)
+            #         await self.server_auth(self.password_required)
 
-                if not self.slot:
-                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                    return
+            #     if not self.slot:
+            #         await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+            #         return
 
-            self.lives = await self.pointers["Lives"].get_value()
+            #self.lives = await self.pointers["Lives"].get_value()
 
             # Currently verified connected to AP and dolphin is properly loaded
             await self.last_visited_galaxy()
@@ -365,6 +427,7 @@ class GalaxyContext(CommonContext):
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         while not self.exit_event.is_set():
             try:
+                self.wii.connect()
                 await self.dme_loop()
                 await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
