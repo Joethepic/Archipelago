@@ -98,13 +98,13 @@ class WiiConnection:
 
         self.status = Status.CONNECTED
 
-        if (remainder := data % PACKET_SIZE) != 0:
+        if (remainder := len(data) % PACKET_SIZE) != 0:
             raise ValueError(f"Encountered an issue while receiving packets. Received {int(100 * remainder / PACKET_SIZE)}% of a packet.")
         
         stream = BinaryIO(data)
 
         packets: list[APPacket] = []
-        for i in range(int(data / PACKET_SIZE)):
+        for i in range(int(len(data) / PACKET_SIZE)):
             packets[i] = APPacket.unpack(stream)
 
         return packets
