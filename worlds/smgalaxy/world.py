@@ -32,11 +32,6 @@ def runClient(*args):
 
 components.append(Component("SMG Client", func=runClient, component_type=Type.CLIENT, file_identifier=SuffixIdentifier(".apsmg")))
 
-
-def _set_gen_thread_finished(multiworld: MultiWorld, game_name: str):
-    for world in multiworld.get_game_worlds(game_name):
-        world.finished_post_generation.set()
-
 class SMGWorld(World):
     """
     Super Mario Galaxy allows you to explore the cosmos with Rosalina in the Comet Observatory.
@@ -67,7 +62,6 @@ class SMGWorld(World):
 
     def __init__(self, *args, **kwargs):
         super(SMGWorld, self).__init__(*args, **kwargs)
-        self.finished_post_generation = threading.Event()
         self.origin_region_name: str = regname.SHIP
         self.shuffled_levels: dict[str, str] = {} # Entrance Name (Galaxy Slot): Region name (Galaxy)
         self.starting_galaxy: str = regname.GOODEGG
@@ -246,36 +240,33 @@ class SMGWorld(World):
     #     visualize_regions(self.get_region(self.origin_region_name), "SMG_region_graph.puml", show_entrance_names=True)
 
     @classmethod
-    def stage_generate_output(cls, multiworld: MultiWorld, output_directory: str):
-        luma_worlds = {world.player for world in multiworld.get_game_worlds(cls.game)
-                      if world.options.observatory_hungry_luma_behavior.value == world.options.observatory_hungry_luma_behavior.option_By_Sphere}
-        try:
-            def check_boo_players_done() -> None:
-                done_players = set()
-                for player in luma_worlds:
-                    player_luma_world = multiworld.worlds[player]
-                    if len(player_luma_world.starbit_luma_spheres.keys()) == len(hungry_luma_events_table.keys()):
-                        done_players.add(player)
-                luma_worlds.difference_update(done_players)
-            if luma_worlds:
-                for sphere_num, sphere in enumerate(multiworld.get_spheres(), 1):
-                    for loc in sphere:
-                        if loc.player in luma_worlds and loc.name in hungry_luma_events_table.keys():
-                            player_world = multiworld.worlds[loc.player]
-                            player_world.starbit_luma_spheres.update({loc.name: sphere_num})
-                        check_boo_players_done()
-                    if not luma_worlds:
-                        return
-        except Exception:
-            import traceback
-            traceback.print_exc()
-            raise
-        finally:
-            _set_gen_thread_finished(multiworld, cls.game)
+    def stage_pre_output(cls, multiworld: MultiWorld) -> None:
+        luma_worlds: set = set([world.player for world in multiworld.get_game_worlds(cls.game) if
+            world.options.observatory_hungry_luma_behavior.value == SMGOptions.ObservatoryLumaBehavior.option_By_Sphere])
+
+        if not luma_worlds:
+            return
+
+        for sphere_num, sphere in enumerate(multiworld.get_spheres(), 1):
+            if not luma_worlds:
+                return
+
+            for loc in sphere:
+                if not (loc.player in luma_worlds and loc.name in hungry_luma_events_table.keys()):
+                    continue
+                multiworld.worlds[loc.player].starbit_luma_spheres.update({loc.name: sphere_num})
+
+            done_players: set = set()
+            for player in luma_worlds:
+                if len(multiworld.worlds[player].starbit_luma_spheres.keys()) == len(hungry_luma_events_table.keys()):
+                    done_players.add(player)
+            luma_worlds.difference_update(done_players)
+
+        return
 
     # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
-        if self.options.observatory_hungry_luma_behavior.value == self.options.observatory_hungry_luma_behavior.option_By_Sphere:
+        if self.options.observatory_hungry_luma_behavior.value == SMGOptions.ObservatoryLumaBehavior.option_By_Sphere:
             max_value: int = self.options.observatory_luma_counts.value["Gateway Hungry Luma"]
             max_sphere: int = max(self.starbit_luma_spheres.values())
             sphere_unit = ceil(max_value/max_sphere)
