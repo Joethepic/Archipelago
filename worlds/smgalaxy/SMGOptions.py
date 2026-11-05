@@ -25,28 +25,36 @@ class RandomOptionCounter(OptionCounter):
                 elif parsed_txt == "low":
                     random_dict[key] = self.min
                 elif parsed_txt.startswith("random"):
+                    if parsed_txt in ["random", "random-low", "random-middle", "random-high"]:
+                        random_dict[key] = random_weighted_range(parsed_txt, self.min, self.max)
+                        continue
+
+                    if not parsed_txt.startswith("random-range-"):
+                        raise OptionError(f"Invalid value provided for option {self.__class__.__name__}. You must "
+                            f"provide either an integer directly or a valid range option, such as {"; ".join(_RANDOM_OPTS)}")
+
+                    # Get the users random min, max to pass directly to random_weighted_range
+                    random_parts: list = parsed_txt.split("-")
+                    user_min, user_max = int(random_parts[-2]), int(random_parts[-1])
+                    if user_min < self.min:
+                        raise OptionError(f"{user_min} is lower than minimum {self.min} "
+                            f"for option {self.__class__.__name__}")
+                    elif user_max > self.max:
+                        raise OptionError(f"{user_max} is higher than maximum {self.max} "
+                            f"for option {self.__class__.__name__}")
+                    elif user_min > user_max:
+                        raise OptionError(f"Range value for max {user_max} cannot be higher than Range value "
+                            f"for min {user_min} for option {self.__class__.__name__}")
+
+                    self.min = user_min
+                    self.max = user_max
+                    print(f"{self.__class__.__name__}; {key}; {user_min}; {user_max}")
+
+                    # Since random_weighted_range has multiple "modes", I split to make the mode tage basically
                     random_mode: str = "random"
-                    if parsed_txt.startswith("random-range-"):
-                        # Get the users random min, max to pass directly to random_weighted_range
-                        random_parts: list = parsed_txt.split("-")
-                        user_min, user_max = int(random_parts[-2]), int(random_parts[-1])
-                        if user_min < self.min:
-                            raise OptionError(f"{user_min} is lower than minimum {self.min} "
-                                f"for option {self.__class__.__name__}")
-                        elif user_max > self.max:
-                            raise OptionError(f"{user_max} is higher than maximum {self.max} "
-                                f"for option {self.__class__.__name__}")
-                        elif user_min > user_max:
-                            raise OptionError(f"Range value for max {user_max} cannot be higher than Range value "
-                                f"for min {user_min} for option {self.__class__.__name__}")
-
-                        self.min = user_min
-                        self.max = user_max
-
-                        # Since random_weighted_range has multiple "modes", I split to make the mode tage basically
-                        random_tag = random_parts[2] if random_parts[2] in ["low", "middle", "high"] else random_mode
-                        if random_tag != random_mode:
-                            random_mode = f"random-{random_tag}"
+                    random_tag = random_parts[2] if random_parts[2] in ["low", "middle", "high"] else random_mode
+                    if random_tag != random_mode:
+                        random_mode = f"random-{random_tag}"
                     random_dict[key] = random_weighted_range(random_mode, self.min, self.max)
 
             else:
