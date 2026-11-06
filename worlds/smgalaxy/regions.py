@@ -654,7 +654,7 @@ def create_regions(world: "SMGWorld"):
         world.get_region(data.region).add_event(loc, "Can Farm Starbits")
 
     for loc, data in hungry_luma_events_table.items():
-        world.get_region(data.region).add_event(loc, "Hungry Luma Event")
+        world.get_region(data.region).add_event(loc, "Hungry Luma Event", rule=data.default_access)
 
     world.get_region(regname.GALREAC1BOSS).add_event(locname.GALAXYREACTORSTAR1, "Peach")
 
