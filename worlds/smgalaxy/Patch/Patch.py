@@ -17,7 +17,7 @@ from .SMGStages.AstroGalaxy import AstroGalaxy
 from .SMGClientHelpers import GalaxyDestination
 
 class Patch:
-    seed: int
+    seed: str
     dol: SMGDOL
     counts: dict[str, int]
     galaxies: dict[str, str]
@@ -29,7 +29,7 @@ class Patch:
     objects: dict[str, SMGObject]
 
     def __init__(self, patcher: WiiIsoPatcher, output: dict):
-        self.seed = int(output["Seed"])
+        self.seed = output["Seed"]
 
         self.counts: dict[str, int] = output['Galaxy Counts']
         self.galaxies: dict[str, str] = output['Galaxies']
