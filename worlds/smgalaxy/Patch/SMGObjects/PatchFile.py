@@ -79,8 +79,8 @@ class PatchFile(SMGObject):
         mini_bcsv.add_bcsv_entry(entry)
 
         network_bcsv = BCSV()
-        network_bcsv.add_bcsv_field(BCSVField(hash_dict["address"], 0xFFFFFFFF, 0, 0, BCSVType.UNSIGNED_LONG))
-        network_bcsv.add_bcsv_field(BCSVField(hash_dict["port"], 0xFFFFFFFF, 4, 0, BCSVType.UNSIGNED_LONG))
+        network_bcsv.add_bcsv_field(BCSVField(hash_dict["address"], 0xFFFFFFFF, 0, 0, BCSVType.UNSIGNED_LONG), 0)
+        network_bcsv.add_bcsv_field(BCSVField(hash_dict["port"], 0xFFFFFFFF, 4, 0, BCSVType.UNSIGNED_LONG), 0)
 
         network_entry = BCSVEntry()
         network_entry[hash_dict["address"]] = 0xC0A8A1D1 # temporary (is 192.168.161.209)
