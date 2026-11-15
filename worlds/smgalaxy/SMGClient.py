@@ -17,7 +17,7 @@ from .dolphin_launcher import DolphinLauncher
 from .regions import SMGRegionData, region_list
 from .locations import locPC_table
 from .smg_helpers import *
-from .WiiConnection import WiiConnection, APPacket, PacketType
+from .WiiConnection import StarPacket, StarType, WiiConnection, APPacket, PacketType
 from settings import get_settings
 import dolphin_memory_engine as dme
 
@@ -127,6 +127,9 @@ class GalaxyContext(CommonContext):
     host: str
     port: str
 
+    region_dict: dict[int, str]
+    location_dict: dict[str, dict[int, int]]
+
     def make_gui(self) -> type["kvui.GameManager"]:
         """
         Initialize the GUI for SMG Client.
@@ -180,6 +183,12 @@ class GalaxyContext(CommonContext):
         self.host = ""
         self.port = ""
 
+        self.region_dict = {int(data.region_offset/4): galaxy_name for galaxy_name, data in region_list.items() if not data.region_offset is None}
+
+        self.location_dict = {}
+        for region_name in self.region_dict.values():
+            self.location_dict[region_name] = {data.game_address + 1: data.code for location_name, data in all_location_table.items() if data.galaxy_name == region_name}
+
     async def disconnect(self, allow_autoreconnect: bool = False) -> None:
         """Disconnect from the server, unhook from Dolphin Memory Engine and set flags."""
         await super().disconnect()
@@ -229,6 +238,21 @@ class GalaxyContext(CommonContext):
 
     async def smg_locs_checker(self) -> None:
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
+        for packet in await self.wii.receive():
+            if packet.packet_type == PacketType.Deathlink:
+                self.send_death()
+            elif packet.packet_type == PacketType.Star:
+                packet: StarPacket
+                galaxy_name = self.region_dict[packet.galaxy_id]
+
+                if galaxy_name == galaxyignname.BOWSER3:
+                    await self.send_goal()
+                
+                location_id = self.location_dict[galaxy_name][packet.scenario_id]
+                self.locations_checked.add(location_id)
+        
+        await self.check_locations(self.locations_checked)
+        return
         if not await self.check_ingame():
             return
         
@@ -248,6 +272,7 @@ class GalaxyContext(CommonContext):
         await self.check_locations(self.locations_checked)
 
     async def check_collect(self):
+        return
         for location_id in self.checked_locations:
             for key, location in all_location_table.items():
                 if key != self.location_names.lookup_in_game(location_id):
@@ -256,15 +281,14 @@ class GalaxyContext(CommonContext):
                 #value |= (1 << location.game_address)
                 #self.pointers[location.in_game_galaxy_name].write_value(value)
 
-    async def check_goal(self):
-        if await self.current_galaxy() == galaxyignname.EPILOGUE:
-            if not self.finished_game:
-                self.finished_game = True
-                logger.info("Goal being sent")
-                await self.send_msgs([{
-                    "cmd": "StatusUpdate",
-                    "status": NetUtils.ClientStatus.CLIENT_GOAL,
-                }])
+    async def send_goal(self):
+        if not self.finished_game:
+            self.finished_game = True
+            logger.info("Goal being sent")
+            await self.send_msgs([{
+                "cmd": "StatusUpdate",
+                "status": NetUtils.ClientStatus.CLIENT_GOAL,
+            }])
 
     async def smg_recv_items(self) -> None:
         """Modify the items we have received to change things in game."""
@@ -276,21 +300,20 @@ class GalaxyContext(CommonContext):
             # TODO: change to constants and probably a NamedTuple aswell
             match item_id.item:
                 case 170000007:
-                    logger.debug("One-up receivec")
-                    self.wii.send(APPacket(PacketType.Lives, 1))
+                    logger.debug("One-up received")
+                    self.wii.send(APPacket(PacketType.Lives))
                     #self.lives = await self.pointers["Lives"].get_value() + 1
                     #self.pointers["Lives"].write_value(self.lives)
 
                 case 170000004:
                     logger.debug("Power Star Received")
-                    self.wii.send(APPacket(PacketType.PowerStar, 1))
+                    self.wii.send(StarPacket(StarType.PowerStar))
                     #powerstars = await self.pointers[POWER].get_value() + 1
                     #self.pointers[POWER].write_value(min(245, powerstars))
 
                 case 170000005:
                     logger.debug("Grand Star Received")
-                    self.wii.send(APPacket(PacketType.PowerStar, 1))
-                    self.wii.send(APPacket(PacketType.GrandStar, 1))
+                    self.wii.send(StarPacket(StarType.GrandStar))
                     #powerstars = await self.pointers[POWER].get_value() + 1
                     #self.pointers[POWER].write_value(min(245, powerstars))
                     #grandstars = await self.pointers[GRAND].get_value() + 1
@@ -298,8 +321,7 @@ class GalaxyContext(CommonContext):
 
                 case 170000006:
                     logger.debug("Green Star Received")
-                    self.wii.send(APPacket(PacketType.PowerStar, 1))
-                    self.wii.send(APPacket(PacketType.GreenStar, 1))
+                    self.wii.send(StarPacket(StarType.GreenStar))
                     #powerstars = await self.pointers[POWER].get_value() + 1
                     #self.pointers[POWER].write_value(min(245, powerstars))
                     #greenstars = await self.pointers[itemname.GREEN].get_value() + 1
@@ -374,8 +396,6 @@ class GalaxyContext(CommonContext):
         """Main loop that checks in game values using Dolphin Memory Engine."""
         try:
             logger.info(f"Status: {self.wii.status}")
-            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-            return
             # If DME is not already hooked or connected in any way
             # if not dme.is_hooked() and not await self.try_hook():
             #     return
@@ -415,7 +435,7 @@ class GalaxyContext(CommonContext):
             await self.smg_recv_items()
             await self.check_death()
             await self.check_collect()
-            await self.check_goal()
+            #await self.check_goal()
 
         except Exception as dmeEx:
             logger.error("Unable to connect to SMG. Details: " + str(dmeEx))

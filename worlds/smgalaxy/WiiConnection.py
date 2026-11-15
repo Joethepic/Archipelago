@@ -1,13 +1,16 @@
 import asyncio
 from enum import IntEnum
+from io import BytesIO
 import socket
-from typing import BinaryIO
+from typing import BinaryIO, ClassVar, Optional
 
 from attr import dataclass
-from wiithon import BinaryReader
+from wiithon import BinaryReader, BinaryWriter
+from wiithon.binary.align import align
 
-PACKET_SIZE = 4
-PACKET_BUFFER = 32
+PACKET_ALIGNMENT = 4
+BASE_PACKET_SIZE = 8
+PACKET_BUFFER = BASE_PACKET_SIZE * 2 * 32
 
 class Status(IntEnum):
     DISCONNECTED = 1
@@ -20,37 +23,100 @@ class Status(IntEnum):
 
 class PacketType(IntEnum):
     NULL = 0
-    PowerStar = 1
-    GrandStar = 2
-    GreenStar = 3
-    Deathlink = 4
-    Lives = 5
+    Sync = 1
+    Star = 2
+    Deathlink = 3
+    Lives = 4
+
+
+class StarType(IntEnum):
+    PowerStar = 0
+    GrandStar = 1
+    GreenStar = 2
 
 
 @dataclass
 class APPacket:
+    size: ClassVar[int] = 2 + 2 + 4
     packet_type: PacketType
-    data: int
+    data: Optional[bytes]
+
 
     @classmethod
-    def unpack(cls, stream: BinaryIO) -> "APPacket":
+    def read(cls, stream: BinaryIO) -> "APPacket":
         reader = BinaryReader(stream)
 
-        packet_type = PacketType(reader.u8())
-        reader.skip(1)
-        data = reader.u16()
+        size = reader.u16()
+        reader.skip(2)
+        packet_type = PacketType(reader.u32())
 
-        return cls(packet_type, data)
+        match packet_type:
+            case PacketType.Star:
+                return StarPacket.read(stream)
+            case _:
+                data = reader.raw(size - APPacket.size)
+                return APPacket(packet_type, data)
+
+    
+    def write(self, stream: BinaryIO) -> None:
+        writer = BinaryWriter(stream)
+
+        packet_start = writer.tell()
+
+        writer.u16(0) # write the size later
+        writer.pad(2)
+        writer.u32(self.packet_type)
+
+        match self.packet_type:
+            case PacketType.Star:
+                size = align(StarPacket.size, PACKET_ALIGNMENT)
+                StarPacket.write(writer.stream)
+            case _:
+                size = align(APPacket.size + len(self.data), PACKET_ALIGNMENT)
+                writer.raw(self.data)
+
+        packet_end = writer.tell()
+
+        writer.seek(packet_start)
+        writer.u16(size)
+
+        writer.seek(packet_end)
 
 
-    def pack(self) -> bytes:
-        out = b''
 
-        out += self.packet_type.to_bytes()
-        out += b'\x00'
-        out += self.data.to_bytes(2)
+@dataclass
+class StarPacket:
+    size: ClassVar[int] = APPacket.size + 4 + 1 + 1
+    star_type: StarType
+    galaxy_id: Optional[int]
+    scenario_id: Optional[int]
 
-        return out
+
+    @classmethod
+    def read(cls, stream: BinaryIO) -> "StarPacket":
+        reader = BinaryReader(stream)
+
+        star_type = reader.u32()
+        galaxy_id = reader.u8()
+        scenario_id = reader.u8()
+
+        return StarPacket(PacketType.Star, b'', StarType(star_type), galaxy_id, scenario_id)
+
+
+    def write(self, stream: BinaryIO) -> None:
+        writer = BinaryWriter(stream)
+
+        writer.u32(self.star_type)
+
+        if self.galaxy_id:
+            writer.u8(self.galaxy_id)
+        else:
+            writer.pad(1)
+        
+        if self.scenario_id:
+            writer.u8(self.scenario_id)
+        else:
+            writer.pad(1)
 
 
 class WiiConnection:
@@ -93,35 +159,33 @@ class WiiConnection:
 
         self.status = Status.RECEIVING
 
-        data = self.connection.recv(PACKET_SIZE * PACKET_BUFFER)
+        data = self.connection.recv(PACKET_BUFFER)
 
         self.status = Status.CONNECTED
         
         if not data:
             return []
 
-        if (remainder := len(data) % PACKET_SIZE) != 0:
-            raise ValueError(f"Encountered an issue while receiving packets. Received {int(100 * remainder / PACKET_SIZE)}% of a packet.")
-        
         stream = BinaryIO(data)
 
-        packet_count = int(len(data) / PACKET_SIZE)
-        packets: list[APPacket] = [APPacket.unpack(stream) for i in range(packet_count)]
-
+        packets: list[APPacket]
+        while stream.tell() != len(data):
+            APPacket.read(stream)
         return packets
         
-    async def send(self, packets: APPacket) -> None:
-        self.send_buffer.append(packets)
+    async def send(self, packet: APPacket) -> None:
+        self.send_buffer.append(packet)
 
         if self.status != Status.CONNECTED:
             return
 
         self.status = Status.SENDING
 
-        self.send_buffer.append(APPacket(PacketType.NULL), 0)
-
-        packed_packets = b''.join([packet.pack() for packet in self.send_buffer])
-        self.connection.send(packed_packets)
+        stream = BytesIO()
+        for packet in self.send_buffer:
+            packet.write(stream)
+        
+        self.connection.send(stream.getvalue())
 
         self.status = Status.CONNECTED
 
