@@ -9,6 +9,7 @@ from ..Patch.extensions import SMGObject
 from .SMGDOL import SMGDOL
 from .SMGObjects.Mario import Mario
 from .SMGObjects.AstroDomeEntrances import AstroDomeEntrances
+from .SMGObjects.PatchFile import PatchFile
 from .SMGObjects.PowerStar import PowerStar
 from .SMGObjects.TitleScreen import TitleScreen
 from .SMGStages.AstroDome import AstroDomes
@@ -58,9 +59,10 @@ class Patch:
             "AstroDomeEntrances": AstroDomeEntrances(),
             "PowerStar": PowerStar(),
             "TitleScreen": TitleScreen(),
+            "PatchFile": PatchFile(),
         }
 
-    def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination]) -> None:
+    def update(self, galaxy_shuffle: list[GalaxyDestination], dome_shuffle: dict[int, int], luma_shuffle: list[GalaxyDestination], star_requirements: dict[str, int]) -> None:
         for object_name, object in self.objects.items():
             print(f"Updating {object_name}")
 
@@ -68,7 +70,8 @@ class Patch:
                           galaxy_shuffle=galaxy_shuffle,
                           dome_shuffle=dome_shuffle,
                           luma_shuffle=luma_shuffle,
-                          show_galaxies=self.show_galaxies)
+                          show_galaxies=self.show_galaxies,
+                          star_requirements=star_requirements)
 
     def build_dol(self, dol: DOL) -> None:
         self.dol = SMGDOL(dol)

@@ -3,6 +3,8 @@ from enum import IntEnum
 # Client Constants
 AP_WORLD_VERSION_NAME: str = "APWorldVersion"
 CLIENT_VERSION: str = "V0.0.3"
+DOL_VERSION: str = "V0.0.3"
+PETARI_ZIP_MD5 = "110c82bdf64eecb64a9216048322c29f"
 CLIENT_NAME: str = "SMG Client"
 GAME_NAME: str = "Super Mario Galaxy"
 CLEAN_MD5: int = 0xf99a97f9ae4dccd1db45e9aaab9cebd8
@@ -33,9 +35,6 @@ DEATH_MESSAGES = [
     "missed the grand star"
     "flew too close to the sun"
 ]
-
-# Petari
-PETARI_ZIP_MD5 = "bd0bd4b0df166f35ef5ce133ce297626"
 
 # Colors
 WHITE = (255,  255,  255)

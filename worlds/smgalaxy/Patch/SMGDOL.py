@@ -30,7 +30,7 @@ class SMGDOL(SMGObject):
     def __init__(self, dol: DOL):
         super().__init__(None)
         self.dol: DOL = dol
-
+        return
         Pointer.dol = self.dol
         SMGDOLObject.dol = self.dol
 

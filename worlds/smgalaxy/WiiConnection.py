@@ -1,3 +1,4 @@
+import asyncio
 from enum import IntEnum
 import socket
 from typing import BinaryIO
@@ -61,6 +62,9 @@ class WiiConnection:
 
     def __init__(self):
         self.status = Status.DISCONNECTED
+        self.server = None
+        self.connection = None
+        self.send_buffer = []
 
 
     def open(self, host: str, port: str) -> None:
@@ -73,39 +77,36 @@ class WiiConnection:
 
 
     async def connect(self) -> bool:
-        if self.status != Status.LISTENING or self.status == Status.CONNECTING:
-            return False
-
-        if self.status == Status.CONNECTED:
-            return True
-        
         self.status = Status.CONNECTING
 
-        self.connection, _ = self.server.accept()
+        self.connection, _ = await asyncio.to_thread(self.server.accept)
+        self.connection.settimeout(0.0)
 
         self.status = Status.CONNECTED
-
+        
         return True
 
 
-    async def receive(self) -> list[APPacket] | None:
+    async def receive(self) -> list[APPacket]:
         if self.status != Status.CONNECTED:
-            return None
+            return []
 
         self.status = Status.RECEIVING
 
         data = self.connection.recv(PACKET_SIZE * PACKET_BUFFER)
 
         self.status = Status.CONNECTED
+        
+        if not data:
+            return []
 
         if (remainder := len(data) % PACKET_SIZE) != 0:
             raise ValueError(f"Encountered an issue while receiving packets. Received {int(100 * remainder / PACKET_SIZE)}% of a packet.")
         
         stream = BinaryIO(data)
 
-        packets: list[APPacket] = []
-        for i in range(int(len(data) / PACKET_SIZE)):
-            packets[i] = APPacket.unpack(stream)
+        packet_count = int(len(data) / PACKET_SIZE)
+        packets: list[APPacket] = [APPacket.unpack(stream) for i in range(packet_count)]
 
         return packets
         
@@ -117,8 +118,10 @@ class WiiConnection:
 
         self.status = Status.SENDING
 
-        while not self.send_buffer is None:
-            self.connection.send(self.send_buffer[0].pack())
+        self.send_buffer.append(APPacket(PacketType.NULL), 0)
+
+        packed_packets = b''.join([packet.pack() for packet in self.send_buffer])
+        self.connection.send(packed_packets)
 
         self.status = Status.CONNECTED
 

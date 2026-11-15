@@ -1,4 +1,3 @@
-from io import BytesIO
 import os, sys, tempfile, zipfile, json, shutil
 import ssl, certifi, urllib.request, requests
 from typing import Any
@@ -7,7 +6,7 @@ from logging import getLogger
 import Utils
 from .SMGClientHelpers import GalaxyDestination, GalaxyShuffle
 from ..SMGSettings import get_base_rom_path
-from ..Constants.constants import GAME_NAME, CLIENT_NAME, CLIENT_VERSION, PETARI_ZIP_MD5
+from ..Constants.constants import GAME_NAME, CLIENT_NAME, CLIENT_VERSION, DOL_VERSION, PETARI_ZIP_MD5
 
 from worlds.Files import APAutoPatchInterface, AutoPatchRegister
 
@@ -53,18 +52,26 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
     def _generate_dol(self, vanilla_rom_path: str, game_version: str) -> str:
         """Create a new DOL based on the decompilation and AP specific changes."""
-        patch_dir = os.path.join(os.curdir, "worlds", "smgalaxy", "Patch")
-        petari_dir = os.path.join(patch_dir, "Petari-Archipelago")
+        temp_dir = _get_temp_dol_path()
+        petari_dir = os.path.join(temp_dir, f"Petari-{DOL_VERSION[1:]}")
+        built_dol_path = os.path.join(temp_dir, game_version, "main.dol")
+
+        # Return if a built dol already exists
+        if os.path.exists(built_dol_path):
+            print("Built DOL already exists")
+            return built_dol_path
+
+        os.makedirs(temp_dir, exist_ok=True)
 
         # Download the decompilation repository
         if not os.path.exists(petari_dir):
             print("Downloading repository")
 
             # Get the decompilation repo
-            with requests.get("https://github.com/Fl-ppie/Petari/archive/refs/heads/Archipelago.zip", stream=True) as response:
+            with requests.get(f"https://github.com/Fl-ppie/Petari/archive/refs/tags/{DOL_VERSION}.zip", stream=True) as response:
                 response.raise_for_status()
 
-                petari_zip_path = os.path.join(patch_dir, "Petari.zip")
+                petari_zip_path = os.path.join(temp_dir, "Petari.zip")
 
                 # Extract the zip to a local dir
                 with open(petari_zip_path, "wb") as new_zip:
@@ -85,68 +92,44 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
             # Unzip the file and remove it
             import zipfile
             with zipfile.ZipFile(petari_zip_path, "r") as petari_zip:
-                petari_zip.extractall(patch_dir)
+                petari_zip.extractall(temp_dir)
             os.remove(petari_zip_path)
 
-            print("Modifying configure.py")
+        print("Getting original DOL")
 
-            # Modify configure.py to accept all TUs as matching
-            configure_path = os.path.join(petari_dir, "configure.py")
-            with open(configure_path, "r") as f:
-                lines = [line for line in f]
+        # Get the DOL from the ROM and place it for ninja to read
+        orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
+        os.makedirs(orig_dir, exist_ok=True)
 
-            # Set all to matching
-            for i, line in enumerate(lines):
-                if "def MatchingFor(*versions) -> bool:\n" == line:
-                    lines.insert(i + 1, "    return True\n")
-                    break
-            else:
-                raise ValueError("Was not able to find the line to modify in configure.py.")
+        orig_dol_path = os.path.join(orig_dir, "main.dol")
+        if not os.path.exists(orig_dol_path):
+            from wiithon import WiiIsoPatcher
+            with WiiIsoPatcher(vanilla_rom_path) as patcher, open(orig_dol_path, "wb") as f:
+                f.write(patcher.read_dol().to_bytes())
 
-            # Write new configure.py
-            with open(configure_path, "w") as f:
-                f.writelines(lines)
+        print("Generating new DOL")
 
-        print("Replacing Petari files")
+        import subprocess
 
-        # Replace decompiled files with custom files
-        replace_dir = os.path.join(patch_dir, "Petari-Replacements")
-        for dir_path, _, file_names in os.walk(replace_dir):
-            for file_name in file_names:
-                print(f"Replacing {file_name}")
+        # Generate build.ninja if it doesn't exist
+        build_ninja_path = os.path.join(petari_dir, "build.ninja")
+        if not os.path.exists(build_ninja_path):
+            subprocess.run([sys.executable, "configure.py", "-v", game_version, "--no-progress"], cwd=petari_dir, check=True)
 
-                replacement_file_path = os.path.join(dir_path, file_name)
-                rel_path = os.path.relpath(dir_path, replace_dir)
-                original_file_path = os.path.join(petari_dir, rel_path, file_name)
-                
-                shutil.copyfile(replacement_file_path, original_file_path)
+        # Run ninja and produce a new dol
+        subprocess.run(["ninja"], cwd=petari_dir)
 
-        # Generate a new DOL if it doesn't already exist
-        built_dol_path = os.path.join(petari_dir, "build", game_version, "main.dol")
-        if not os.path.exists(built_dol_path): # TODO: Also check dol hash in the future
-            import subprocess
+        # TODO: verify that the DOL has the hash that we expect
 
-            print("Getting original DOL")
+        # Move the dol to the correct place
+        ninja_dol_path = os.path.join(petari_dir, "build", game_version, "main.dol")
+        os.makedirs(os.path.dirname(built_dol_path))
+        os.replace(ninja_dol_path, built_dol_path)
 
-            # Get the DOL from the ROM and place it for ninja to read
-            orig_dir = os.path.join(petari_dir, "orig", game_version, "sys")
-            os.makedirs(orig_dir, exist_ok=True)
+        print("Cleaning up")
 
-            orig_dol_path = os.path.join(orig_dir, "main.dol")
-            if not os.path.exists(orig_dol_path):
-                from wiithon import WiiIsoPatcher
-                with WiiIsoPatcher(vanilla_rom_path) as patcher, open(orig_dol_path, "wb") as f:
-                    f.write(patcher.read_dol().to_bytes())
-
-            print("Generating new DOL")
-
-            # Generate build.ninja if it doesn't exist
-            build_ninja_path = os.path.join(petari_dir, "build.ninja")
-            if not os.path.exists(build_ninja_path):
-                subprocess.run([sys.executable, "configure.py", "-v", game_version], cwd=petari_dir, check=True)
-
-            # Run ninja and produce a new dol
-            subprocess.run(["ninja"], cwd=petari_dir, check=True)
+        # Remove temporary directory
+        shutil.rmtree(petari_dir)
 
         return built_dol_path
 
@@ -177,14 +160,18 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
             luma_galaxies = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "luma"]
             gateway_galaxy = [galaxy for galaxy in galaxy_shuffle if galaxy.type == "gateway"][0]
 
-            patch.update(dome_galaxies, dome_shuffle, luma_galaxies)
+            patch.update(dome_galaxies, dome_shuffle, luma_galaxies, galaxy_counts)
+
+            #patcher.add_file("/Archipelago/Patch.arc", bytes(0x1000))
 
             def dol_patch(dol: DOL):
                 with open(built_dol_path, "rb") as f:
-                    patch.dol = dol.read(f)
+                    built_dol = DOL.read(f)
+                dol.__dict__.clear()
+                dol.__dict__.update(built_dol.__dict__)
                 #patch.build_dol(dol)
                 #patch.update_dol(dome_galaxies, luma_galaxies, dome_shuffle, galaxy_counts, gateway_galaxy)
-
+            
             patcher.patch_dol(dol_patch)
             patcher.build(target)
 
@@ -213,6 +200,10 @@ class SuperMarioGalaxyRandomiser(APAutoPatchInterface, metaclass=AutoPatchRegist
 
         with zipfile.ZipFile(temp_zip_path) as z:
             z.extractall(tmp_dir_path)
+
+def _get_temp_dol_path() -> str:
+    """Gets a temp file based on the current OS, then a subdirectory for game, version, and dol version."""
+    return os.path.join(tempfile.gettempdir(), "super_mario_galaxy", CLIENT_VERSION, f"dol-{DOL_VERSION}")
 
 def _get_temp_folder_name() -> str:
     """Gets a temp file based on the current OS, then a subdirectory for game, version, and libs."""

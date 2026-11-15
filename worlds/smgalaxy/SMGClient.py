@@ -56,6 +56,7 @@ class GalaxyCommand(ClientCommandProcessor):
         """Set the host and port that the client will open a connection on with the Wii.
         Format: address:port (123.45.67.89:12345) with address between 0 and 255, and port between 0 and 65535."""
         if isinstance(self.ctx, GalaxyContext):
+            # Sanitize the input because I do not trust the user
             try:
                 host, port = host_and_port.split(":")
             except:
@@ -84,7 +85,11 @@ class GalaxyCommand(ClientCommandProcessor):
             self.ctx.host = host
             self.ctx.port = port
             self.ctx.wii.open(host, port)
-            
+
+            logger.info(f"Started listening on {host}:{port}.")
+
+            Utils.async_start(self.ctx.wii.connect(), "Wii - connect")
+
     def _cmd_change_dolphin_process_name(self, process_name: str):
         """Specify the name of the Dolphin process to connect to. "" for system default."""
         self.ctx.hook_check = False
@@ -368,13 +373,8 @@ class GalaxyContext(CommonContext):
     async def dme_loop(self) -> None:
         """Main loop that checks in game values using Dolphin Memory Engine."""
         try:
-            if not self.wii.is_connected():
-                self.wii.connect()
-                logger.info(f"Failed to connect. Status: {self.wii.status}")
-                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                return
             logger.info(f"Status: {self.wii.status}")
-            await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+            await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
             return
             # If DME is not already hooked or connected in any way
             # if not dme.is_hooked() and not await self.try_hook():
@@ -426,8 +426,12 @@ class GalaxyContext(CommonContext):
         """Continuously check and communicate with Dolphin until the user disconnects."""
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         while not self.exit_event.is_set():
+            if not self.wii.is_connected():
+                logger.info(f"Not connected to the Wii. Retrying in {WAIT_TIMER_LONG_TIMEOUT} seconds. Status: {self.wii.status}")
+                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
+                continue
+
             try:
-                self.wii.connect()
                 await self.dme_loop()
                 await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
@@ -502,7 +506,6 @@ async def _main(connect, password):
 
         if gui_enabled:
             ctx.run_gui()
-
         ctx.run_cli()
         await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 

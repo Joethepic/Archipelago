@@ -56,4 +56,4 @@ class Gateway:
 
         print(f"Creating {MINIATURE_GATEWAY_NAME}.arc")
 
-        self.patcher.add_file(new_file_path, self.arc_file.get_bytes())
+        self.patcher.replace_file(new_file_path, self.arc_file.get_bytes())
