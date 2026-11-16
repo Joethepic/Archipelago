@@ -79,17 +79,23 @@ class PatchFile(SMGObject):
         mini_bcsv.add_bcsv_entry(entry)
 
         network_bcsv = BCSV()
-        network_bcsv.add_bcsv_field(BCSVField(hash_dict["address"], 0xFFFFFFFF, 0, 0, BCSVType.UNSIGNED_LONG), 0)
+        network_bcsv.add_bcsv_field(BCSVField(hash_dict["address"], 0xFFFFFFFF, 0, 0, BCSVType.LONG), 0)
         network_bcsv.add_bcsv_field(BCSVField(hash_dict["port"], 0xFFFFFFFF, 4, 0, BCSVType.UNSIGNED_LONG), 0)
 
         network_entry = BCSVEntry()
-        network_entry[hash_dict["address"]] = 0xC0A8A1D1 # temporary (is 192.168.161.209)
+        network_entry[hash_dict["address"]] = 0xC0A8A1D1 - 0x100000000 # temporary (is 192.168.161.209)
         network_entry[hash_dict["port"]] = 0x4150 # temporary (is 'AP')
+        print(network_entry)
+        network_bcsv.add_bcsv_entry(network_entry)
 
         arc_file = Rarc.create_empty()
 
         stream = BytesIO()
         mini_bcsv.write(stream)
 
+        network_stream = BytesIO()
+        network_bcsv.write(network_stream)
+
         arc_file.add_file("Patch.bcsv", stream.getvalue())
+        arc_file.add_file("Network.bcsv", network_stream.getvalue())
         self.patcher.add_file(self.path, arc_file.get_bytes())

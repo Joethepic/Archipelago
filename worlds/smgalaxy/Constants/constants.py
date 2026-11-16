@@ -3,8 +3,8 @@ from enum import IntEnum
 # Client Constants
 AP_WORLD_VERSION_NAME: str = "APWorldVersion"
 CLIENT_VERSION: str = "V0.0.3"
-DOL_VERSION: str = "V0.0.3"
-PETARI_ZIP_MD5 = "110c82bdf64eecb64a9216048322c29f"
+DOL_VERSION: str = "V0.1.0"
+PETARI_ZIP_MD5 = "581d77fcab8b518296574e5866c1de1d"
 CLIENT_NAME: str = "SMG Client"
 GAME_NAME: str = "Super Mario Galaxy"
 CLEAN_MD5: int = 0xf99a97f9ae4dccd1db45e9aaab9cebd8

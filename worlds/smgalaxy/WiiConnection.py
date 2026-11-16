@@ -35,11 +35,19 @@ class StarType(IntEnum):
     GreenStar = 2
 
 
-@dataclass
 class APPacket:
     size: ClassVar[int] = 2 + 2 + 4
     packet_type: PacketType
-    data: Optional[bytes]
+    data: bytes
+
+
+    def __init__(self, packet_type: PacketType, data: bytes = None):
+        self.packet_type = packet_type
+
+        if data is None:
+            self.data = b''
+        else:
+            self.data = data
 
 
     @classmethod
@@ -108,15 +116,15 @@ class StarPacket:
 
         writer.u32(self.star_type)
 
-        if self.galaxy_id:
+        if self.galaxy_id is None:
+            writer.pad(1)
+        else:
             writer.u8(self.galaxy_id)
-        else:
-            writer.pad(1)
         
-        if self.scenario_id:
-            writer.u8(self.scenario_id)
-        else:
+        if self.scenario_id is None:
             writer.pad(1)
+        else:
+            writer.u8(self.scenario_id)
 
 
 class WiiConnection:
@@ -146,7 +154,6 @@ class WiiConnection:
         self.status = Status.CONNECTING
 
         self.connection, _ = await asyncio.to_thread(self.server.accept)
-        self.connection.settimeout(0.0)
 
         self.status = Status.CONNECTED
         
@@ -159,24 +166,26 @@ class WiiConnection:
 
         self.status = Status.RECEIVING
 
-        data = self.connection.recv(PACKET_BUFFER)
+        data = await asyncio.to_thread(self.connection.recv, PACKET_BUFFER)
 
         self.status = Status.CONNECTED
         
         if not data:
             return []
 
-        stream = BinaryIO(data)
+        stream = BytesIO(data)
 
-        packets: list[APPacket]
+        packets: list[APPacket] = []
         while stream.tell() != len(data):
-            APPacket.read(stream)
+            packet = APPacket.read(stream)
+            packets.append(packet)
         return packets
+
         
     async def send(self, packet: APPacket) -> None:
         self.send_buffer.append(packet)
 
-        if self.status != Status.CONNECTED:
+        if self.status != Status.CONNECTED or self.status != Status.RECEIVING:
             return
 
         self.status = Status.SENDING
@@ -184,7 +193,7 @@ class WiiConnection:
         stream = BytesIO()
         for packet in self.send_buffer:
             packet.write(stream)
-        
+
         self.connection.send(stream.getvalue())
 
         self.status = Status.CONNECTED

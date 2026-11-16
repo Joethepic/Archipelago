@@ -90,6 +90,14 @@ class GalaxyCommand(ClientCommandProcessor):
 
             Utils.async_start(self.ctx.wii.connect(), "Wii - connect")
 
+    async def _cmd_kill_mario(self):
+        logger.info("Killing mario through command")
+        await self.ctx.wii.send(APPacket(PacketType.Deathlink))
+        logger.info(self.ctx.wii.send_buffer)
+
+    def _cmd_status(self):
+        logger.info(f"Status: {self.ctx.wii.status}")
+
     def _cmd_change_dolphin_process_name(self, process_name: str):
         """Specify the name of the Dolphin process to connect to. "" for system default."""
         self.ctx.hook_check = False
@@ -179,6 +187,8 @@ class GalaxyContext(CommonContext):
         # Setup the handler for managing the star colours in scenario select
         #self.starcolorhandler = StarColorHandler(star_colour_pointers)
 
+        self.highest_processed_item_index = 0
+
         self.wii = WiiConnection()
         self.host = ""
         self.port = ""
@@ -240,7 +250,7 @@ class GalaxyContext(CommonContext):
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
         for packet in await self.wii.receive():
             if packet.packet_type == PacketType.Deathlink:
-                self.send_death()
+                await self.send_death()
             elif packet.packet_type == PacketType.Star:
                 packet: StarPacket
                 galaxy_name = self.region_dict[packet.galaxy_id]
@@ -493,6 +503,7 @@ class GalaxyContext(CommonContext):
 
     async def kill_player(self) -> None:
         """Kill the player in game."""
+        return
         if await self.current_galaxy() == "FileSelect":
             self.pointers[FORCEDEATH].write_value(True)
         elif await self.check_ingame():
