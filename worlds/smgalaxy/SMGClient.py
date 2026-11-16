@@ -52,51 +52,51 @@ class GalaxyCommand(ClientCommandProcessor):
         if isinstance(self.ctx, GalaxyContext):
             Utils.async_start(self.ctx.update_death_link(not "DeathLink" in self.ctx.tags))
 
-    def _cmd_set_wii_host_and_port(self, host_and_port: str):
+    async def _cmd_set_wii_host_and_port(self, host_and_port: str):
         """Set the host and port that the client will open a connection on with the Wii.
         Format: address:port (123.45.67.89:12345) with address between 0 and 255, and port between 0 and 65535."""
-        if isinstance(self.ctx, GalaxyContext):
-            # Sanitize the input because I do not trust the user
-            try:
-                host, port = host_and_port.split(":")
-            except:
-                logger.error("Invalid format, expected in the form: address:port.")
-                return
+        if not isinstance(self.ctx, GalaxyContext):
+            return
+        
+        # Sanitize the input because I do not trust the user
+        try:
+            host, port = host_and_port.split(":")
+        except:
+            logger.error("Invalid format, expected in the form: address:port.")
+            return
 
-            octets = host.split(".")
+        octets = host.split(".")
 
-            if len(octets) != 4:
-                logger.error("Invalid address format, expected in the form: XXX.YYY.ZZZ.WWW")
-                return
+        if len(octets) != 4:
+            logger.error("Invalid address format, expected in the form: XXX.YYY.ZZZ.WWW")
+            return
 
-            for octet in octets:
-                if 0 <= int(octet) <= 255:
-                    continue
+        for octet in octets:
+            if 0 <= int(octet) <= 255:
+                continue
 
-                logger.error(f"Invalid octet value, octet {octet} must be between 0 and 255.")
-                return
+            logger.error(f"Invalid octet value, octet {octet} must be between 0 and 255.")
+            return
 
-            port = int(port)
+        port = int(port)
 
-            if not 0 <= port <= 65535:
-                logger.error("Invalid port value, must be between 0 and 65535.")
-                return
+        if not 0 <= port <= 65535:
+            logger.error("Invalid port value, must be between 0 and 65535.")
+            return
 
-            self.ctx.host = host
-            self.ctx.port = port
-            self.ctx.wii.open(host, port)
+        self.ctx.host = host
+        self.ctx.port = port
+        await self.ctx.wii.open(host, port)
 
-            logger.info(f"Started listening on {host}:{port}.")
+        logger.info(f"Started listening on {host}:{port}.")
 
-            Utils.async_start(self.ctx.wii.connect(), "Wii - connect")
-
-    async def _cmd_kill_mario(self):
+    def _cmd_kill_mario(self):
         logger.info("Killing mario through command")
-        await self.ctx.wii.send(APPacket(PacketType.Deathlink))
+        self.ctx.wii.send(APPacket(PacketType.Deathlink))
         logger.info(self.ctx.wii.send_buffer)
 
     def _cmd_status(self):
-        logger.info(f"Status: {self.ctx.wii.status}")
+        logger.info(f"Status: {self.ctx.wii.is_connected}")
 
     def _cmd_change_dolphin_process_name(self, process_name: str):
         """Specify the name of the Dolphin process to connect to. "" for system default."""
@@ -248,19 +248,23 @@ class GalaxyContext(CommonContext):
 
     async def smg_locs_checker(self) -> None:
         """Checks the various location within SMG to see if the player has completed any appropriate actions."""
-        for packet in await self.wii.receive():
-            if packet.packet_type == PacketType.Deathlink:
-                await self.send_death()
-            elif packet.packet_type == PacketType.Star:
-                packet: StarPacket
-                galaxy_name = self.region_dict[packet.galaxy_id]
+        packet = self.wii.receive()
 
-                if galaxy_name == galaxyignname.BOWSER3:
-                    await self.send_goal()
-                
-                location_id = self.location_dict[galaxy_name][packet.scenario_id]
-                self.locations_checked.add(location_id)
+        if not packet:
+            return
         
+        if packet.packet_type == PacketType.Deathlink:
+            await self.send_death()
+        elif packet.packet_type == PacketType.Star:
+            packet: StarPacket
+            galaxy_name = self.region_dict[packet.galaxy_id]
+
+            if galaxy_name == galaxyignname.BOWSER3:
+                await self.send_goal()
+            
+            location_id = self.location_dict[galaxy_name][packet.scenario_id]
+            self.locations_checked.add(location_id)
+    
         await self.check_locations(self.locations_checked)
         return
         if not await self.check_ingame():
@@ -405,7 +409,6 @@ class GalaxyContext(CommonContext):
     async def dme_loop(self) -> None:
         """Main loop that checks in game values using Dolphin Memory Engine."""
         try:
-            logger.info(f"Status: {self.wii.status}")
             # If DME is not already hooked or connected in any way
             # if not dme.is_hooked() and not await self.try_hook():
             #     return
@@ -456,14 +459,13 @@ class GalaxyContext(CommonContext):
         """Continuously check and communicate with Dolphin until the user disconnects."""
         logger.info("Starting Dolphin connector. Use /dolphin for status information.")
         while not self.exit_event.is_set():
-            if not self.wii.is_connected():
-                logger.info(f"Not connected to the Wii. Retrying in {WAIT_TIMER_LONG_TIMEOUT} seconds. Status: {self.wii.status}")
-                await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
-                continue
-
             try:
-                await self.dme_loop()
-                await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+                if self.wii.is_connected:
+                    await self.dme_loop()
+                    await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
+                else:
+                    logger.info(f"Not connected to the wii, retrying in {WAIT_TIMER_LONG_TIMEOUT}s")
+                    await wait_for_next_loop(WAIT_TIMER_LONG_TIMEOUT)
 
             except Exception as dolphinEx:
                 logger.error("Something went wrong when connecting to Dolphin Memory Engine. Details:" + str(dolphinEx))
