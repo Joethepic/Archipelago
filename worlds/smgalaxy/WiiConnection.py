@@ -147,7 +147,7 @@ class WiiConnection:
                 await writer.drain()
 
             try:
-                packet = await recv(reader)
+                packet = await asyncio.wait_for(recv(reader), 1.0)
 
                 if packet:
                     print(f"Received: {packet}")
@@ -155,19 +155,23 @@ class WiiConnection:
             except asyncio.IncompleteReadError as error:
                 if error.expected != 2:
                     raise ValueError(f"Something went wrong when reading a data packet. Expected to read {error.expected} bytes, got {error.partial} instead.")
-            except Exception as e:
-                print("Receive error: ", e)
+            except TimeoutError:
+                pass
+            except Exception as error:
+                print(f"Receive error ({type(error).__name__}): {error}")
 
             try:
                 if self.send_buffer:
                     packet = self.send_buffer[0]
                     await send(writer, packet)
+                    
                     print(f"Sent: {packet}")
-                    self.send_buffer.pop(0)
-            except Exception as e:
-                print("Send error: ", e)
 
-            await asyncio.sleep(1)
+                    self.send_buffer.pop(0)
+            except Exception as error:
+                print(f"Send error ({type(error).__name__}): {error}")
+
+            await asyncio.sleep(1.0)
 
 
     def receive(self) -> APPacket | None:
